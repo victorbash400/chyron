@@ -1,0 +1,138 @@
+import test from "node:test";
+import assert from "node:assert/strict";
+import { createApp } from "../server/app.ts";
+import { Newsroom } from "../server/newsroom.ts";
+process.env.COOKIE_SECRET =
+  "test-only-cookie-secret-with-at-least-32-characters";
+process.env.APP_ORIGIN = "http://localhost:5173";
+process.env.PORT = "5173";
+async function fixture() {
+  const room = new Newsroom(
+    async () => ({ stories: [] }),
+    async () => {},
+  );
+  const { app } = await createApp(room);
+  return {
+    app,
+    room,
+    request: (
+      url: string,
+      payload?: unknown,
+      headers: Record<string, string> = {},
+    ) =>
+      app.inject({
+        method: payload === undefined ? "GET" : "POST",
+        url,
+        payload: payload === undefined ? undefined : JSON.stringify(payload),
+        headers: {
+          host: "localhost:5173",
+          ...(payload === undefined
+            ? {}
+            : { "content-type": "application/json" }),
+          ...headers,
+        },
+      }),
+  };
+}
+test("API rejects foreign hosts and cross-site mutations", async () => {
+  const f = await fixture();
+  try {
+    assert.equal(
+      (
+        await f.request("/api/bootstrap", undefined, {
+          host: "foreign.example",
+        })
+      ).statusCode,
+      403,
+    );
+    assert.equal(
+      (
+        await f.request(
+          "/api/settings",
+          { automatic: true },
+          { origin: "https://foreign.example" },
+        )
+      ).statusCode,
+      403,
+    );
+    assert.equal(f.room.state.automatic, false);
+  } finally {
+    await f.app.close();
+  }
+});
+test("overlay endpoint requires its exact capability token and returns only broadcast data", async () => {
+  const f = await fixture();
+  try {
+    assert.equal((await f.request("/api/overlay/incorrect")).statusCode, 404);
+    const response = await f.request(`/api/overlay/${f.room.overlayToken}`);
+    assert.equal(response.statusCode, 200);
+    assert.deepEqual(Object.keys(response.json()).sort(), [
+      "lead",
+      "mode",
+      "quote",
+      "ticker",
+      "visible",
+    ]);
+  } finally {
+    await f.app.close();
+  }
+});
+test("simulation is explicit and settings are validated", async () => {
+  const f = await fixture();
+  try {
+    assert.equal(
+      (await f.request("/api/simulation", { scenario: "keyboard" })).statusCode,
+      400,
+    );
+    assert.equal(
+      (await f.request("/api/mode", { mode: "simulation" })).statusCode,
+      200,
+    );
+    assert.equal(
+      (await f.request("/api/settings", { paused: true })).statusCode,
+      200,
+    );
+    assert.equal(
+      (await f.request("/api/simulation", { scenario: "keyboard" })).statusCode,
+      200,
+    );
+    assert.ok(f.room.state.messages.every((m) => m.source === "simulation"));
+    assert.equal(
+      (await f.request("/api/settings", { automatic: "yes" })).statusCode,
+      400,
+    );
+  } finally {
+    await f.app.close();
+  }
+});
+test("OAuth rejects missing state before contacting Twitch", async () => {
+  const f = await fixture();
+  try {
+    const response = await f.request(
+      "/api/twitch/callback?code=untrusted&state=untrusted",
+    );
+    assert.equal(response.statusCode, 400);
+    assert.equal(f.room.state.channel, null);
+  } finally {
+    await f.app.close();
+  }
+});
+test("cross-site page navigation is allowed while API access remains protected", async () => {
+  const f = await fixture();
+  try {
+    const response = await f.request("/", undefined, {
+      "sec-fetch-site": "cross-site",
+    });
+    assert.equal(response.statusCode, 404);
+    assert.equal(
+      (
+        await f.request("/api/bootstrap", undefined, {
+          "sec-fetch-site": "cross-site",
+        })
+      ).statusCode,
+      403,
+    );
+  } finally {
+    await f.app.close();
+  }
+});

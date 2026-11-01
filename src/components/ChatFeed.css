@@ -1,0 +1,16 @@
+.chat-feed {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 240px;
+}
+.chat-feed .region-heading {
+  flex-shrink: 0;
+}
+.chat-feed-scroll {
+  flex: 1;
+  min-height: 100px;
+  overflow: auto;
+  padding-right: 12px;
+  margin-bottom: 10px;
+}

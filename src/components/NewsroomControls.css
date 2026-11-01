@@ -1,0 +1,67 @@
+.source-switch {
+  display: flex;
+  gap: 3px;
+  padding: 3px;
+  background: var(--soft);
+  border-radius: 9px;
+}
+.source-switch button {
+  padding: 8px 16px;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 500;
+}
+.source-switch button[aria-pressed="true"] {
+  background: #fff;
+}
+.newsroom-controls {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.automatic-control {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  padding: 7px 9px;
+  border-radius: 7px;
+  font-size: 11px;
+  color: #6c6c65;
+}
+.switch-track {
+  width: 25px;
+  height: 15px;
+  border-radius: 20px;
+  background: #d4d5ce;
+  padding: 2px;
+}
+.switch-track span {
+  display: block;
+  background: white;
+  width: 11px;
+  height: 11px;
+  border-radius: 50%;
+  transition: transform 0.15s;
+}
+.automatic-control[aria-checked="true"] .switch-track {
+  background: var(--accent);
+}
+.automatic-control[aria-checked="true"] .switch-track span {
+  transform: translateX(10px);
+}
+.is-working svg {
+  animation: working-pulse 1s alternate infinite;
+}
+@keyframes working-pulse {
+  to {
+    opacity: 0.25;
+  }
+}
+@media (max-width: 850px) {
+  .source-switch button {
+    padding: 8px 10px;
+  }
+  .newsroom-controls {
+    gap: 1px;
+  }
+}

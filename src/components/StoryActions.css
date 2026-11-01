@@ -1,0 +1,45 @@
+.story-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.publish-action {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 11px;
+  font-weight: 600;
+  background: #f0f0eb;
+  padding: 7px 10px;
+  border-radius: 6px;
+}
+.publish-action.is-published {
+  color: var(--accent);
+  background: #faecee;
+}
+.publish-action svg {
+  width: 13px;
+  height: 13px;
+}
+.evidence-action {
+  font-size: 11px;
+  color: var(--muted);
+  padding: 7px 5px;
+  border-radius: 6px;
+}
+.action-spacer {
+  flex: 1;
+}
+.story-actions .icon-button {
+  color: #93938d;
+  width: 28px;
+  height: 28px;
+}
+.story-actions .icon-button svg {
+  width: 14px;
+  height: 14px;
+}
+.story-actions .icon-button[aria-pressed="true"] {
+  color: var(--accent);
+  background: #faecee;
+}

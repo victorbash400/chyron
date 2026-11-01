@@ -1,0 +1,12 @@
+.story-evidence {
+  max-height: 60vh;
+  overflow: auto;
+  padding-right: 10px;
+}
+.story-evidence h3 {
+  font-size: 17px;
+  line-height: 1.4;
+  letter-spacing: -0.3px;
+  font-weight: 600;
+  margin-bottom: 24px;
+}

@@ -1,0 +1,70 @@
+.channel-header {
+  height: 88px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-shrink: 0;
+  gap: 20px;
+}
+.wordmark {
+  font-size: 27px;
+  letter-spacing: -1.7px;
+  font-weight: 850;
+}
+.wordmark span {
+  color: var(--accent);
+}
+.channel-connection {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 12px;
+}
+.channel-name {
+  font-weight: 600;
+}
+.connection-state {
+  color: var(--muted);
+  font-size: 11px;
+}
+.connection-state.is-connected {
+  color: #3d7350;
+}
+.connect-button {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  border-radius: var(--radius);
+  background: #282826;
+  color: #fff;
+  padding: 10px 14px;
+  font-size: 12px;
+  font-weight: 600;
+}
+.connect-button:hover:not(:disabled) {
+  background: #42423e;
+}
+.icon-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: var(--radius);
+}
+@media (max-width: 680px) {
+  .channel-header {
+    height: 72px;
+  }
+  .channel-name {
+    max-width: 100px;
+    text-overflow: ellipsis;
+    overflow: hidden;
+  }
+  .channel-connection {
+    gap: 6px;
+  }
+  .connection-state {
+    display: none;
+  }
+}

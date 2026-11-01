@@ -1,0 +1,30 @@
+.chat-message {
+  padding: 0 0 18px;
+  font-size: 12px;
+  line-height: 1.55;
+  overflow-wrap: anywhere;
+}
+.chat-message > div {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  margin-bottom: 3px;
+}
+.chat-author {
+  font-size: 11px;
+  font-weight: 600;
+  color: #53554e;
+}
+.chat-message time {
+  margin-left: auto;
+  font-size: 9px;
+  color: #b1b1a9;
+  font-variant-numeric: tabular-nums;
+}
+.chat-message p {
+  color: #777970;
+}
+.message-source {
+  font-size: 9px;
+  color: var(--accent);
+}

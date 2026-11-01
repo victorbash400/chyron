@@ -1,0 +1,207 @@
+{
+  "AWSTemplateFormatVersion": "2010-09-09",
+  "Description": "Chyron isolated development newsroom storage and Bedrock models",
+  "Resources": {
+    "Data": {
+      "Type": "AWS::DynamoDB::Table",
+      "DeletionPolicy": "Retain",
+      "UpdateReplacePolicy": "Retain",
+      "Properties": {
+        "TableName": "Chyron-dev",
+        "BillingMode": "PAY_PER_REQUEST",
+        "AttributeDefinitions": [
+          {
+            "AttributeName": "pk",
+            "AttributeType": "S"
+          },
+          {
+            "AttributeName": "sk",
+            "AttributeType": "S"
+          }
+        ],
+        "KeySchema": [
+          {
+            "AttributeName": "pk",
+            "KeyType": "HASH"
+          },
+          {
+            "AttributeName": "sk",
+            "KeyType": "RANGE"
+          }
+        ],
+        "TimeToLiveSpecification": {
+          "AttributeName": "expiresAt",
+          "Enabled": true
+        },
+        "PointInTimeRecoverySpecification": {
+          "PointInTimeRecoveryEnabled": true
+        },
+        "SSESpecification": {
+          "SSEEnabled": true
+        },
+        "Tags": [
+          {
+            "Key": "Project",
+            "Value": "Chyron"
+          },
+          {
+            "Key": "Environment",
+            "Value": "development"
+          }
+        ]
+      }
+    },
+    "Files": {
+      "Type": "AWS::S3::Bucket",
+      "DeletionPolicy": "Retain",
+      "UpdateReplacePolicy": "Retain",
+      "Properties": {
+        "BucketName": {
+          "Fn::Sub": "chyron-dev-${AWS::AccountId}-${AWS::Region}"
+        },
+        "PublicAccessBlockConfiguration": {
+          "BlockPublicAcls": true,
+          "IgnorePublicAcls": true,
+          "BlockPublicPolicy": true,
+          "RestrictPublicBuckets": true
+        },
+        "BucketEncryption": {
+          "ServerSideEncryptionConfiguration": [
+            {
+              "ServerSideEncryptionByDefault": {
+                "SSEAlgorithm": "AES256"
+              }
+            }
+          ]
+        },
+        "VersioningConfiguration": {
+          "Status": "Enabled"
+        },
+        "Tags": [
+          {
+            "Key": "Project",
+            "Value": "Chyron"
+          },
+          {
+            "Key": "Environment",
+            "Value": "development"
+          }
+        ]
+      }
+    },
+    "AgentProject": {
+      "Type": "AWS::BedrockMantle::Project",
+      "DeletionPolicy": "Retain",
+      "UpdateReplacePolicy": "Retain",
+      "Properties": {
+        "Name": "Chyron-Development",
+        "Tags": [
+          {
+            "Key": "Application",
+            "Value": "chyron"
+          },
+          {
+            "Key": "Environment",
+            "Value": "development"
+          }
+        ]
+      }
+    },
+    "RuntimeUser": {
+      "Type": "AWS::IAM::User",
+      "Properties": {
+        "UserName": "chyron-dev-runtime",
+        "Tags": [
+          {
+            "Key": "Project",
+            "Value": "Chyron"
+          }
+        ],
+        "Policies": [
+          {
+            "PolicyName": "ChyronDevelopmentResources",
+            "PolicyDocument": {
+              "Version": "2012-10-17",
+              "Statement": [
+                {
+                  "Effect": "Allow",
+                  "Action": [
+                    "dynamodb:GetItem",
+                    "dynamodb:PutItem",
+                    "dynamodb:UpdateItem",
+                    "dynamodb:DeleteItem",
+                    "dynamodb:Query",
+                    "dynamodb:BatchGetItem",
+                    "dynamodb:BatchWriteItem",
+                    "dynamodb:DescribeTable",
+                    "dynamodb:ConditionCheckItem"
+                  ],
+                  "Resource": {
+                    "Fn::GetAtt": ["Data", "Arn"]
+                  }
+                },
+                {
+                  "Effect": "Allow",
+                  "Action": ["s3:ListBucket"],
+                  "Resource": {
+                    "Fn::GetAtt": ["Files", "Arn"]
+                  }
+                },
+                {
+                  "Effect": "Allow",
+                  "Action": ["s3:GetObject", "s3:PutObject", "s3:DeleteObject"],
+                  "Resource": {
+                    "Fn::Sub": "${Files.Arn}/*"
+                  }
+                },
+                {
+                  "Effect": "Allow",
+                  "Action": [
+                    "bedrock-mantle:CreateInference",
+                    "bedrock-mantle:GetProject",
+                    "bedrock-mantle:ListTagsForResource"
+                  ],
+                  "Resource": {
+                    "Fn::GetAtt": ["AgentProject", "Arn"]
+                  }
+                },
+                {
+                  "Effect": "Allow",
+                  "Action": ["bedrock-mantle:CallWithBearerToken"],
+                  "Resource": "*"
+                }
+              ]
+            }
+          }
+        ]
+      }
+    }
+  },
+  "Outputs": {
+    "TableName": {
+      "Value": {
+        "Ref": "Data"
+      }
+    },
+    "BucketName": {
+      "Value": {
+        "Ref": "Files"
+      }
+    },
+    "BedrockProjectId": {
+      "Value": {
+        "Fn::GetAtt": ["AgentProject", "Id"]
+      }
+    },
+    "BedrockProjectArn": {
+      "Value": {
+        "Fn::GetAtt": ["AgentProject", "Arn"]
+      }
+    },
+    "RuntimeUserName": {
+      "Value": {
+        "Ref": "RuntimeUser"
+      }
+    }
+  }
+}

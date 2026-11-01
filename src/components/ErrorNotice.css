@@ -1,0 +1,19 @@
+.error-notice {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 14px;
+  background: #fbeaec;
+  border-radius: var(--radius);
+  color: #a51823;
+  font-size: 12px;
+  flex-shrink: 0;
+}
+.error-notice span {
+  flex: 1;
+}
+.error-notice button {
+  display: flex;
+  padding: 4px;
+  border-radius: 4px;
+}

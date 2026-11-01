@@ -1,0 +1,54 @@
+.story-card {
+  padding: 24px;
+  background: var(--surface);
+  border-radius: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+.story-meta {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  color: #93938d;
+  font-size: 10px;
+}
+.story-meta time {
+  margin-left: auto;
+  font-variant-numeric: tabular-nums;
+}
+.story-status {
+  font-size: 9px;
+  letter-spacing: 0.85px;
+  font-weight: 750;
+  color: #6f706a;
+}
+.story-status.is-breaking {
+  color: var(--accent);
+}
+.story-card h2 {
+  font-size: 23px;
+  line-height: 1.2;
+  letter-spacing: -0.65px;
+  font-weight: 650;
+  max-width: 580px;
+  overflow-wrap: anywhere;
+}
+.story-card p {
+  font-size: 13px;
+  line-height: 1.6;
+  color: #787872;
+  max-width: 580px;
+  overflow-wrap: anywhere;
+}
+.story-card .story-actions {
+  margin-top: 7px;
+}
+@media (max-width: 850px) {
+  .story-card {
+    padding: 20px;
+  }
+  .story-card h2 {
+    font-size: 21px;
+  }
+}
