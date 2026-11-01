@@ -1,3 +1,4 @@
+import type { OverlayDesign } from "./overlayDesign.ts";
 export type StoryStatus = "BREAKING" | "DEVELOPING" | "UPDATE";
 export type SourceMode = "twitch" | "simulation";
 export interface ChatMessage {
@@ -39,8 +40,10 @@ export interface NewsroomState {
   model: string;
   audioModel: string;
   revision: number;
+  design: OverlayDesign;
 }
 export interface OverlayState {
+  design: OverlayDesign;
   mode: SourceMode;
   visible: boolean;
   lead: Story | null;

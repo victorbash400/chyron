@@ -1,0 +1,20 @@
+.broadcast-quote {
+  display: flex;
+  align-items: center;
+  gap: 1.2cqw;
+  background: #0b1018e8;
+  color: #fff;
+  padding: 0.6cqw 1.5cqw;
+  font-size: 1.45cqw;
+  line-height: 1.2;
+}
+.broadcast-quote > span {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+.broadcast-quote strong {
+  white-space: nowrap;
+  font-size: 1.25cqw;
+  font-weight: 600;
+  color: #d9deea;
+}

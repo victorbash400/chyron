@@ -1,3 +1,4 @@
+import { defaultOverlayDesign } from "../shared/overlayDesign.ts";
 import { z } from "zod";
 import { randomBytes, randomUUID } from "node:crypto";
 import { EventEmitter } from "node:events";
@@ -24,6 +25,7 @@ export class Newsroom extends EventEmitter {
     model: process.env.BEDROCK_REASONING_MODEL_ID ?? "",
     audioModel: process.env.BEDROCK_AUDIO_MODEL_ID ?? "",
     revision: 0,
+    design: { ...defaultOverlayDesign },
   };
   overlayToken = randomBytes(32).toString("hex");
   private pending = false;
@@ -42,6 +44,7 @@ export class Newsroom extends EventEmitter {
     if (saved) {
       this.state = {
         ...saved.state,
+        design: { ...defaultOverlayDesign, ...saved.state.design },
         working: false,
         connection: "disconnected",
         model: process.env.BEDROCK_REASONING_MODEL_ID ?? "",

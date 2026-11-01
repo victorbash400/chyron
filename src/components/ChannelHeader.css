@@ -1,70 +1,70 @@
 .channel-header {
-  height: 88px;
+  height: 64px;
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  gap: 34px;
+  padding: 0 28px;
+  background: #fff;
+  border-bottom: 1px solid var(--line);
   flex-shrink: 0;
-  gap: 20px;
 }
 .wordmark {
-  font-size: 27px;
-  letter-spacing: -1.7px;
-  font-weight: 850;
+  font-size: 31px;
+  letter-spacing: -1.8px;
+  font-weight: 800;
+  line-height: 1;
 }
 .wordmark span {
-  color: var(--accent);
-}
-.channel-connection {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  font-size: 12px;
-}
-.channel-name {
-  font-weight: 600;
-}
-.connection-state {
-  color: var(--muted);
-  font-size: 11px;
-}
-.connection-state.is-connected {
-  color: #3d7350;
-}
-.connect-button {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  border-radius: var(--radius);
-  background: #282826;
-  color: #fff;
-  padding: 10px 14px;
-  font-size: 12px;
-  font-weight: 600;
-}
-.connect-button:hover:not(:disabled) {
-  background: #42423e;
+  color: var(--red);
 }
 .icon-button {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 32px;
-  height: 32px;
-  border-radius: var(--radius);
+  width: 30px;
+  height: 30px;
+  border-radius: 5px;
+}
+.icon-button svg {
+  width: 17px;
+  height: 17px;
 }
 @media (max-width: 680px) {
   .channel-header {
-    height: 72px;
+    height: 60px;
+    padding: 0 16px;
+    gap: 18px;
   }
-  .channel-name {
-    max-width: 100px;
-    text-overflow: ellipsis;
+  .wordmark {
+    font-size: 27px;
+  }
+  .channel-header .source-switch button {
+    min-width: 0;
+    padding: 8px 12px;
+  }
+  .account-trigger {
+    font-size: 11px;
+    gap: 5px;
+    max-width: 150px;
     overflow: hidden;
   }
-  .channel-connection {
-    gap: 6px;
+}
+@media (max-width: 460px) {
+  .channel-header {
+    flex-wrap: wrap;
+    height: auto;
+    min-height: 92px;
+    padding: 12px 14px;
+    gap: 12px;
   }
-  .connection-state {
-    display: none;
+  .channel-header .source-switch {
+    order: 3;
+    width: 100%;
+  }
+  .channel-header .source-switch button {
+    flex: 1;
+  }
+  .account-menu {
+    margin-left: auto;
   }
 }

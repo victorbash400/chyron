@@ -3,7 +3,7 @@ import type { Story } from "../shared/types.ts";
 import { useNewsroom } from "./state/useNewsroom.ts";
 import WorkspaceShell from "./components/WorkspaceShell.tsx";
 import ChannelHeader from "./components/ChannelHeader.tsx";
-import NewsroomControls from "./components/NewsroomControls.tsx";
+import StylePicker from "./components/StylePicker.tsx";
 import StoryList from "./components/StoryList.tsx";
 import OverlayPreview from "./components/OverlayPreview.tsx";
 import ChatFeed from "./components/ChatFeed.tsx";
@@ -34,6 +34,7 @@ export default function App() {
             busy={room.pending}
             onReconnect={() => void act("/api/twitch/reconnect")}
             onDisconnect={() => void act("/api/twitch/disconnect")}
+            onMode={(mode) => void act("/api/mode", { mode })}
             onSetup={() =>
               twitchConfigured
                 ? location.assign("/api/twitch/connect")
@@ -51,18 +52,19 @@ export default function App() {
             />
           )
         }
-        toolbar={
-          <NewsroomControls
+        styles={
+          <StylePicker
             state={state}
-            busy={room.pending}
-            onSettings={(patch) => void act("/api/settings", patch)}
-            onGenerate={() => void act("/api/coverage")}
-            onMode={(mode) => void act("/api/mode", { mode })}
+            disabled={room.pending}
+            onChange={(design) => void act("/api/settings", { design })}
           />
         }
         stories={
           <StoryList
             stories={state.stories}
+            working={state.working}
+            canGenerate={!state.paused && state.messages.length > 0}
+            onGenerate={() => void act("/api/coverage")}
             busy={room.pending}
             onAction={(id, action) =>
               void act(`/api/stories/${id}`, { action })
@@ -75,6 +77,9 @@ export default function App() {
           <OverlayPreview
             state={state}
             url={overlayUrl}
+            busy={room.pending}
+            onSettings={(patch) => void act("/api/settings", patch)}
+            onDesign={(design) => void act("/api/settings", { design })}
             onError={room.setError}
           />
         }

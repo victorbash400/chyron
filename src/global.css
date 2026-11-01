@@ -1,13 +1,17 @@
 :root {
-  font-family: Inter, Arial, Helvetica, sans-serif;
-  color: #242422;
-  background: #f7f7f5;
+  font-family: "Inter Variable", Inter, Arial, Helvetica, sans-serif;
+  color: #101322;
+  background: #f7f8fa;
   font-synthesis: none;
-  --muted: #81817b;
-  --accent: #cc1723;
+  --muted: #8b93a4;
+  --accent: #7336ff;
+  --purple: #7336ff;
+  --red: #ff263d;
+  --line: #eceef3;
+  --canvas: #f7f8fa;
   --surface: #fff;
-  --soft: #eeefeb;
-  --radius: 8px;
+  --soft: #f0f1f6;
+  --radius: 6px;
 }
 * {
   box-sizing: border-box;
@@ -75,18 +79,18 @@ textarea {
   resize: vertical;
 }
 ::selection {
-  background: #f6ccd0;
+  background: #e7dcff;
 }
 * {
   scrollbar-width: thin;
-  scrollbar-color: #d2d3cc transparent;
+  scrollbar-color: #d6dae5 transparent;
 }
 ::-webkit-scrollbar {
   width: 5px;
   height: 5px;
 }
 ::-webkit-scrollbar-thumb {
-  background: #d2d3cc;
+  background: #d6dae5;
   border-radius: 5px;
 }
 h1,

@@ -1,54 +1,78 @@
 .story-card {
-  padding: 24px;
-  background: var(--surface);
-  border-radius: 12px;
-  display: flex;
-  flex-direction: column;
-  gap: 15px;
-}
-.story-meta {
   display: flex;
   align-items: center;
-  gap: 12px;
-  color: #93938d;
-  font-size: 10px;
+  gap: 10px;
+  padding: 8px 10px;
+  min-height: 48px;
+  border: 1px solid #e8eaf0;
+  border-radius: 6px;
+  background: #fff;
 }
-.story-meta time {
-  margin-left: auto;
-  font-variant-numeric: tabular-nums;
+.story-title {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  min-width: 0;
+  flex: 1;
+  text-align: left;
+  padding: 0;
+  border-radius: 3px;
+}
+.story-title:hover:not(:disabled) {
+  background: transparent;
+}
+.story-title h3 {
+  font-size: 12px;
+  line-height: 1.35;
+  letter-spacing: -0.23px;
+  font-weight: 600;
+  overflow-wrap: anywhere;
 }
 .story-status {
-  font-size: 9px;
-  letter-spacing: 0.85px;
-  font-weight: 750;
-  color: #6f706a;
+  background: var(--red);
+  color: #fff;
+  border-radius: 3px;
+  padding: 4px 6px;
+  white-space: nowrap;
+  font-family: "Barlow Condensed", "Arial Narrow", sans-serif;
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 1;
+  flex-shrink: 0;
 }
-.story-status.is-breaking {
-  color: var(--accent);
-}
-.story-card h2 {
-  font-size: 23px;
-  line-height: 1.2;
-  letter-spacing: -0.65px;
-  font-weight: 650;
-  max-width: 580px;
-  overflow-wrap: anywhere;
-}
-.story-card p {
-  font-size: 13px;
-  line-height: 1.6;
-  color: #787872;
-  max-width: 580px;
-  overflow-wrap: anywhere;
-}
-.story-card .story-actions {
-  margin-top: 7px;
-}
-@media (max-width: 850px) {
+@media (max-width: 1450px) {
   .story-card {
-    padding: 20px;
+    gap: 5px;
+    padding: 7px 8px;
   }
-  .story-card h2 {
-    font-size: 21px;
+  .story-title {
+    gap: 6px;
+  }
+  .story-title h3 {
+    font-size: 11px;
+  }
+  .story-status {
+    font-size: 10px;
+    padding: 4px;
+  }
+}
+@media (max-width: 1120px) {
+  .story-card {
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+  .story-title {
+    flex-basis: 100%;
+  }
+  .story-actions {
+    margin-left: auto;
+  }
+}
+@media (max-width: 600px) {
+  .story-title h3 {
+    font-size: 12px;
+  }
+  .story-card {
+    padding: 10px;
   }
 }

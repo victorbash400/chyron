@@ -1,0 +1,41 @@
+.style-picker {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+.style-picker-scroll {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 5px 17px 17px;
+  overflow: auto;
+  flex: 1;
+  min-height: 0;
+}
+.style-picker .panel-heading {
+  min-height: 46px;
+}
+.style-picker .panel-heading h2 {
+  font-size: 17px;
+}
+@media (max-width: 1120px) {
+  .style-picker-scroll {
+    padding: 5px 12px 14px;
+    gap: 14px;
+  }
+}
+@media (max-width: 600px) {
+  .style-picker-scroll {
+    flex-direction: row;
+    overflow: auto;
+    padding: 5px 14px 14px;
+    gap: 14px;
+  }
+  .style-card {
+    width: 240px;
+    aspect-ratio: 4/1;
+  }
+  .style-picker .panel-heading {
+    min-height: 41px;
+  }
+}

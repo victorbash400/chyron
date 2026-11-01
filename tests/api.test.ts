@@ -67,6 +67,7 @@ test("overlay endpoint requires its exact capability token and returns only broa
     const response = await f.request(`/api/overlay/${f.room.overlayToken}`);
     assert.equal(response.statusCode, 200);
     assert.deepEqual(Object.keys(response.json()).sort(), [
+      "design",
       "lead",
       "mode",
       "quote",
@@ -132,6 +133,41 @@ test("cross-site page navigation is allowed while API access remains protected",
       ).statusCode,
       403,
     );
+  } finally {
+    await f.app.close();
+  }
+});
+test("overlay design updates reach the read-only broadcast feed and preserve other controls", async () => {
+  const f = await fixture();
+  try {
+    const update = await f.request("/api/settings", {
+      design: { style: "neon", color: "#1767ff", size: 115, speed: 60 },
+    });
+    assert.equal(update.statusCode, 200);
+    const overlay = (
+      await f.request(`/api/overlay/${f.room.overlayToken}`)
+    ).json();
+    assert.deepEqual(overlay.design, {
+      style: "neon",
+      color: "#1767ff",
+      size: 115,
+      speed: 60,
+    });
+    assert.equal(f.room.state.automatic, false);
+    assert.equal(
+      (await f.request("/api/settings", { design: { size: 400 } })).statusCode,
+      400,
+    );
+    assert.equal(
+      (await f.request("/api/settings", { design: { color: "invalid" } }))
+        .statusCode,
+      400,
+    );
+    assert.equal(
+      (await f.request("/api/settings", { design: { speed: 0 } })).statusCode,
+      400,
+    );
+    assert.equal(f.room.state.design.size, 115);
   } finally {
     await f.app.close();
   }

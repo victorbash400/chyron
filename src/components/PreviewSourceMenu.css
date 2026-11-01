@@ -1,0 +1,29 @@
+.preview-source-menu {
+  position: relative;
+}
+.preview-source-options {
+  position: absolute;
+  right: 0;
+  top: calc(100% + 5px);
+  z-index: 5;
+  min-width: 155px;
+  background: white;
+  border: 1px solid var(--line);
+  border-radius: 7px;
+  padding: 5px;
+  box-shadow: 0 5px 16px #1820360d;
+}
+.preview-source-options button {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  padding: 9px;
+  border-radius: 4px;
+  font-size: 11px;
+  text-align: left;
+}
+.preview-source-options svg {
+  width: 14px;
+  height: 14px;
+}

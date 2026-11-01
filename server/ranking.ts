@@ -55,6 +55,7 @@ export function overlayState(
   );
   const lead = stories[0] ?? null;
   return {
+    design: state.design,
     mode: state.mode,
     visible: state.visible,
     lead,

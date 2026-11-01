@@ -1,3 +1,4 @@
+import { overlayColors } from "../shared/overlayDesign.ts";
 import { randomBytes, randomUUID, timingSafeEqual } from "node:crypto";
 import type { FastifyInstance } from "fastify";
 import { z } from "zod";
@@ -48,10 +49,23 @@ export async function registerRoutes(
         paused: z.boolean().optional(),
         automatic: z.boolean().optional(),
         visible: z.boolean().optional(),
+        design: z
+          .object({
+            style: z
+              .enum(["bulletin", "minimal", "world", "neon", "scoreboard"])
+              .optional(),
+            color: z.enum(overlayColors).optional(),
+            size: z.number().int().min(70).max(130).optional(),
+            speed: z.number().int().min(10).max(70).optional(),
+          })
+          .strict()
+          .optional(),
       })
       .strict()
       .parse(request.body);
-    Object.assign(room.state, patch);
+    const { design, ...settings } = patch;
+    Object.assign(room.state, settings);
+    if (design) room.state.design = { ...room.state.design, ...design };
     await room.commit();
     if (patch.paused === false && room.state.messages.length)
       void room.process().catch((error) => room.fail(error));

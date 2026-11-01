@@ -24,32 +24,35 @@ export default function ChatFeed({
       scroll.current.scrollTop = scroll.current.scrollHeight;
   }, [state.messages]);
   return (
-    <section className="chat-feed">
-      <div className="region-heading">
+    <section className="workspace-panel chat-feed">
+      <div className="panel-heading">
         <h2>{state.mode === "simulation" ? "Simulation chat" : "Chat"}</h2>
-        <span>{state.messages.length} messages</span>
+        <span className="count-badge">{state.messages.length}</span>
       </div>
       <div
         className="chat-feed-scroll"
         ref={scroll}
         onScroll={() => {
-          const el = scroll.current!;
+          const element = scroll.current!;
           follow.current =
-            el.scrollHeight - el.scrollTop - el.clientHeight < 50;
+            element.scrollHeight - element.scrollTop - element.clientHeight <
+            50;
         }}
       >
         {state.messages.map((message) => (
           <ChatMessageRow key={message.id} message={message} />
         ))}
       </div>
-      {state.mode === "simulation" && (
-        <SimulationControls
-          busy={busy || state.paused}
-          onScenario={onScenario}
-          onMessage={onMessage}
-        />
-      )}
-      <AudioCapture disabled={state.paused} onError={onError} />
+      <div className="chat-feed-controls">
+        {state.mode === "simulation" && (
+          <SimulationControls
+            busy={busy || state.paused}
+            onScenario={onScenario}
+            onMessage={onMessage}
+          />
+        )}
+        <AudioCapture disabled={state.paused} onError={onError} />
+      </div>
     </section>
   );
 }

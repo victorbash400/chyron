@@ -1,7 +1,7 @@
 .audio-capture {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 7px;
   padding-top: 8px;
   flex-shrink: 0;
 }
@@ -10,13 +10,13 @@
   gap: 2px;
 }
 .audio-capture .icon-button {
-  width: 28px;
-  height: 28px;
-  color: #a2a298;
+  width: 26px;
+  height: 26px;
+  color: #959dae;
 }
 .audio-capture .icon-button[aria-pressed="true"] {
-  color: #4c4e45;
-  background: #eaece5;
+  color: var(--purple);
+  background: #f0eaff;
 }
 .audio-capture .icon-button svg {
   width: 13px;
@@ -25,17 +25,17 @@
 .record-button {
   display: flex;
   align-items: center;
-  gap: 7px;
-  padding: 8px 10px;
-  border-radius: 7px;
-  font-size: 11px;
-  color: #777970;
+  gap: 6px;
+  padding: 7px 9px;
+  border-radius: 5px;
+  font-size: 10px;
+  color: #747d91;
 }
 .record-button svg {
   width: 12px;
   height: 12px;
 }
 .record-button.is-recording {
-  color: var(--accent);
-  background: #faecee;
+  color: var(--red);
+  background: #fff0f2;
 }

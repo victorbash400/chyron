@@ -1,5 +1,6 @@
-import { Radio, Unplug, RotateCw } from "lucide-react";
-import type { NewsroomState } from "../../shared/types.ts";
+import type { NewsroomState, SourceMode } from "../../shared/types.ts";
+import SourceSwitch from "./SourceSwitch.tsx";
+import AccountMenu from "./AccountMenu.tsx";
 import "./ChannelHeader.css";
 export default function ChannelHeader({
   state,
@@ -7,59 +8,32 @@ export default function ChannelHeader({
   onReconnect,
   onDisconnect,
   onSetup,
+  onMode,
 }: {
   state: NewsroomState;
   busy: boolean;
   onReconnect: () => void;
   onDisconnect: () => void;
   onSetup: () => void;
+  onMode: (mode: SourceMode) => void;
 }) {
   return (
     <header className="channel-header">
       <a className="wordmark" href="/">
         chyron<span>.</span>
       </a>
-      <div className="channel-connection">
-        {state.channel && (
-          <span className="channel-name">{state.channel.name}</span>
-        )}
-        <span
-          className={`connection-state ${state.connection === "connected" ? "is-connected" : ""}`}
-        >
-          {state.connection === "connected"
-            ? "Connected"
-            : state.connection === "connecting"
-              ? "Connecting"
-              : state.mode === "simulation"
-                ? "Simulation"
-                : "Disconnected"}
-        </span>
-        {state.channel ? (
-          <>
-            <button
-              className="icon-button"
-              aria-label="Reconnect Twitch"
-              onClick={onReconnect}
-              disabled={busy}
-            >
-              <RotateCw />
-            </button>
-            <button
-              className="icon-button"
-              aria-label="Disconnect Twitch"
-              onClick={onDisconnect}
-              disabled={busy}
-            >
-              <Unplug />
-            </button>
-          </>
-        ) : (
-          <button className="connect-button" onClick={onSetup}>
-            <Radio />
-            Connect Twitch
-          </button>
-        )}
-      </div>
+      <SourceSwitch
+        mode={state.mode}
+        disabled={busy || state.working}
+        onChange={onMode}
+      />
+      <AccountMenu
+        state={state}
+        busy={busy}
+        onReconnect={onReconnect}
+        onDisconnect={onDisconnect}
+        onSetup={onSetup}
+      />
     </header>
   );
 }

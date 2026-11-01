@@ -1,0 +1,82 @@
+.broadcast-ticker {
+  height: 3cqw;
+  background: #0b1018;
+  color: #fff;
+  display: flex;
+  align-items: center;
+  overflow: hidden;
+  font-family: "Barlow Condensed", "Arial Narrow", Arial, sans-serif;
+  font-size: 1.75cqw;
+  font-weight: 500;
+  line-height: 1;
+}
+.ticker-label {
+  background: var(--broadcast-accent);
+  color: var(--broadcast-ink);
+  align-self: stretch;
+  display: flex;
+  align-items: center;
+  padding: 0 2cqw 0 1.5cqw;
+  clip-path: polygon(0 0, 90% 0, 100% 100%, 0 100%);
+  z-index: 1;
+  white-space: nowrap;
+  font-size: 2.1cqw;
+  font-weight: 750;
+}
+.ticker-window {
+  overflow: hidden;
+  flex: 1;
+}
+.ticker-track {
+  display: flex;
+  width: max-content;
+  animation: ticker-scroll var(--ticker-duration, 45s) linear infinite;
+}
+.ticker-items {
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+}
+.ticker-items > span {
+  padding: 0 1.6cqw;
+  white-space: nowrap;
+  display: flex;
+  align-items: center;
+}
+.ticker-items > span::after {
+  content: "";
+  display: block;
+  width: 0.16cqw;
+  height: 1.25cqw;
+  margin-left: 3.2cqw;
+  background: var(--broadcast-accent);
+}
+.broadcast-style-minimal .broadcast-ticker {
+  background: #18191c;
+  margin-top: 0.5cqw;
+}
+.broadcast-style-minimal .ticker-label {
+  display: none;
+}
+.broadcast-style-world .ticker-label {
+  background: transparent;
+  color: var(--broadcast-accent);
+  clip-path: none;
+}
+.broadcast-style-neon .ticker-label {
+  background: var(--broadcast-accent);
+  border-radius: 0 0 0.8cqw 0.8cqw;
+  clip-path: none;
+}
+.broadcast-style-scoreboard .ticker-label {
+  clip-path: none;
+  border-radius: 1cqw 0 0 1cqw;
+}
+.broadcast-style-scoreboard .broadcast-ticker {
+  border-radius: 0 0 0.6cqw 0.6cqw;
+}
+@keyframes ticker-scroll {
+  to {
+    transform: translateX(-50%);
+  }
+}

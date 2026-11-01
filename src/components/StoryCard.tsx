@@ -15,23 +15,11 @@ export default function StoryCard({
   onEvidence: () => void;
 }) {
   return (
-    <article className="story-card">
-      <div className="story-meta">
-        <span
-          className={`story-status ${story.status === "BREAKING" ? "is-breaking" : ""}`}
-        >
-          {story.status}
-        </span>
-        <time dateTime={new Date(story.updatedAt).toISOString()}>
-          {new Date(story.updatedAt).toLocaleTimeString([], {
-            hour: "2-digit",
-            minute: "2-digit",
-          })}
-        </time>
-        {story.edited && <span>Edited</span>}
-      </div>
-      <h2>{story.headline}</h2>
-      {story.summary && <p>{story.summary}</p>}
+    <article className={`story-card ${story.published ? "is-published" : ""}`}>
+      <button className="story-title" onClick={onEvidence}>
+        {story.published && <span className="story-status">ON AIR</span>}
+        <h3>{story.headline}</h3>
+      </button>
       <StoryActions
         story={story}
         busy={busy}

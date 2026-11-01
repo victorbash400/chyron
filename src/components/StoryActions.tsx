@@ -1,4 +1,4 @@
-import { ArrowUpRight, Check, Pencil, Pin, X } from "lucide-react";
+import { MessageSquare, Pin, X } from "lucide-react";
 import type { Story } from "../../shared/types.ts";
 import "./StoryActions.css";
 export default function StoryActions({
@@ -17,19 +17,25 @@ export default function StoryActions({
   return (
     <div className="story-actions">
       <button
+        className="evidence-action"
+        aria-label={`${story.participants} viewers, source messages`}
+        onClick={onEvidence}
+      >
+        <MessageSquare />
+        {story.participants}
+      </button>
+      <button className="edit-action" onClick={onEdit}>
+        Edit
+      </button>
+      <button
         className={`publish-action ${story.published ? "is-published" : ""}`}
         onClick={() => onAction(story.published ? "unpublish" : "publish")}
         disabled={busy}
       >
-        {story.published ? <Check /> : <ArrowUpRight />}
-        {story.published ? "On air" : "Publish"}
+        {story.published ? "Unpublish" : "Publish"}
       </button>
-      <button className="evidence-action" onClick={onEvidence}>
-        {story.participants} viewers
-      </button>
-      <span className="action-spacer" />
       <button
-        className="icon-button"
+        className="icon-button pin-action"
         aria-label={story.pinned ? "Unpin story" : "Pin story"}
         aria-pressed={story.pinned}
         onClick={() => onAction("pin")}
@@ -37,11 +43,8 @@ export default function StoryActions({
       >
         <Pin />
       </button>
-      <button className="icon-button" aria-label="Edit story" onClick={onEdit}>
-        <Pencil />
-      </button>
       <button
-        className="icon-button"
+        className="icon-button dismiss-action"
         aria-label="Dismiss story"
         onClick={() => onAction("dismiss")}
         disabled={busy}

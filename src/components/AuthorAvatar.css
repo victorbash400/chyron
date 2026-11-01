@@ -1,0 +1,12 @@
+.author-avatar {
+  display: grid;
+  place-items: center;
+  width: 24px;
+  height: 27px;
+  flex-shrink: 0;
+  border-radius: 4px;
+  color: #fff;
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 1;
+}

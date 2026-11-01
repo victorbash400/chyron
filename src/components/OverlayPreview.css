@@ -1,45 +1,78 @@
 .overlay-preview {
   flex-shrink: 0;
+  padding: 0 14px 13px;
 }
-.region-heading {
+.overlay-preview > .panel-heading {
+  padding: 0;
+  min-height: 48px;
+}
+.overlay-preview > .panel-heading h2 {
+  font-size: 21px;
+  letter-spacing: -0.7px;
+}
+.preview-actions {
+  margin-left: auto;
   display: flex;
   align-items: center;
-  gap: 8px;
-  margin-bottom: 16px;
+  gap: 2px;
 }
-.region-heading h2 {
-  font-size: 12px;
-  font-weight: 600;
-  margin-right: auto;
+.preview-actions .icon-button {
+  margin-left: 0;
+  width: 25px;
+  height: 28px;
+  color: #72798c;
 }
-.region-heading > span {
+.preview-actions svg {
+  width: 14px;
+  height: 14px;
+}
+.draft-label {
   font-size: 10px;
-  color: #92928c;
-}
-.region-heading .icon-button {
-  width: 26px;
-  height: 26px;
-  color: #92928c;
-}
-.region-heading svg {
-  width: 13px;
-  height: 13px;
+  color: #737a8c;
+  background: #f0f1f5;
+  border-radius: 4px;
+  padding: 3px 6px;
 }
 .preview-canvas {
   position: relative;
   aspect-ratio: 16/9;
-  background: #222323;
-  background-image:
-    linear-gradient(45deg, #272828 25%, transparent 25%),
-    linear-gradient(-45deg, #272828 25%, transparent 25%),
-    linear-gradient(45deg, transparent 75%, #272828 75%),
-    linear-gradient(-45deg, transparent 75%, #272828 75%);
+  background-color: #27292b;
+  background-image: conic-gradient(
+    #343638 25%,
+    transparent 0 50%,
+    #343638 0 75%,
+    transparent 0
+  );
   background-size: 20px 20px;
-  background-position:
-    0 0,
-    0 10px,
-    10px -10px,
-    -10px 0;
-  border-radius: 10px;
+  border-radius: 7px;
   overflow: hidden;
+  margin-bottom: 9px;
+}
+.overlay-preview:fullscreen {
+  display: flex;
+  flex-direction: column;
+  padding: 0 20px 20px;
+  max-width: none;
+  background: #fff;
+  border: 0;
+  border-radius: 0;
+}
+.overlay-preview:fullscreen .preview-canvas {
+  flex: 1;
+  min-height: 0;
+  aspect-ratio: auto;
+}
+.overlay-preview:fullscreen .newsroom-controls {
+  justify-content: center;
+}
+.overlay-preview:fullscreen .copy-overlay {
+  margin-left: 0;
+}
+@media (max-width: 1120px) {
+  .overlay-preview {
+    padding: 0 11px 11px;
+  }
+  .overlay-preview > .panel-heading h2 {
+    font-size: 18px;
+  }
 }

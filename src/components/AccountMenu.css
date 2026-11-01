@@ -1,0 +1,48 @@
+.account-menu {
+  position: relative;
+  margin-left: auto;
+}
+.account-trigger {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 13px;
+  font-weight: 600;
+  padding: 9px 4px 9px 12px;
+  border-radius: 6px;
+}
+.account-trigger svg {
+  width: 17px;
+  height: 17px;
+}
+.account-actions {
+  position: absolute;
+  right: 0;
+  top: calc(100% + 10px);
+  z-index: 10;
+  width: 210px;
+  background: white;
+  border: 1px solid var(--line);
+  border-radius: 9px;
+  padding: 7px;
+  box-shadow: 0 6px 20px #1415270d;
+}
+.account-actions button {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  width: 100%;
+  text-align: left;
+  padding: 10px;
+  border-radius: 5px;
+  font-size: 12px;
+}
+.account-status {
+  display: block;
+  padding: 8px 10px;
+  font-size: 11px;
+  color: var(--muted);
+}
+.account-status.is-connected {
+  color: #28864e;
+}

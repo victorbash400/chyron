@@ -1,0 +1,50 @@
+.broadcast-scoreboard {
+  display: flex;
+  align-items: stretch;
+  min-height: 6.7cqw;
+  font-family: "Barlow Condensed", "Arial Narrow", Arial, sans-serif;
+  text-transform: uppercase;
+  font-weight: 800;
+  background: #0b1c35;
+  color: #fff;
+  border-radius: 0.8cqw 0.8cqw 0 0;
+  border-top: 0.25cqw solid #5784ba;
+  line-height: 1;
+}
+.scoreboard-metric {
+  display: flex;
+  align-items: center;
+  gap: 1.1cqw;
+  background: #073b78;
+  padding: 1cqw 1.3cqw;
+  font-size: 2.1cqw;
+  flex-shrink: 0;
+}
+.scoreboard-metric strong {
+  font-size: 4.8cqw;
+  letter-spacing: -0.05em;
+}
+.scoreboard-metric:last-child {
+  background: var(--broadcast-accent);
+  color: var(--broadcast-ink);
+}
+.scoreboard-headline {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex: 1;
+  min-width: 0;
+  padding: 0.6cqw 1.5cqw;
+  text-align: center;
+  font-size: 2.5cqw;
+  overflow-wrap: anywhere;
+}
+.is-thumbnail .broadcast-scoreboard {
+  min-height: 8.3cqw;
+}
+.is-thumbnail .scoreboard-metric {
+  font-size: 2.6cqw;
+}
+.is-thumbnail .scoreboard-metric strong {
+  font-size: 5.8cqw;
+}

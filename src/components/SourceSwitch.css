@@ -1,0 +1,23 @@
+.source-switch {
+  display: flex;
+  align-items: center;
+  border: 1px solid var(--line);
+  background: #fff;
+  border-radius: 7px;
+  padding: 3px;
+  gap: 2px;
+}
+.source-switch button {
+  font-size: 12px;
+  font-weight: 550;
+  padding: 9px 24px;
+  border-radius: 4px;
+  min-width: 88px;
+}
+.source-switch button[aria-pressed="true"] {
+  color: white;
+  background: var(--purple);
+}
+.source-switch button[aria-pressed="true"]:hover {
+  background: #5721e8;
+}

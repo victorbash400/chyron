@@ -2,15 +2,15 @@ import type { ReactNode } from "react";
 import "./WorkspaceShell.css";
 export default function WorkspaceShell({
   header,
-  toolbar,
   notice,
+  styles,
   stories,
   preview,
   chat,
 }: {
   header: ReactNode;
-  toolbar: ReactNode;
   notice: ReactNode;
+  styles: ReactNode;
   stories: ReactNode;
   preview: ReactNode;
   chat: ReactNode;
@@ -18,16 +18,14 @@ export default function WorkspaceShell({
   return (
     <div className="workspace-shell">
       {header}
-      {notice}
-      <div className="workspace-toolbar">{toolbar}</div>
+      {notice && <div className="workspace-notice">{notice}</div>}
       <main className="workspace-content">
-        <section className="workspace-stories" aria-label="Newsroom stories">
-          {stories}
-        </section>
-        <aside className="workspace-side">
+        {styles}
+        <div className="workspace-center">
           {preview}
-          {chat}
-        </aside>
+          {stories}
+        </div>
+        {chat}
       </main>
     </div>
   );

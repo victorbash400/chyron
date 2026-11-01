@@ -1,77 +1,80 @@
-import { Eye, EyeOff, Pause, Play, Sparkles } from "lucide-react";
+import { Check, Link, Pause, Play } from "lucide-react";
+import { useState } from "react";
 import type { NewsroomState } from "../../shared/types.ts";
+import type { OverlayDesign } from "../../shared/overlayDesign.ts";
+import ColorPalette from "./ColorPalette.tsx";
+import RangeControl from "./RangeControl.tsx";
 import "./NewsroomControls.css";
 export default function NewsroomControls({
   state,
+  url,
   busy,
   onSettings,
-  onGenerate,
-  onMode,
+  onDesign,
+  onError,
 }: {
   state: NewsroomState;
+  url: string;
   busy: boolean;
-  onSettings: (patch: Partial<NewsroomState>) => void;
-  onGenerate: () => void;
-  onMode: (mode: NewsroomState["mode"]) => void;
+  onSettings: (patch: { automatic?: boolean; paused?: boolean }) => void;
+  onDesign: (patch: Partial<OverlayDesign>) => void;
+  onError: (error: string) => void;
 }) {
+  const [copied, setCopied] = useState(false);
+  async function copy() {
+    try {
+      await navigator.clipboard.writeText(url);
+      setCopied(true);
+    } catch {
+      onError(
+        "Could not copy overlay URL. Open the overlay and copy its address.",
+      );
+    }
+  }
   return (
-    <>
-      <div className="source-switch" role="group" aria-label="Chat source">
-        <button
-          aria-pressed={state.mode === "twitch"}
-          onClick={() => onMode("twitch")}
-          disabled={busy || state.working}
-        >
-          Twitch
-        </button>
-        <button
-          aria-pressed={state.mode === "simulation"}
-          onClick={() => onMode("simulation")}
-          disabled={busy || state.working}
-        >
-          Simulation
-        </button>
-      </div>
-      <div className="newsroom-controls">
-        <button
-          className="automatic-control"
-          role="switch"
-          aria-checked={state.automatic}
-          onClick={() => onSettings({ automatic: !state.automatic })}
-          disabled={busy}
-        >
-          <span className="switch-track">
-            <span />
-          </span>
-          Auto publish
-        </button>
-        <button
-          className="icon-button"
-          aria-label={state.paused ? "Resume coverage" : "Pause coverage"}
-          onClick={() => onSettings({ paused: !state.paused })}
-          disabled={busy}
-        >
-          {state.paused ? <Play /> : <Pause />}
-        </button>
-        <button
-          className="icon-button"
-          aria-label={state.visible ? "Hide overlay" : "Show overlay"}
-          onClick={() => onSettings({ visible: !state.visible })}
-          disabled={busy}
-        >
-          {state.visible ? <Eye /> : <EyeOff />}
-        </button>
-        <button
-          className={`icon-button ${state.working ? "is-working" : ""}`}
-          aria-label="Generate coverage"
-          onClick={onGenerate}
-          disabled={
-            busy || state.working || state.paused || !state.messages.length
-          }
-        >
-          <Sparkles />
-        </button>
-      </div>
-    </>
+    <div className="newsroom-controls">
+      <ColorPalette
+        value={state.design.color}
+        disabled={busy}
+        onChange={(color) => onDesign({ color })}
+      />
+      <RangeControl
+        label="Size"
+        value={state.design.size}
+        min={70}
+        max={130}
+        disabled={busy}
+        onCommit={(size) => onDesign({ size })}
+      />
+      <RangeControl
+        label="Speed"
+        value={state.design.speed}
+        min={10}
+        max={70}
+        disabled={busy}
+        onCommit={(speed) => onDesign({ speed })}
+      />
+      <button
+        className="automatic-control"
+        role="checkbox"
+        aria-checked={state.automatic}
+        onClick={() => onSettings({ automatic: !state.automatic })}
+        disabled={busy}
+      >
+        <span>{state.automatic && <Check />}</span>Auto
+      </button>
+      <button
+        className="pause-control"
+        onClick={() => onSettings({ paused: !state.paused })}
+        disabled={busy}
+      >
+        {state.paused ? <Play /> : <Pause />}
+        {state.paused ? "Resume" : "Pause"}
+      </button>
+      <button className="copy-overlay" onClick={() => void copy()}>
+        {copied ? <Check /> : <Link />}
+        {copied ? "Copied" : "Copy overlay"}
+      </button>
+    </div>
   );
 }
