@@ -63,12 +63,12 @@ a svg {
   flex-shrink: 0;
 }
 button:hover:not(:disabled) {
-  background: var(--soft);
+  background-color: var(--soft);
 }
 input,
 textarea {
   appearance: none;
-  border: 1px solid #deded8;
+  border: 1px solid #dfe3ec;
   border-radius: var(--radius);
   padding: 11px 12px;
   background: #fff;

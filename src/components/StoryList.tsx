@@ -26,7 +26,7 @@ export default function StoryList({
   const [dismissed, setDismissed] = useState(false);
   const shown = sortedStories(
     stories.filter((story) => story.dismissed === dismissed),
-  );
+  ).sort((a, b) => Number(b.published) - Number(a.published));
   return (
     <section
       className="workspace-panel story-list-panel"

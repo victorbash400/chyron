@@ -1,4 +1,5 @@
 import "@fontsource-variable/inter";
+import "@fontsource/barlow-condensed/latin-500.css";
 import "@fontsource/barlow-condensed/latin-800.css";
 import "@fontsource/barlow-condensed/latin-800-italic.css";
 import React from "react";

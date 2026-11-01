@@ -4,7 +4,7 @@ import {
   type OverlayDesign,
 } from "../../shared/overlayDesign.ts";
 import type { NewsroomState, Story, OverlayState } from "../../shared/types.ts";
-import { sortedStories } from "../../server/ranking.ts";
+import { previewCoverage } from "../state/previewCoverage.ts";
 import StyleCard from "./StyleCard.tsx";
 import "./StylePicker.css";
 const template: Story = {
@@ -33,9 +33,7 @@ export default function StylePicker({
   disabled: boolean;
   onChange: (patch: Partial<OverlayDesign>) => void;
 }) {
-  const lead =
-    sortedStories(state.stories.filter((story) => !story.dismissed))[0] ??
-    template;
+  const lead = previewCoverage(state).coverage.lead ?? template;
   return (
     <section
       className="workspace-panel style-picker"
@@ -49,7 +47,10 @@ export default function StylePicker({
           const design = {
             ...defaultOverlayDesign,
             style: choice.id,
-            color: choice.color,
+            color:
+              state.design.style === choice.id
+                ? state.design.color
+                : choice.color,
           };
           const sample: OverlayState = {
             mode: "twitch",

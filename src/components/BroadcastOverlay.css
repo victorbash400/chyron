@@ -7,10 +7,10 @@
 }
 .broadcast-coverage {
   position: absolute;
-  left: 2%;
-  right: 2%;
+  left: 50%;
+  width: calc(96% / max(1, var(--broadcast-scale, 1)));
   bottom: 4%;
-  transform: scale(var(--broadcast-scale, 1));
+  transform: translateX(-50%) scale(var(--broadcast-scale, 1));
   transform-origin: bottom center;
   animation: banner-enter 0.2s ease-out;
 }
@@ -29,6 +29,7 @@
 .broadcast-overlay.is-thumbnail .broadcast-coverage {
   left: 1.5%;
   right: 1.5%;
+  width: auto;
   bottom: 3%;
   transform: none;
 }
@@ -57,10 +58,10 @@
 @keyframes banner-enter {
   from {
     opacity: 0;
-    transform: translateY(5px) scale(var(--broadcast-scale, 1));
+    transform: translate(-50%, 5px) scale(var(--broadcast-scale, 1));
   }
   to {
     opacity: 1;
-    transform: translateY(0) scale(var(--broadcast-scale, 1));
+    transform: translateX(-50%) scale(var(--broadcast-scale, 1));
   }
 }

@@ -26,7 +26,9 @@
   line-height: 1.35;
   letter-spacing: -0.23px;
   font-weight: 600;
-  overflow-wrap: anywhere;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 .story-status {
   background: var(--red);

@@ -18,6 +18,7 @@ export default function BroadcastOverlay({
   const style = {
     "--broadcast-accent": design.color,
     "--broadcast-ink": light ? "#0b1018" : "#ffffff",
+    "--broadcast-text-accent": light ? "#101827" : design.color,
     "--broadcast-scale": design.size / 100,
     "--ticker-duration": `${100 - design.speed}s`,
   } as CSSProperties;

@@ -19,11 +19,11 @@
   padding: 11px 18px;
   border-radius: 7px;
   color: #fff;
-  background: #282826;
+  background: var(--purple);
   font-size: 12px;
   font-weight: 600;
   align-self: flex-end;
 }
 .form-submit:hover:not(:disabled) {
-  background: #42423e;
+  background: #5721e8;
 }

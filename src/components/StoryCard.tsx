@@ -17,7 +17,7 @@ export default function StoryCard({
   return (
     <article className={`story-card ${story.published ? "is-published" : ""}`}>
       <button className="story-title" onClick={onEvidence}>
-        {story.published && <span className="story-status">ON AIR</span>}
+        {story.published && <span className="story-status">PUBLISHED</span>}
         <h3>{story.headline}</h3>
       </button>
       <StoryActions

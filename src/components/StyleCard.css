@@ -58,3 +58,7 @@
 .style-card .broadcast-coverage {
   animation: none;
 }
+.style-card:disabled {
+  opacity: 1;
+  cursor: wait;
+}

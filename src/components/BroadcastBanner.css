@@ -41,7 +41,7 @@
 .broadcast-style-minimal .broadcast-kicker {
   clip-path: none;
   background: transparent;
-  color: var(--broadcast-accent);
+  color: var(--broadcast-text-accent);
   font-style: normal;
   min-width: 13%;
   font-size: 3cqw;
@@ -82,24 +82,4 @@
 }
 .broadcast-style-neon .broadcast-headline {
   font-size: 3.2cqw;
-}
-.broadcast-style-scoreboard .broadcast-banner {
-  background: #0d244a;
-  color: #fff;
-  border-top: 0.28cqw solid #3f6fa7;
-  border-radius: 0.8cqw 0.8cqw 0 0;
-}
-.broadcast-style-scoreboard .broadcast-kicker {
-  clip-path: none;
-  background: #123868;
-  color: white;
-  border-right: 0.3cqw solid #ffffff32;
-  margin: 0;
-  font-size: 3cqw;
-  min-width: 22%;
-}
-.broadcast-style-scoreboard .broadcast-headline {
-  padding-left: 1.6cqw;
-  border-right: 1cqw solid var(--broadcast-accent);
-  font-size: 3.1cqw;
 }

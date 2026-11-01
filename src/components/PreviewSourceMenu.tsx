@@ -14,6 +14,7 @@ export default function PreviewSourceMenu({
 }) {
   const [open, setOpen] = useState(false);
   const root = useRef<HTMLDivElement>(null);
+  const trigger = useRef<HTMLButtonElement>(null);
   useEffect(() => {
     if (!open) return;
     function outside(event: PointerEvent) {
@@ -27,10 +28,14 @@ export default function PreviewSourceMenu({
       className="preview-source-menu"
       ref={root}
       onKeyDown={(event) => {
-        if (event.key === "Escape") setOpen(false);
+        if (event.key === "Escape") {
+          setOpen(false);
+          trigger.current?.focus();
+        }
       }}
     >
       <button
+        ref={trigger}
         className="icon-button"
         aria-label="Preview video source"
         aria-expanded={open}
@@ -44,6 +49,7 @@ export default function PreviewSourceMenu({
           <button
             onClick={() => {
               setOpen(false);
+              trigger.current?.focus();
               onSelect("camera");
             }}
           >
@@ -53,6 +59,7 @@ export default function PreviewSourceMenu({
           <button
             onClick={() => {
               setOpen(false);
+              trigger.current?.focus();
               onSelect("screen");
             }}
           >
@@ -63,6 +70,7 @@ export default function PreviewSourceMenu({
             <button
               onClick={() => {
                 setOpen(false);
+                trigger.current?.focus();
                 onRemove();
               }}
             >
