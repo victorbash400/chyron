@@ -1,5 +1,6 @@
 import { useState, type FormEvent } from "react";
 import type { Story } from "../../shared/types.ts";
+import SettingsInlineButton from "./settings/SettingsInlineButton.tsx";
 import Dialog from "./Dialog.tsx";
 import ErrorNotice from "./ErrorNotice.tsx";
 import "./StoryEditor.css";
@@ -47,13 +48,14 @@ export default function StoryEditor({
             rows={3}
           />
         </label>
-        <button
-          className="form-submit"
+        <SettingsInlineButton
+          primary
+          className="story-save"
           disabled={saving || !headline.trim()}
           type="submit"
         >
           {saving ? "Saving" : "Save"}
-        </button>
+        </SettingsInlineButton>
       </form>
     </Dialog>
   );

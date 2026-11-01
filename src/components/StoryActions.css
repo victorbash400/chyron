@@ -1,110 +1,23 @@
 .story-actions {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 5px;
   flex-shrink: 0;
 }
 .evidence-action {
   display: flex;
   align-items: center;
-  gap: 7px;
+  gap: 5px;
   font-size: 11px;
-  color: #565e73;
-  padding: 6px 3px;
-  border-radius: 4px;
-  min-width: 41px;
+  color: var(--muted);
+  padding: 6px;
+  border-radius: 8px;
 }
 .evidence-action svg {
   width: 14px;
   height: 14px;
-  stroke-width: 1.5;
-}
-.edit-action,
-.publish-action {
-  height: 30px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 11px;
-  font-weight: 550;
-  border-radius: 5px;
-  padding: 0 17px;
-  min-width: 65px;
-}
-.edit-action {
-  border: 1px solid #e0e3eb;
-  background: #f5f6f9;
-}
-.publish-action {
-  background: var(--purple);
-  color: white;
-  min-width: 84px;
-}
-.publish-action:hover:not(:disabled) {
-  background: #5721e8;
-}
-.publish-action.is-published {
-  background: var(--red);
-}
-.publish-action.is-published:hover:not(:disabled) {
-  background: #e31931;
-}
-.story-actions .icon-button {
-  width: 23px;
-  height: 28px;
-}
-.story-actions .icon-button svg {
-  width: 14px;
-  height: 14px;
-}
-.pin-action {
-  color: #858da0;
+  stroke-width: 1.8;
 }
 .pin-action[aria-pressed="true"] {
-  color: var(--purple);
-  background: #f0eaff;
-}
-.dismiss-action {
-  color: #222637;
-}
-.story-actions .pin-action {
-  width: 19px;
-}
-@media (max-width: 1450px) {
-  .story-actions {
-    gap: 5px;
-  }
-  .edit-action {
-    padding: 0 10px;
-    min-width: 45px;
-  }
-  .publish-action {
-    padding: 0 10px;
-    min-width: 71px;
-  }
-  .evidence-action {
-    min-width: 33px;
-    gap: 5px;
-  }
-}
-@media (max-width: 1120px) {
-  .story-actions {
-    gap: 4px;
-  }
-  .story-actions .pin-action {
-    width: 17px;
-  }
-  .edit-action,
-  .publish-action {
-    font-size: 10px;
-    height: 29px;
-  }
-  .evidence-action {
-    font-size: 10px;
-    min-width: 26px;
-  }
-  .evidence-action svg {
-    width: 12px;
-    height: 12px;
-  }
+  background: var(--selection);
 }

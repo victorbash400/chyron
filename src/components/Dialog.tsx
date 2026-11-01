@@ -1,5 +1,6 @@
 import { useEffect, useRef, type ReactNode } from "react";
 import { X } from "lucide-react";
+import IconButton from "./controls/IconButton.tsx";
 import "./Dialog.css";
 export default function Dialog({
   title,
@@ -29,13 +30,13 @@ export default function Dialog({
       <div className="dialog-content">
         <div className="dialog-heading">
           <h2>{title}</h2>
-          <button
-            className="icon-button"
-            aria-label="Close dialog"
+          <IconButton
+            className="dialog-close"
+            label="Close dialog"
             onClick={onClose}
           >
             <X />
-          </button>
+          </IconButton>
         </div>
         {children}
       </div>

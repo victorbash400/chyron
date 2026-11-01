@@ -1,0 +1,19 @@
+.region {
+  display: grid;
+  place-items: center;
+  flex: 1;
+  align-self: stretch;
+  width: 100%;
+  min-width: 0;
+  min-height: 180px;
+}
+.region[data-compact] {
+  min-height: 72px;
+}
+.region[data-overlay] {
+  position: absolute;
+  inset: 0;
+  z-index: 6;
+  min-height: 0;
+  background: color-mix(in srgb, var(--surface) 88%, transparent);
+}

@@ -1,17 +1,44 @@
+@font-face {
+  font-family: Geist;
+  src: url("/fonts/Geist-Regular.ttf") format("truetype");
+  font-weight: 400;
+  font-display: swap;
+}
+@font-face {
+  font-family: Geist;
+  src: url("/fonts/Geist-Medium.ttf") format("truetype");
+  font-weight: 500 700;
+  font-display: swap;
+}
 :root {
-  font-family: "Inter Variable", Inter, Arial, Helvetica, sans-serif;
-  color: #101322;
-  background: #f7f8fa;
+  font-family: Geist, sans-serif;
+  color-scheme: light;
+  color: var(--ink);
+  background: var(--panel);
   font-synthesis: none;
-  --muted: #8b93a4;
-  --accent: #7336ff;
-  --purple: #7336ff;
-  --red: #ff263d;
-  --line: #eceef3;
-  --canvas: #f7f8fa;
-  --surface: #fff;
-  --soft: #f0f1f6;
-  --radius: 6px;
+  -webkit-font-smoothing: antialiased;
+  --sidebar-width: 280px;
+  --danger: #b73526;
+  --surface: #f1f7f6;
+  --ink: #263e3b;
+  --accent: #267d73;
+  --on-accent: #ffffff;
+  --panel: #edf4f3;
+  --muted: #526663;
+  --icon: #536764;
+  --selection: #cde2df;
+  --hover: #e5eceb;
+  --stripe: #ecf2f1;
+  --border: #d4dcdb;
+  --sidebar-border: #d1d9d8;
+  --divider: #e1e8e7;
+  --disabled: #b8c3c2;
+  --purple: var(--accent);
+  --red: var(--danger);
+  --line: var(--border);
+  --canvas: var(--panel);
+  --soft: var(--hover);
+  --radius: 8px;
 }
 * {
   box-sizing: border-box;
@@ -50,7 +77,7 @@ button:focus-visible,
 a:focus-visible,
 input:focus-visible,
 textarea:focus-visible {
-  outline: 2px solid var(--accent);
+  outline: 1px solid var(--icon);
 }
 a {
   color: inherit;
@@ -62,16 +89,13 @@ a svg {
   height: 16px;
   flex-shrink: 0;
 }
-button:hover:not(:disabled) {
-  background-color: var(--soft);
-}
 input,
 textarea {
   appearance: none;
-  border: 1px solid #dfe3ec;
+  border: 1px solid var(--border);
   border-radius: var(--radius);
   padding: 11px 12px;
-  background: #fff;
+  background: var(--surface);
   color: inherit;
   min-width: 0;
 }
@@ -79,18 +103,18 @@ textarea {
   resize: vertical;
 }
 ::selection {
-  background: #e7dcff;
+  background: var(--selection);
 }
 * {
   scrollbar-width: thin;
-  scrollbar-color: #d6dae5 transparent;
+  scrollbar-color: color-mix(in srgb, var(--ink) 32%, transparent) transparent;
 }
 ::-webkit-scrollbar {
   width: 5px;
   height: 5px;
 }
 ::-webkit-scrollbar-thumb {
-  background: #d6dae5;
+  background: color-mix(in srgb, var(--ink) 32%, transparent);
   border-radius: 5px;
 }
 h1,

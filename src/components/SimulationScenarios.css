@@ -1,0 +1,5 @@
+.simulation-scenarios {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}

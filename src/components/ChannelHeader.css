@@ -1,70 +1,8 @@
 .channel-header {
-  height: 64px;
-  display: flex;
-  align-items: center;
-  gap: 34px;
-  padding: 0 28px;
-  background: #fff;
-  border-bottom: 1px solid var(--line);
-  flex-shrink: 0;
+  background: transparent;
 }
-.wordmark {
-  font-size: 31px;
-  letter-spacing: -1.8px;
-  font-weight: 800;
-  line-height: 1;
-}
-.wordmark span {
-  color: var(--red);
-}
-.icon-button {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 30px;
-  height: 30px;
-  border-radius: 5px;
-}
-.icon-button svg {
-  width: 17px;
-  height: 17px;
-}
-@media (max-width: 680px) {
-  .channel-header {
-    height: 60px;
-    padding: 0 16px;
-    gap: 18px;
-  }
-  .wordmark {
-    font-size: 27px;
-  }
-  .channel-header .source-switch button {
-    min-width: 0;
-    padding: 8px 12px;
-  }
-  .account-trigger {
-    font-size: 11px;
-    gap: 5px;
-    max-width: 150px;
-    overflow: hidden;
-  }
-}
-@media (max-width: 460px) {
-  .channel-header {
-    flex-wrap: wrap;
-    height: auto;
-    min-height: 92px;
-    padding: 12px 14px;
-    gap: 12px;
-  }
-  .channel-header .source-switch {
-    order: 3;
-    width: 100%;
-  }
-  .channel-header .source-switch button {
-    flex: 1;
-  }
-  .account-menu {
-    margin-left: auto;
+@media (max-width: 760px) {
+  .account-name {
+    display: none;
   }
 }

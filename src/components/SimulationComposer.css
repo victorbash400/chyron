@@ -1,0 +1,48 @@
+.simulation-composer {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.simulation-composer .simulation-author {
+  width: 100%;
+  border: 0;
+  padding: 0 3px;
+  background: transparent;
+  font-size: 11px;
+  color: var(--muted);
+  height: 20px;
+}
+.simulation-message-input {
+  display: flex;
+  align-items: center;
+  padding: 3px;
+  gap: 4px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--surface);
+}
+.simulation-message-input:focus-within {
+  border-color: var(--muted);
+}
+.simulation-message-input input {
+  flex: 1;
+  width: 0;
+  border: 0;
+  background: transparent;
+  padding: 7px 8px;
+  font-size: 12px;
+}
+.simulation-message-input button {
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  flex-shrink: 0;
+  border-radius: 6px;
+  background: var(--ink);
+  color: var(--surface);
+}
+.simulation-message-input button svg {
+  width: 16px;
+  height: 16px;
+}

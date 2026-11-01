@@ -1,36 +1,41 @@
 import { useEffect, useRef } from "react";
 import type { NewsroomState } from "../../shared/types.ts";
+import ChatHeader from "./ChatHeader.tsx";
 import ChatMessageRow from "./ChatMessageRow.tsx";
-import SimulationControls from "./SimulationControls.tsx";
-import AudioCapture from "./AudioCapture.tsx";
+import SimulationComposer from "./SimulationComposer.tsx";
 import "./ChatFeed.css";
 export default function ChatFeed({
   state,
+  open,
+  onClose,
   busy,
-  onScenario,
   onMessage,
-  onError,
 }: {
+  open: boolean;
+  onClose: () => void;
   state: NewsroomState;
   busy: boolean;
-  onScenario: (scenario: string) => void;
   onMessage: (author: string, text: string) => Promise<boolean>;
-  onError: (message: string) => void;
 }) {
   const scroll = useRef<HTMLDivElement>(null),
     follow = useRef(true);
   useEffect(() => {
-    if (follow.current && scroll.current)
+    if (open && follow.current && scroll.current)
       scroll.current.scrollTop = scroll.current.scrollHeight;
-  }, [state.messages]);
+  }, [state.messages, open]);
   return (
-    <section className="workspace-panel chat-feed">
-      <div className="panel-heading">
-        <h2>{state.mode === "simulation" ? "Simulation chat" : "Chat"}</h2>
-        <span className="count-badge">{state.messages.length}</span>
-      </div>
+    <section className="chat-feed" hidden={!open} aria-label="Chat">
+      <ChatHeader
+        count={state.messages.length}
+        simulation={state.mode === "simulation"}
+        onClose={onClose}
+      />
       <div
         className="chat-feed-scroll"
+        role="log"
+        aria-label="Chat messages"
+        aria-live="polite"
+        aria-relevant="additions text"
         ref={scroll}
         onScroll={() => {
           const element = scroll.current!;
@@ -45,13 +50,19 @@ export default function ChatFeed({
       </div>
       <div className="chat-feed-controls">
         {state.mode === "simulation" && (
-          <SimulationControls
+          <SimulationComposer
             busy={busy || state.paused}
-            onScenario={onScenario}
-            onMessage={onMessage}
+            onMessage={async (author, text) => {
+              const sent = await onMessage(author, text);
+              if (sent) {
+                follow.current = true;
+                if (scroll.current)
+                  scroll.current.scrollTop = scroll.current.scrollHeight;
+              }
+              return sent;
+            }}
           />
         )}
-        <AudioCapture disabled={state.paused} onError={onError} />
       </div>
     </section>
   );

@@ -1,8 +1,9 @@
-import { Check } from "lucide-react";
 import type { OverlayState } from "../../shared/types.ts";
 import type { overlayStyles } from "../../shared/overlayDesign.ts";
 import BroadcastOverlay from "./BroadcastOverlay.tsx";
+import styles from "./StyleCard.module.css";
 import "./StyleCard.css";
+
 export default function StyleCard({
   choice,
   index,
@@ -20,19 +21,16 @@ export default function StyleCard({
 }) {
   return (
     <button
-      className={`style-card ${selected ? "is-selected" : ""}`}
+      className={`${styles.button} style-card`}
       aria-label={`Style ${String(index + 1).padStart(2, "0")}: ${choice.name}`}
       aria-pressed={selected}
       disabled={disabled}
       onClick={onSelect}
     >
-      <span className="style-number">{String(index + 1).padStart(2, "0")}</span>
-      {selected && (
-        <span className="style-selected">
-          <Check />
-        </span>
-      )}
-      <BroadcastOverlay state={state} thumbnail />
+      <span className={`${styles.preview} style-card-preview`}>
+        <BroadcastOverlay state={state} thumbnail />
+      </span>
+      <span className={styles.label}>{choice.name}</span>
     </button>
   );
 }

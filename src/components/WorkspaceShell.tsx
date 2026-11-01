@@ -1,32 +1,51 @@
 import type { ReactNode } from "react";
+import { useRailOverlay } from "../state/useRailOverlay.ts";
+import { useNarrowLayout } from "../state/useNarrowLayout.ts";
+import WorkspaceRail from "./WorkspaceRail.tsx";
 import "./WorkspaceShell.css";
+
 export default function WorkspaceShell({
   header,
   notice,
   styles,
   stories,
   preview,
+  controls,
   chat,
+  settings,
+  stylesOpen,
+  chatOpen,
 }: {
   header: ReactNode;
   notice: ReactNode;
   styles: ReactNode;
   stories: ReactNode;
   preview: ReactNode;
+  controls: ReactNode;
   chat: ReactNode;
+  settings?: ReactNode;
+  stylesOpen: boolean;
+  chatOpen: boolean;
 }) {
+  const narrow = useNarrowLayout();
+  const railOverlay = useRailOverlay();
   return (
     <div className="workspace-shell">
-      {header}
-      {notice && <div className="workspace-notice">{notice}</div>}
-      <main className="workspace-content">
-        {styles}
-        <div className="workspace-center">
-          {preview}
-          {stories}
+      {styles}
+      <div className="workspace-main" inert={narrow && stylesOpen}>
+        {header}
+        {notice && <div className="workspace-notice">{notice}</div>}
+        <div className="workspace-body" hidden={Boolean(settings)}>
+          <main className="workspace-content">
+            <div className="workspace-center" inert={railOverlay && chatOpen}>
+              {preview}
+              {stories}
+            </div>
+            <WorkspaceRail chat={chat} controls={controls} open={chatOpen} />
+          </main>
         </div>
-        {chat}
-      </main>
+        {settings}
+      </div>
     </div>
   );
 }

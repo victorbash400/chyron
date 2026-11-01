@@ -5,6 +5,7 @@ import BroadcastScoreboard from "./BroadcastScoreboard.tsx";
 import BroadcastTicker from "./BroadcastTicker.tsx";
 import BroadcastQuote from "./BroadcastQuote.tsx";
 import "./BroadcastOverlay.css";
+import "./BroadcastVariants.css";
 export default function BroadcastOverlay({
   state,
   thumbnail = false,

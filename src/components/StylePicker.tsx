@@ -3,37 +3,21 @@ import {
   overlayStyles,
   type OverlayDesign,
 } from "../../shared/overlayDesign.ts";
-import type { NewsroomState, Story, OverlayState } from "../../shared/types.ts";
-import { previewCoverage } from "../state/previewCoverage.ts";
+import { memo } from "react";
+import type { OverlayState } from "../../shared/types.ts";
+import { styleSampleStory } from "../state/styleSample.ts";
 import StyleCard from "./StyleCard.tsx";
 import "./StylePicker.css";
-const template: Story = {
-  id: "style-template",
-  headline: "Headline",
-  summary: "",
-  status: "BREAKING",
-  messageIds: [],
-  quoteId: null,
-  participants: 0,
-  score: 0,
-  interest: 0,
-  updatedAt: 0,
-  createdAt: 0,
-  published: false,
-  pinned: false,
-  dismissed: false,
-  edited: false,
-};
-export default function StylePicker({
-  state,
+function StylePicker({
+  design: selectedDesign,
   disabled,
   onChange,
 }: {
-  state: NewsroomState;
+  design: OverlayDesign;
   disabled: boolean;
   onChange: (patch: Partial<OverlayDesign>) => void;
 }) {
-  const lead = previewCoverage(state).coverage.lead ?? template;
+  const lead = styleSampleStory;
   return (
     <section
       className="workspace-panel style-picker"
@@ -41,6 +25,7 @@ export default function StylePicker({
     >
       <div className="panel-heading">
         <h2>Styles</h2>
+        <span className="count-badge">{overlayStyles.length}</span>
       </div>
       <div className="style-picker-scroll">
         {overlayStyles.map((choice, index) => {
@@ -48,8 +33,8 @@ export default function StylePicker({
             ...defaultOverlayDesign,
             style: choice.id,
             color:
-              state.design.style === choice.id
-                ? state.design.color
+              selectedDesign.style === choice.id
+                ? selectedDesign.color
                 : choice.color,
           };
           const sample: OverlayState = {
@@ -65,7 +50,7 @@ export default function StylePicker({
               key={choice.id}
               choice={choice}
               index={index}
-              selected={state.design.style === choice.id}
+              selected={selectedDesign.style === choice.id}
               state={sample}
               disabled={disabled}
               onSelect={() =>
@@ -78,3 +63,12 @@ export default function StylePicker({
     </section>
   );
 }
+
+export default memo(
+  StylePicker,
+  (previous, next) =>
+    previous.disabled === next.disabled &&
+    previous.onChange === next.onChange &&
+    previous.design.style === next.design.style &&
+    previous.design.color === next.design.color,
+);

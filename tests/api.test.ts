@@ -1,3 +1,4 @@
+import { overlayStyles } from "../shared/overlayDesign.ts";
 import test from "node:test";
 import assert from "node:assert/strict";
 import { createApp } from "../server/app.ts";
@@ -168,6 +169,78 @@ test("overlay design updates reach the read-only broadcast feed and preserve oth
       400,
     );
     assert.equal(f.room.state.design.size, 115);
+  } finally {
+    await f.app.close();
+  }
+});
+
+test("every style can be saved and is returned in the broadcast feed", async () => {
+  const f = await fixture();
+  try {
+    for (const style of overlayStyles) {
+      const response = await f.request("/api/settings", {
+        design: { style: style.id, color: style.color },
+      });
+      assert.equal(response.statusCode, 200);
+      const overlay = (
+        await f.request(`/api/overlay/${f.room.overlayToken}`)
+      ).json();
+      assert.equal(overlay.design.style, style.id);
+      assert.equal(overlay.design.color, style.color);
+    }
+    assert.equal(
+      (await f.request("/api/settings", { design: { style: "unknown" } }))
+        .statusCode,
+      400,
+    );
+  } finally {
+    await f.app.close();
+  }
+});
+
+test("simulation messages preserve chat identity and reject invalid input", async () => {
+  const f = await fixture();
+  try {
+    assert.equal(
+      (
+        await f.request("/api/simulation/message", {
+          author: "viewer",
+          text: "Hello chat",
+        })
+      ).statusCode,
+      400,
+    );
+    await f.request("/api/mode", { mode: "simulation" });
+    const response = await f.request("/api/simulation/message", {
+      author: "  pixelpilot  ",
+      text: "  Hello chat  ",
+    });
+    assert.equal(response.statusCode, 200);
+    const message = f.room.state.messages.at(-1)!;
+    assert.equal(message.author, "pixelpilot");
+    assert.equal(message.userId, "sim-pixelpilot");
+    assert.equal(message.text, "Hello chat");
+    assert.equal(message.source, "simulation");
+    assert.equal(typeof message.id, "string");
+    assert.equal(
+      (
+        await f.request("/api/simulation/message", {
+          author: "",
+          text: "Invalid author",
+        })
+      ).statusCode,
+      400,
+    );
+    assert.equal(
+      (
+        await f.request("/api/simulation/message", {
+          author: "viewer",
+          text: "   ",
+        })
+      ).statusCode,
+      400,
+    );
+    assert.equal(f.room.state.messages.length, 1);
   } finally {
     await f.app.close();
   }

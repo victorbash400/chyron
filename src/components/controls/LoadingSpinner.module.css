@@ -1,0 +1,21 @@
+.spinner {
+  display: inline-block;
+  box-sizing: border-box;
+  flex-shrink: 0;
+  vertical-align: middle;
+  border: 2px solid color-mix(in srgb, currentColor 16%, transparent);
+  border-top-color: currentColor;
+  border-radius: 50%;
+  color: var(--muted, #737373);
+  animation: rotate 800ms linear infinite;
+}
+@keyframes rotate {
+  to {
+    transform: rotate(360deg);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .spinner {
+    animation: none;
+  }
+}

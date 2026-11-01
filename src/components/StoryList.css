@@ -2,36 +2,22 @@
   display: flex;
   flex-direction: column;
   flex: 1;
-  min-height: 130px;
+  min-height: 220px;
 }
 .story-list-panel > .panel-heading {
-  min-height: 43px;
+  min-height: 42px;
 }
 .story-list-tools {
   margin-left: auto;
   display: flex;
-  gap: 2px;
-}
-.story-list-tools .icon-button {
-  margin-left: 0;
-  color: #80889a;
-  width: 25px;
-  height: 26px;
-}
-.story-list-tools svg {
-  width: 14px;
-  height: 14px;
-}
-.story-list-tools button[aria-pressed="true"] {
-  color: var(--purple);
-  background: #f0eaff;
+  gap: 3px;
 }
 .story-list {
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: 6px;
   overflow: auto;
-  padding: 0 13px 13px;
+  padding: 0 12px 12px;
   min-height: 0;
   flex: 1;
 }
@@ -40,28 +26,27 @@
   align-items: center;
   justify-content: space-between;
   gap: 12px;
-  padding: 12px 10px;
-  border: 1px solid #e8eaf0;
-  border-radius: 6px;
+  padding: 10px 12px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
   font-size: 12px;
 }
 .dismissed-story button {
   padding: 7px 10px;
-  border-radius: 4px;
+  border-radius: 14px;
   font-size: 11px;
-  background: #f0eaff;
-  color: var(--purple);
+  background: var(--selection);
 }
 .is-working svg {
-  animation: working-pulse 0.8s alternate infinite;
+  animation: coverage-spin 1s linear infinite;
 }
-@keyframes working-pulse {
+@keyframes coverage-spin {
   to {
-    opacity: 0.25;
+    transform: rotate(360deg);
   }
 }
-@media (max-width: 600px) {
+@media (max-width: 760px) {
   .story-list-panel {
-    min-height: 220px;
+    flex: 1;
   }
 }

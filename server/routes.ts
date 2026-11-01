@@ -1,4 +1,4 @@
-import { overlayColors } from "../shared/overlayDesign.ts";
+import { overlayColors, overlayStyleIds } from "../shared/overlayDesign.ts";
 import { randomBytes, randomUUID, timingSafeEqual } from "node:crypto";
 import type { FastifyInstance } from "fastify";
 import { z } from "zod";
@@ -51,9 +51,7 @@ export async function registerRoutes(
         visible: z.boolean().optional(),
         design: z
           .object({
-            style: z
-              .enum(["bulletin", "minimal", "world", "neon", "scoreboard"])
-              .optional(),
+            style: z.enum(overlayStyleIds).optional(),
             color: z.enum(overlayColors).optional(),
             size: z.number().int().min(70).max(130).optional(),
             speed: z.number().int().min(10).max(70).optional(),

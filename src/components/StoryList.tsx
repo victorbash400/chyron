@@ -1,7 +1,8 @@
-import { useState } from "react";
-import { Archive, Sparkles } from "lucide-react";
+import { useMemo, useState } from "react";
+import { Archive, RefreshCw } from "lucide-react";
 import type { Story } from "../../shared/types.ts";
 import { sortedStories } from "../../server/ranking.ts";
+import IconButton from "./controls/IconButton.tsx";
 import StoryCard from "./StoryCard.tsx";
 import "./StoryList.css";
 export default function StoryList({
@@ -24,9 +25,13 @@ export default function StoryList({
   onGenerate: () => void;
 }) {
   const [dismissed, setDismissed] = useState(false);
-  const shown = sortedStories(
-    stories.filter((story) => story.dismissed === dismissed),
-  ).sort((a, b) => Number(b.published) - Number(a.published));
+  const shown = useMemo(
+    () =>
+      sortedStories(
+        stories.filter((story) => story.dismissed === dismissed),
+      ).sort((a, b) => Number(b.published) - Number(a.published)),
+    [stories, dismissed],
+  );
   return (
     <section
       className="workspace-panel story-list-panel"
@@ -36,22 +41,21 @@ export default function StoryList({
         <h2>{dismissed ? "Dismissed" : "Stories"}</h2>
         <span className="count-badge">{shown.length}</span>
         <div className="story-list-tools">
-          <button
-            className="icon-button"
-            aria-label={dismissed ? "Show stories" : "Show dismissed stories"}
-            aria-pressed={dismissed}
+          <IconButton
+            label={dismissed ? "Show stories" : "Show dismissed stories"}
+            selected={dismissed}
             onClick={() => setDismissed(!dismissed)}
           >
             <Archive />
-          </button>
-          <button
-            className={`icon-button ${working ? "is-working" : ""}`}
-            aria-label={working ? "Generating coverage" : "Generate coverage"}
+          </IconButton>
+          <IconButton
+            className={working ? "is-working" : ""}
+            label={working ? "Generating coverage" : "Generate coverage"}
             disabled={busy || working || !canGenerate}
             onClick={onGenerate}
           >
-            <Sparkles />
-          </button>
+            <RefreshCw />
+          </IconButton>
         </div>
       </div>
       <div className="story-list">

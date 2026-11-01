@@ -29,7 +29,10 @@ export default function RangeControl({
   }
   return (
     <label className="range-control">
-      <span>{label}</span>
+      <span>
+        {draft}
+        {label === "Size" ? "%" : ""}
+      </span>
       <input
         type="range"
         aria-label={label}

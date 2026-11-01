@@ -1,34 +1,25 @@
 .color-palette {
   display: flex;
   align-items: center;
-  gap: 3px;
-  flex-shrink: 0;
+  gap: 6px;
+  flex-wrap: wrap;
 }
 .color-palette button {
-  width: 18px;
-  height: 24px;
-  border-radius: 3px;
-  border: 1px solid #858b9c60;
+  width: 23px;
+  height: 23px;
+  border-radius: 50%;
+  border: 1px solid #24262830;
   display: grid;
   place-items: center;
   padding: 0;
   position: relative;
 }
 .color-palette button[aria-pressed="true"] {
-  outline: 1px solid currentColor;
-  outline-offset: -3px;
+  outline: 1px solid var(--ink);
+  outline-offset: 3px;
 }
 .color-palette button svg {
-  width: 11px;
-  height: 11px;
-  stroke-width: 3;
-}
-.color-palette button:hover:not(:disabled) {
-  transform: translateY(-1px);
-}
-@media (min-width: 1600px) {
-  .color-palette button {
-    width: 21px;
-    height: 26px;
-  }
+  width: 12px;
+  height: 12px;
+  stroke-width: 2;
 }

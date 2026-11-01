@@ -4,6 +4,13 @@ export const overlayStyles = [
   { id: "world", name: "World desk", color: "#ffd20a" },
   { id: "neon", name: "Studio", color: "#7739ff" },
   { id: "scoreboard", name: "Scoreboard", color: "#f46b18" },
+  { id: "editorial", name: "Editorial", color: "#101827" },
+  { id: "signal", name: "Signal", color: "#1767ff" },
+  { id: "dispatch", name: "Dispatch", color: "#00874d" },
+  { id: "frame", name: "Frame", color: "#7739ff" },
+  { id: "ribbon", name: "Ribbon", color: "#ff263d" },
+  { id: "terminal", name: "Terminal", color: "#00874d" },
+  { id: "capsule", name: "Capsule", color: "#f46b18" },
 ] as const;
 export const overlayColors = [
   "#ff263d",
@@ -27,3 +34,5 @@ export const defaultOverlayDesign: OverlayDesign = {
   size: 100,
   speed: 35,
 };
+
+export const overlayStyleIds = overlayStyles.map((style) => style.id);

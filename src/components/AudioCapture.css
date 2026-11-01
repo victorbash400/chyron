@@ -1,41 +1,15 @@
-.audio-capture {
-  display: flex;
-  align-items: center;
-  gap: 7px;
-  padding-top: 8px;
-  flex-shrink: 0;
-}
-.audio-capture > div {
+.audio-source-picker {
   display: flex;
   gap: 2px;
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 3px;
 }
-.audio-capture .icon-button {
+.audio-source-picker > button {
   width: 26px;
   height: 26px;
-  color: #959dae;
+  border-radius: 17px;
 }
-.audio-capture .icon-button[aria-pressed="true"] {
-  color: var(--purple);
-  background: #f0eaff;
-}
-.audio-capture .icon-button svg {
-  width: 13px;
-  height: 13px;
-}
-.record-button {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  padding: 7px 9px;
-  border-radius: 5px;
-  font-size: 10px;
-  color: #747d91;
-}
-.record-button svg {
-  width: 12px;
-  height: 12px;
-}
-.record-button.is-recording {
-  color: var(--red);
-  background: #fff0f2;
+.audio-recording {
+  color: var(--danger);
 }

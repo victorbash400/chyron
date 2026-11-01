@@ -1,0 +1,60 @@
+.toolbar {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  min-height: 64px;
+  padding: 10px 14px;
+  box-sizing: border-box;
+  flex-shrink: 0;
+  overflow-x: auto;
+  scrollbar-width: thin;
+}
+.navigation {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+  flex: 1 0 auto;
+}
+.actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+}
+.group {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  padding: 3px;
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  background: transparent;
+}
+.group > button {
+  border-radius: 17px;
+}
+.mobile {
+  display: none;
+}
+.back {
+  border: 1px solid var(--border);
+  border-radius: 50%;
+  background: transparent;
+}
+.back svg {
+  width: 16px;
+  height: 16px;
+}
+@media (max-width: 760px) {
+  .mobile {
+    display: block;
+  }
+  .toolbar {
+    padding: 8px 12px;
+    gap: 12px;
+  }
+  .navigation {
+    gap: 5px;
+  }
+}

@@ -1,14 +1,14 @@
 .overlay-preview {
-  flex-shrink: 0;
-  padding: 0 14px 13px;
+  display: flex;
+  flex-direction: column;
+  flex: 1.2;
+  min-height: 160px;
+  padding: 0 12px 12px;
+  background: var(--panel);
 }
 .overlay-preview > .panel-heading {
-  padding: 0;
-  min-height: 48px;
-}
-.overlay-preview > .panel-heading h2 {
-  font-size: 21px;
-  letter-spacing: -0.7px;
+  padding: 4px 0;
+  min-height: 40px;
 }
 .preview-actions {
   margin-left: auto;
@@ -16,63 +16,45 @@
   align-items: center;
   gap: 2px;
 }
-.preview-actions .icon-button {
-  margin-left: 0;
-  width: 25px;
-  height: 28px;
-  color: #72798c;
-}
-.preview-actions svg {
-  width: 14px;
-  height: 14px;
-}
 .draft-label {
   font-size: 10px;
-  color: #737a8c;
-  background: #f0f1f5;
-  border-radius: 4px;
-  padding: 3px 6px;
+  color: var(--muted);
+}
+.preview-stage {
+  container-type: size;
+  display: grid;
+  place-items: center;
+  flex: 1;
+  min-height: 0;
 }
 .preview-canvas {
   position: relative;
   aspect-ratio: 16/9;
-  background-color: #27292b;
+  background-color: #26282a;
   background-image: conic-gradient(
-    #343638 25%,
+    #2d2f31 25%,
     transparent 0 50%,
-    #343638 0 75%,
+    #2d2f31 0 75%,
     transparent 0
   );
-  background-size: 20px 20px;
-  border-radius: 7px;
+  background-size: 16px 16px;
+  border-radius: 10px;
   overflow: hidden;
-  margin-bottom: 9px;
 }
-.overlay-preview:fullscreen {
-  display: flex;
-  flex-direction: column;
-  padding: 0 20px 20px;
-  max-width: none;
-  background: #fff;
-  border: 0;
-  border-radius: 0;
+.preview-stage .preview-canvas {
+  width: min(100cqw, calc(100cqh * 16 / 9));
 }
-.overlay-preview:fullscreen .preview-canvas {
-  flex: 1;
-  min-height: 0;
-  aspect-ratio: auto;
-}
-.overlay-preview:fullscreen .newsroom-controls {
-  justify-content: center;
-}
-.overlay-preview:fullscreen .copy-overlay {
-  margin-left: 0;
-}
-@media (max-width: 1120px) {
+@media (max-width: 760px) {
   .overlay-preview {
-    padding: 0 11px 11px;
+    flex: 0 0 auto;
+    min-height: 0;
   }
-  .overlay-preview > .panel-heading h2 {
-    font-size: 18px;
+  .preview-stage {
+    container-type: normal;
+    display: block;
+    flex: none;
+  }
+  .preview-stage .preview-canvas {
+    width: 100%;
   }
 }

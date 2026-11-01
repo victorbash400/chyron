@@ -7,11 +7,10 @@
   top: calc(100% + 5px);
   z-index: 5;
   min-width: 155px;
-  background: white;
+  background: var(--surface);
   border: 1px solid var(--line);
-  border-radius: 7px;
+  border-radius: 16px;
   padding: 5px;
-  box-shadow: 0 5px 16px #1820360d;
 }
 .preview-source-options button {
   display: flex;
@@ -19,7 +18,7 @@
   gap: 8px;
   width: 100%;
   padding: 9px;
-  border-radius: 4px;
+  border-radius: 10px;
   font-size: 11px;
   text-align: left;
 }

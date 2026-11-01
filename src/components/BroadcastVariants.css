@@ -1,0 +1,188 @@
+.broadcast-style-editorial .broadcast-banner {
+  background: #fbf9f3;
+  border-top: 0.35cqw solid var(--broadcast-accent);
+  font-family: Georgia, serif;
+  text-transform: none;
+}
+.broadcast-style-editorial .broadcast-kicker {
+  clip-path: none;
+  background: transparent;
+  color: var(--broadcast-text-accent);
+  font:
+    600 2cqw Geist,
+    sans-serif;
+  min-width: 18%;
+  margin: 0;
+  padding: 1cqw;
+  border-right: 0.12cqw solid #24262830;
+}
+.broadcast-style-editorial .broadcast-headline {
+  font-size: 2.8cqw;
+  padding-left: 1.5cqw;
+  font-weight: 500;
+}
+.broadcast-style-editorial .broadcast-ticker {
+  background: #fbf9f3;
+  color: #242628;
+  border-top: 0.1cqw solid #24262830;
+}
+.broadcast-style-editorial .ticker-label {
+  display: none;
+}
+.broadcast-style-signal .broadcast-banner {
+  background: #0d1830;
+  color: white;
+  border-left: 1cqw solid var(--broadcast-accent);
+  border-radius: 0.5cqw;
+}
+.broadcast-style-signal .broadcast-kicker {
+  clip-path: none;
+  background: transparent;
+  color: #fff;
+  font-size: 2.4cqw;
+  min-width: 17%;
+  border-right: 0.15cqw solid #ffffff40;
+  margin: 0;
+}
+.broadcast-style-signal .broadcast-headline {
+  padding-left: 1.5cqw;
+  font-family: Geist, sans-serif;
+  font-size: 2.4cqw;
+}
+.broadcast-style-signal .broadcast-ticker {
+  margin-top: 0.6cqw;
+  background: #0d1830;
+}
+.broadcast-style-dispatch .broadcast-coverage {
+  width: 80%;
+  left: 3%;
+  transform: scale(var(--broadcast-scale));
+  transform-origin: bottom left;
+}
+.broadcast-style-dispatch .broadcast-banner {
+  background: #fff;
+  border-radius: 1cqw 1cqw 0 0;
+  flex-direction: column;
+  align-items: flex-start;
+  padding: 1.5cqw;
+}
+.broadcast-style-dispatch .broadcast-kicker {
+  clip-path: none;
+  min-width: 0;
+  font:
+    600 1.6cqw Geist,
+    sans-serif;
+  padding: 0.6cqw 1cqw;
+  margin: 0 0 1cqw;
+  border-radius: 0.4cqw;
+}
+.broadcast-style-dispatch .broadcast-headline {
+  font:
+    500 2.8cqw Geist,
+    sans-serif;
+  padding: 0;
+  text-transform: none;
+}
+.broadcast-style-dispatch .broadcast-ticker {
+  background: #19382b;
+  border-radius: 0 0 1cqw 1cqw;
+}
+.broadcast-style-dispatch .ticker-label {
+  display: none;
+}
+.broadcast-style-frame .broadcast-banner {
+  background: #fff;
+  border: 0.35cqw solid var(--broadcast-accent);
+  border-radius: 0.4cqw;
+}
+.broadcast-style-frame .broadcast-kicker {
+  clip-path: none;
+  background: transparent;
+  color: var(--broadcast-text-accent);
+  font-style: normal;
+  min-width: 18%;
+  border-right: 0.2cqw solid var(--broadcast-accent);
+  margin: 0.8cqw;
+  font-size: 2.8cqw;
+}
+.broadcast-style-frame .broadcast-headline {
+  font-size: 3cqw;
+}
+.broadcast-style-frame .broadcast-ticker {
+  background: white;
+  color: #242628;
+  margin-top: 0.4cqw;
+}
+.broadcast-style-ribbon .broadcast-banner {
+  background: var(--broadcast-accent);
+  color: var(--broadcast-ink);
+  transform: skewX(-7deg);
+}
+.broadcast-style-ribbon .broadcast-kicker {
+  clip-path: none;
+  background: #fff;
+  color: var(--broadcast-text-accent);
+  font-size: 3cqw;
+  margin: 0 1.5cqw 0 0;
+}
+.broadcast-style-ribbon .broadcast-headline {
+  transform: skewX(7deg);
+  font-style: italic;
+}
+.broadcast-style-ribbon .broadcast-ticker {
+  margin: 0 2cqw;
+}
+.broadcast-style-terminal .broadcast-banner {
+  background: #111c18;
+  color: #e0f0e7;
+  border-top: 0.3cqw solid var(--broadcast-accent);
+  font-family: monospace;
+}
+.broadcast-style-terminal .broadcast-kicker {
+  clip-path: none;
+  background: transparent;
+  color: #9de6b9;
+  font-style: normal;
+  font-size: 2.2cqw;
+  min-width: 21%;
+}
+.broadcast-style-terminal .broadcast-headline {
+  font-size: 2.5cqw;
+}
+.broadcast-style-terminal .broadcast-ticker {
+  background: #192d23;
+  color: #c5dfcf;
+  font-family: monospace;
+  font-size: 1.5cqw;
+}
+.broadcast-style-terminal .ticker-label {
+  display: none;
+}
+.broadcast-style-capsule .broadcast-banner {
+  border-radius: 5cqw;
+  padding: 0.6cqw;
+  background: #fff;
+  min-height: 6cqw;
+}
+.broadcast-style-capsule .broadcast-kicker {
+  clip-path: none;
+  border-radius: 5cqw;
+  margin: 0 1cqw 0 0;
+  font-size: 2.5cqw;
+  min-width: 18%;
+  font-style: normal;
+}
+.broadcast-style-capsule .broadcast-headline {
+  font:
+    600 2.5cqw Geist,
+    sans-serif;
+  text-transform: none;
+}
+.broadcast-style-capsule .broadcast-ticker {
+  width: 90%;
+  margin: 0.6cqw auto 0;
+  border-radius: 4cqw;
+}
+.broadcast-style-capsule .ticker-label {
+  clip-path: none;
+}

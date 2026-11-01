@@ -1,0 +1,33 @@
+.workspace-rail {
+  display: grid;
+  grid-template-rows: minmax(0, 1fr) minmax(0, 1fr);
+  width: 340px;
+  flex-shrink: 0;
+  gap: 12px;
+  margin: 8px 12px 12px 8px;
+  min-height: 0;
+  background: var(--panel);
+}
+.workspace-rail:has(.chat-feed[hidden]) {
+  grid-template-rows: auto;
+  align-content: start;
+}
+@container workspace (max-width:849px) {
+  .workspace-rail {
+    display: none;
+    position: absolute;
+    inset: 56px 0 0 auto;
+    width: min(340px, calc(100% - 20px));
+    z-index: 15;
+  }
+  .workspace-rail[data-open="true"] {
+    display: grid;
+  }
+}
+@media (max-width: 760px) {
+  .workspace-rail {
+    inset: 56px 0 0;
+    width: auto;
+    margin: 8px 12px 12px;
+  }
+}

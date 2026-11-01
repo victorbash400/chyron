@@ -1,4 +1,5 @@
 import { useState, type FormEvent } from "react";
+import SettingsInlineButton from "./settings/SettingsInlineButton.tsx";
 import Dialog from "./Dialog.tsx";
 import ErrorNotice from "./ErrorNotice.tsx";
 import "./TwitchSetup.css";
@@ -61,13 +62,14 @@ export default function TwitchSetup({
             required
           />
         </label>
-        <button
+        <SettingsInlineButton
+          primary
           type="submit"
-          className="form-submit"
+          className="twitch-connect"
           disabled={busy || !clientId.trim() || !clientSecret.trim()}
         >
           Connect Twitch
-        </button>
+        </SettingsInlineButton>
       </form>
     </Dialog>
   );

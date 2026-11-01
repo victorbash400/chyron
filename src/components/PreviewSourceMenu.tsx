@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { Camera, Monitor, Video, X } from "lucide-react";
+import IconButton from "./controls/IconButton.tsx";
 import "./PreviewSourceMenu.css";
 export default function PreviewSourceMenu({
   active,
@@ -34,16 +35,15 @@ export default function PreviewSourceMenu({
         }
       }}
     >
-      <button
+      <IconButton
         ref={trigger}
-        className="icon-button"
-        aria-label="Preview video source"
+        label="Preview video source"
         aria-expanded={open}
         disabled={disabled}
         onClick={() => setOpen(!open)}
       >
         <Video />
-      </button>
+      </IconButton>
       {open && (
         <div className="preview-source-options">
           <button

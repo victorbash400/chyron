@@ -8,14 +8,14 @@
   flex-direction: column;
   gap: 8px;
   font-size: 12px;
-  color: #74746e;
+  color: var(--muted);
 }
 .twitch-setup input {
   font-size: 12px;
 }
 .twitch-setup input[readonly] {
-  color: #8b8d83;
-  background: #f8f8f5;
+  color: var(--muted);
+  background: var(--panel);
   font-size: 11px;
 }
 .developer-link {
@@ -23,4 +23,8 @@
   text-decoration: underline;
   text-underline-offset: 3px;
   align-self: flex-start;
+}
+
+.twitch-connect {
+  align-self: flex-end;
 }

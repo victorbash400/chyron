@@ -1,0 +1,52 @@
+.main {
+  container: settings / inline-size;
+  flex: 1;
+  min-width: 0;
+  padding: 28px 32px;
+  overflow-y: auto;
+  background: var(--panel);
+}
+.content {
+  width: 100%;
+  max-width: 760px;
+  margin: 0 auto;
+}
+.content > header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 20px;
+}
+.content > header > button {
+  display: none;
+}
+.content h1 {
+  margin: 0;
+  font-size: 20px;
+  font-weight: 500;
+}
+.surface {
+  min-width: 0;
+}
+@media (max-width: 799px) {
+  .main {
+    padding-inline: 20px;
+  }
+}
+@media (max-height: 599px) {
+  .main {
+    padding-top: 24px;
+    padding-bottom: 24px;
+  }
+}
+@media (max-width: 520px) {
+  .main {
+    padding: 20px 16px;
+  }
+  .content > header > button {
+    display: inline-flex;
+  }
+  .content h1 {
+    font-size: 18px;
+  }
+}

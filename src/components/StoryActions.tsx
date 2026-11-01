@@ -1,5 +1,7 @@
 import { MessageSquare, Pin, X } from "lucide-react";
 import type { Story } from "../../shared/types.ts";
+import SettingsInlineButton from "./settings/SettingsInlineButton.tsx";
+import IconButton from "./controls/IconButton.tsx";
 import "./StoryActions.css";
 export default function StoryActions({
   story,
@@ -24,33 +26,34 @@ export default function StoryActions({
         <MessageSquare />
         {story.participants}
       </button>
-      <button className="edit-action" onClick={onEdit}>
+      <SettingsInlineButton className="edit-action" onClick={onEdit}>
         Edit
-      </button>
-      <button
+      </SettingsInlineButton>
+      <SettingsInlineButton
+        primary={!story.published}
         className={`publish-action ${story.published ? "is-published" : ""}`}
         onClick={() => onAction(story.published ? "unpublish" : "publish")}
         disabled={busy}
       >
         {story.published ? "Unpublish" : "Publish"}
-      </button>
-      <button
-        className="icon-button pin-action"
-        aria-label={story.pinned ? "Unpin story" : "Pin story"}
-        aria-pressed={story.pinned}
+      </SettingsInlineButton>
+      <IconButton
+        className="pin-action"
+        label={story.pinned ? "Unpin story" : "Pin story"}
+        selected={story.pinned}
         onClick={() => onAction("pin")}
         disabled={busy}
       >
         <Pin />
-      </button>
-      <button
-        className="icon-button dismiss-action"
-        aria-label="Dismiss story"
+      </IconButton>
+      <IconButton
+        className="dismiss-action"
+        label="Dismiss story"
         onClick={() => onAction("dismiss")}
         disabled={busy}
       >
         <X />
-      </button>
+      </IconButton>
     </div>
   );
 }

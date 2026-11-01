@@ -18,7 +18,7 @@ export default function StoryEvidence({
         {messages
           .filter((m) => story.messageIds.includes(m.id))
           .map((message) => (
-            <ChatMessageRow key={message.id} message={message} />
+            <ChatMessageRow key={message.id} message={message} timestamps />
           ))}
       </div>
     </Dialog>

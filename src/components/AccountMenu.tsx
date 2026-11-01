@@ -1,5 +1,11 @@
 import { useEffect, useRef, useState } from "react";
-import { ChevronDown, Radio, RotateCw, Unplug } from "lucide-react";
+import {
+  CircleUserRound,
+  ChevronDown,
+  Radio,
+  RotateCw,
+  Unplug,
+} from "lucide-react";
 import type { NewsroomState } from "../../shared/types.ts";
 import "./AccountMenu.css";
 export default function AccountMenu({
@@ -43,12 +49,18 @@ export default function AccountMenu({
     >
       <button
         className="account-trigger"
+        aria-label={state.channel?.name ?? "Connect Twitch"}
         ref={trigger}
         aria-expanded={open}
         aria-controls="account-actions"
         onClick={() => setOpen(!open)}
       >
-        {state.channel?.name ?? "Connect Twitch"}
+        <span className="account-avatar">
+          <CircleUserRound />
+        </span>
+        <span className="account-name">
+          {state.channel?.name ?? "Connect Twitch"}
+        </span>
         <ChevronDown />
       </button>
       {open && (
