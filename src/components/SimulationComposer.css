@@ -1,46 +1,85 @@
 .simulation-composer {
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 8px;
+  padding: 10px 12px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: var(--surface);
+}
+.simulation-composer:focus-within {
+  border-color: var(--accent);
+}
+.simulation-author-field {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  color: var(--muted);
+}
+.simulation-author-field svg {
+  width: 13px;
+  height: 13px;
+  flex-shrink: 0;
+  stroke-width: 1.6;
 }
 .simulation-composer .simulation-author {
-  width: 100%;
+  flex: 1;
+  min-width: 0;
+  padding: 0;
   border: 0;
-  padding: 0 3px;
+  border-radius: 0;
   background: transparent;
   font-size: 11px;
   color: var(--muted);
-  height: 20px;
+  line-height: 20px;
 }
 .simulation-message-input {
   display: flex;
-  align-items: center;
-  padding: 3px;
-  gap: 4px;
-  border: 1px solid var(--border);
-  border-radius: 8px;
-  background: var(--surface);
+  align-items: flex-end;
+  gap: 10px;
 }
-.simulation-message-input:focus-within {
-  border-color: var(--muted);
-}
-.simulation-message-input input {
+.simulation-message-input textarea {
   flex: 1;
-  width: 0;
+  min-width: 0;
+  min-height: 36px;
+  max-height: 120px;
+  field-sizing: content;
+  resize: none;
   border: 0;
+  border-radius: 0;
   background: transparent;
-  padding: 7px 8px;
+  padding: 0 0 5px;
   font-size: 12px;
+  line-height: 18px;
+}
+.simulation-message-input textarea::placeholder {
+  color: var(--muted);
+}
+.simulation-composer input:focus-visible,
+.simulation-composer textarea:focus-visible {
+  outline: none;
 }
 .simulation-message-input button {
   display: grid;
   place-items: center;
-  width: 28px;
-  height: 28px;
+  width: 30px;
+  height: 30px;
   flex-shrink: 0;
-  border-radius: 6px;
-  background: var(--ink);
-  color: var(--surface);
+  border-radius: 50%;
+  background: var(--accent);
+  color: var(--on-accent);
+}
+.simulation-message-input button:hover:not(:disabled) {
+  background: color-mix(in srgb, var(--ink) 12%, var(--accent));
+}
+.simulation-message-input button:disabled {
+  background: var(--hover);
+  color: var(--disabled);
+  opacity: 1;
+}
+.simulation-message-input button:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
 }
 .simulation-message-input button svg {
   width: 16px;
