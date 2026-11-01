@@ -1,5 +1,5 @@
 import IconButton from "./controls/IconButton.tsx";
-import { Check, Link, Pause, Play, Maximize2 } from "lucide-react";
+import { Check, Link, Pause, Play, Settings2 } from "lucide-react";
 import { useState } from "react";
 import type { NewsroomState, SourceMode } from "../../shared/types.ts";
 import ToggleSwitch from "./controls/ToggleSwitch.tsx";
@@ -19,9 +19,9 @@ export default function NewsroomControls({
   onError,
   onMode,
   onScenario,
-  onExpand,
+  onOpenSettings,
 }: {
-  onExpand: () => void;
+  onOpenSettings: () => void;
   state: NewsroomState;
   url: string;
   busy: boolean;
@@ -48,8 +48,8 @@ export default function NewsroomControls({
     >
       <div className="panel-heading">
         <h2>News controls</h2>
-        <IconButton label="Expand news controls" onClick={onExpand}>
-          <Maximize2 />
+        <IconButton label="Open news settings" onClick={onOpenSettings}>
+          <Settings2 />
         </IconButton>
       </div>
       <SettingsGroup className="newsroom-control-rows">

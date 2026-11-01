@@ -110,7 +110,7 @@ export default function App() {
         }
         controls={
           <NewsroomControls
-            onExpand={() => navigation.navigate(true, "news")}
+            onOpenSettings={() => navigation.navigate(true, "news")}
             state={state}
             url={overlayUrl}
             busy={room.pending}
