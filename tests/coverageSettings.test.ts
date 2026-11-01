@@ -129,3 +129,103 @@ test("participant threshold, viewer quotes and story duration affect coverage", 
     room.dispose();
   }
 });
+
+test("automatic batching waits for the message threshold and does not starve during busy chat", async (context) => {
+  context.mock.timers.enable({ apis: ["setTimeout"] });
+  let calls = 0;
+  const room = new Newsroom(
+    async () => {
+      calls++;
+      return { stories: [] };
+    },
+    async () => {},
+  );
+  room.state.coverage.minimumMessages = 3;
+  room.state.coverage.updateDelayMs = 800;
+  const add = (id: string) =>
+    room.add([
+      {
+        id,
+        userId: id,
+        author: id,
+        text: "Keyboard chat",
+        at: Date.now(),
+        source: "chat",
+      },
+    ]);
+  add("a");
+  context.mock.timers.tick(1000);
+  assert.equal(calls, 0);
+  add("b");
+  add("c");
+  context.mock.timers.tick(400);
+  add("d");
+  context.mock.timers.tick(400);
+  assert.equal(calls, 1);
+  await new Promise((resolve) => setImmediate(resolve));
+  room.state.coverage.generation = "manual";
+  room.rescheduleCoverage();
+  add("e");
+  add("f");
+  add("g");
+  context.mock.timers.tick(10000);
+  assert.equal(calls, 1);
+  await room.process();
+  assert.equal(calls, 2);
+  room.dispose();
+});
+
+test("editorial format, newsworthiness and user direction reach the newsroom prompt", async () => {
+  const { coveragePrompt } = await import("../server/editor.ts");
+  const prompt = coveragePrompt({
+    ...defaultCoverageSettings,
+    focus: "recap",
+    newsworthiness: "major",
+    instructions: "Focus on cooking and ingredient changes.",
+  });
+  assert.ok(prompt.includes("main themes"));
+  assert.ok(prompt.includes("Only cover major developments"));
+  assert.ok(prompt.includes("Focus on cooking and ingredient changes."));
+  assert.ok(prompt.includes("Never invent facts"));
+  assert.ok(prompt.includes("A discussion on a different topic must become a new story"));
+  assert.ok(prompt.includes("cite messageIds from at least 2 distinct userId values"));
+});
+
+test("audio can start news only when explicitly enabled and triggers generation without waiting for chat", async (context) => {
+  context.mock.timers.enable({ apis: ["setTimeout"] });
+  let calls = 0;
+  const room = new Newsroom(
+    async () => {
+      calls++;
+      return { stories: [] };
+    },
+    async () => {},
+  );
+  try {
+    room.state.coverage.minimumMessages = 5;
+    room.state.coverage.updateDelayMs = 800;
+    const message: ChatMessage = {
+      id: "voice",
+      userId: "streamer",
+      author: "Streamer",
+      source: "audio",
+      text: "The cooking challenge is starting now.",
+      at: Date.now(),
+    };
+    room.add([message]);
+    context.mock.timers.tick(800);
+    assert.equal(calls, 1);
+    await new Promise((resolve) => setImmediate(resolve));
+    const output = {
+      stories: [{ ...draft, messageIds: ["voice"], quoteId: null }],
+    };
+    room.apply(output, Date.now());
+    assert.equal(room.state.stories.length, 0);
+    room.state.coverage.audioStories = true;
+    room.apply(output, Date.now());
+    assert.equal(room.state.stories.length, 1);
+    assert.equal(room.state.stories[0]?.quoteId, null);
+  } finally {
+    room.dispose();
+  }
+});

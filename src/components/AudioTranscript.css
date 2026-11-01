@@ -1,0 +1,10 @@
+.audio-transcript {
+  display: block;
+  max-height: 100px;
+  overflow: auto;
+  font-size: 12px;
+  line-height: 1.5;
+  padding: 8px 12px;
+  color: var(--muted);
+  user-select: text;
+}

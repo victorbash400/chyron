@@ -1,0 +1,43 @@
+.chat-simulator {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-width: 0;
+}
+.chat-simulator > input {
+  width: 100%;
+  padding: 8px 10px;
+  font-size: 12px;
+}
+.chat-simulator-options {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+.chat-simulator-options button {
+  padding: 4px 7px;
+  font-size: 10px;
+  min-height: 24px;
+}
+.chat-simulator-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.chat-simulator-actions output {
+  font-size: 11px;
+  color: var(--muted);
+  margin-right: auto;
+}
+.chat-simulator-actions svg {
+  width: 14px;
+  height: 14px;
+}
+.simulator-working {
+  animation: simulator-spin 1s linear infinite;
+}
+@keyframes simulator-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}

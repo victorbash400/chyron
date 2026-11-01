@@ -31,6 +31,12 @@ export interface Story {
   edited: boolean;
 }
 export interface NewsroomState {
+  sourceId: string;
+  simulator: {
+    status: "idle" | "generating" | "running";
+    delivered: number;
+    total: number;
+  };
   mode: SourceMode;
   channel: { id: string; name: string } | null;
   connection: "disconnected" | "connecting" | "connected" | "error";

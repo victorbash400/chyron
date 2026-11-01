@@ -1,0 +1,12 @@
+.audio-source-picker {
+  display: flex;
+  gap: 2px;
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 3px;
+}
+.audio-source-picker > button {
+  width: 26px;
+  height: 26px;
+  border-radius: 17px;
+}

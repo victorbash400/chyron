@@ -1,3 +1,5 @@
+import ChatSimulatorControls from "./ChatSimulatorControls.tsx";
+import type { SimulatorSettings } from "../../shared/simulator.ts";
 import IconButton from "./controls/IconButton.tsx";
 import { Check, Link, Pause, Play, Settings2 } from "lucide-react";
 import { useState } from "react";
@@ -20,8 +22,12 @@ export default function NewsroomControls({
   onMode,
   onScenario,
   onOpenSettings,
+  onSimulate,
+  onStopSimulation,
 }: {
   onOpenSettings: () => void;
+  onSimulate: (settings: SimulatorSettings) => Promise<boolean>;
+  onStopSimulation: () => void;
   state: NewsroomState;
   url: string;
   busy: boolean;
@@ -68,7 +74,22 @@ export default function NewsroomControls({
             />
           </SettingsRow>
         )}
-        <AudioCapture disabled={state.paused} onError={onError} />
+        {state.mode === "simulation" && (
+          <div className="newsroom-simulator">
+            <ChatSimulatorControls
+              simulator={state.simulator}
+              disabled={busy || state.paused}
+              onStart={onSimulate}
+              onStop={onStopSimulation}
+            />
+          </div>
+        )}
+        <AudioCapture
+          sourceId={state.sourceId}
+          model={state.audioModel}
+          disabled={state.paused}
+          onError={onError}
+        />
         <SettingsRow compact label="Coverage">
           <SettingsInlineButton
             onClick={() => onSettings({ paused: !state.paused })}

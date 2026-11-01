@@ -17,6 +17,8 @@ export interface SavedNewsroom {
 }
 export class Newsroom extends EventEmitter {
   state: NewsroomState = {
+    sourceId: randomUUID(),
+    simulator: { status: "idle", delivered: 0, total: 0 },
     mode: "twitch",
     channel: null,
     connection: "disconnected",
@@ -35,6 +37,8 @@ export class Newsroom extends EventEmitter {
   };
   overlayToken = randomBytes(32).toString("hex");
   private pending = false;
+  private pendingAudio = false;
+  private unseenMessages = 0;
   private saveQueue: Promise<void> = Promise.resolve();
   private batch: ReturnType<typeof setTimeout> | undefined;
   private expiry: ReturnType<typeof setTimeout> | undefined;
@@ -52,6 +56,8 @@ export class Newsroom extends EventEmitter {
         ...saved.state,
         design: { ...defaultOverlayDesign, ...saved.state.design },
         coverage: { ...defaultCoverageSettings, ...saved.state.coverage },
+        sourceId: randomUUID(),
+        simulator: { status: "idle", delivered: 0, total: 0 },
         working: false,
         connection: "disconnected",
         model:
@@ -106,18 +112,45 @@ export class Newsroom extends EventEmitter {
     this.state.messages = [...this.state.messages, ...unique].slice(-200);
     this.emitState();
     void this.persist().catch((error) => this.fail(error));
-    if (!this.state.paused) {
-      this.pending = true;
-      if (!this.batch && !this.state.working)
-        this.batch = setTimeout(() => {
-          this.batch = undefined;
-          void this.process().catch((error) => this.fail(error));
-        }, 1800);
-    }
+    this.unseenMessages += unique.filter(
+      (message) =>
+        this.state.coverage.includeAudio || message.source !== "audio",
+    ).length;
+    this.pendingAudio ||=
+      this.state.coverage.includeAudio &&
+      unique.some((message) => message.source === "audio");
+    this.pending = true;
+    this.scheduleCoverage();
+  }
+  scheduleCoverage() {
+    if (this.batch) return;
+    if (
+      this.state.paused ||
+      this.state.working ||
+      this.state.coverage.generation === "manual" ||
+      !this.pending ||
+      (!this.pendingAudio &&
+        this.unseenMessages < this.state.coverage.minimumMessages)
+    )
+      return;
+    this.batch = setTimeout(() => {
+      this.batch = undefined;
+      void this.process().catch((error) => this.fail(error));
+    }, this.state.coverage.updateDelayMs);
+  }
+
+  rescheduleCoverage() {
+    clearTimeout(this.batch);
+    this.batch = undefined;
+    this.scheduleCoverage();
   }
   async process() {
     if (this.state.working || this.state.paused) return;
+    clearTimeout(this.batch);
+    this.batch = undefined;
     this.pending = false;
+    this.unseenMessages = 0;
+    this.pendingAudio = false;
     const epoch = this.epoch;
     this.state.working = true;
     this.state.error = null;
@@ -139,17 +172,13 @@ export class Newsroom extends EventEmitter {
       );
       if (epoch !== this.epoch || this.state.paused) return;
       this.apply(coverage, now);
+      this.emitState();
       await this.persist();
       this.scheduleExpiry();
     } finally {
       this.state.working = false;
       this.emitState();
-      if (this.pending && !this.state.paused) {
-        this.batch = setTimeout(() => {
-          this.batch = undefined;
-          void this.process().catch((error) => this.fail(error));
-        }, 1800);
-      }
+      this.scheduleCoverage();
     }
   }
   apply(coverage: Coverage, now: number) {
@@ -182,7 +211,14 @@ export class Newsroom extends EventEmitter {
       const participants = new Set(
         messages.filter((m) => m.source !== "audio").map((m) => m.userId),
       ).size;
-      if (!existing && participants < this.state.coverage.minimumParticipants)
+      if (
+        !existing &&
+        participants < this.state.coverage.minimumParticipants &&
+        !(
+          this.state.coverage.audioStories &&
+          messages.some((message) => message.source === "audio")
+        )
+      )
         continue;
       if (existing?.dismissed || existing?.edited) continue;
       const story: Story = {
@@ -232,6 +268,10 @@ export class Newsroom extends EventEmitter {
     this.pending = false;
     clearTimeout(this.batch);
     this.batch = undefined;
+    this.unseenMessages = 0;
+    this.pendingAudio = false;
+    this.state.sourceId = randomUUID();
+    this.emit("source");
     this.state.mode = mode;
     this.state.messages = [];
     this.state.stories = [];
@@ -260,6 +300,7 @@ export class Newsroom extends EventEmitter {
       );
   }
   dispose() {
+    this.emit("shutdown");
     clearTimeout(this.batch);
     clearTimeout(this.expiry);
     this.removeAllListeners();

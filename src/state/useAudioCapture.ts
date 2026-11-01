@@ -1,47 +1,92 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-export function useAudioCapture(onError: (error: string) => void) {
-  const [opening, setOpening] = useState(false);
-  const [recording, setRecording] = useState(false),
-    [busy, setBusy] = useState(false);
+import { AudioUploads } from "./audioUploads.ts";
+export function useAudioCapture(
+  sourceId: string,
+  onError: (error: string) => void,
+) {
+  const [opening, setOpening] = useState(false),
+    [recording, setRecording] = useState(false),
+    [pending, setPending] = useState(0);
+  const [transcript, setTranscript] = useState<string | null>(null);
   const recorder = useRef<MediaRecorder | null>(null),
     media = useRef<MediaStream | null>(null);
-  const limit = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
+  const segment = useRef<ReturnType<typeof setTimeout> | undefined>(undefined),
+    session = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
+  const generation = useRef(0);
+  const discardFinal = useRef(false);
   const mounted = useRef(true),
-    abort = useRef<AbortController | null>(null);
+    repeat = useRef(false),
+    uploads = useRef<AudioUploads | null>(null);
+  const errorHandler = useRef(onError);
+  errorHandler.current = onError;
   const stopTracks = useCallback(() => {
     media.current?.getTracks().forEach((track) => track.stop());
     media.current = null;
-    clearTimeout(limit.current);
+    clearTimeout(segment.current);
+    clearTimeout(session.current);
   }, []);
   const stop = useCallback(() => {
+    repeat.current = false;
+    clearTimeout(segment.current);
+    clearTimeout(session.current);
     if (recorder.current?.state === "recording") recorder.current.stop();
-    setRecording(false);
-  }, []);
+    else stopTracks();
+    if (mounted.current) setRecording(false);
+  }, [stopTracks]);
   useEffect(() => {
     mounted.current = true;
+    generation.current++;
+    setRecording(false);
+    setOpening(false);
+    setPending(0);
+    setTranscript(null);
+    uploads.current = new AudioUploads(
+      setPending,
+      (result) =>
+        setTranscript(
+          result.status === "speech"
+            ? result.transcript
+            : result.status === "uncertain"
+              ? "Speech unclear."
+              : "No speech detected.",
+        ),
+      (message) => {
+        discardFinal.current = true;
+        stop();
+        errorHandler.current(message);
+      },
+    );
     return () => {
       mounted.current = false;
-      abort.current?.abort();
+      repeat.current = false;
+      uploads.current?.dispose();
       if (recorder.current?.state === "recording") recorder.current.stop();
       stopTracks();
     };
-  }, [stopTracks]);
-  const start = async (source: "microphone" | "tab") => {
-    setBusy(true);
+  }, [sourceId, stop, stopTracks]);
+  async function start(
+    source: "microphone" | "tab",
+    continuous: boolean,
+    seconds: 6 | 12,
+  ) {
+    if (opening || recording || pending) return;
+    const current = generation.current;
+    discardFinal.current = false;
     setOpening(true);
+    setTranscript(null);
     try {
       if (!navigator.mediaDevices || !window.MediaRecorder)
-        throw new Error(
-          "Audio capture is unavailable in this browser. Use Chrome.",
-        );
+        throw new Error("Audio capture is unavailable. Use Chrome.");
       const stream =
         source === "microphone"
-          ? await navigator.mediaDevices.getUserMedia({ audio: true })
+          ? await navigator.mediaDevices.getUserMedia({
+              audio: { echoCancellation: true, noiseSuppression: true },
+            })
           : await navigator.mediaDevices.getDisplayMedia({
               video: true,
               audio: true,
             });
-      if (!mounted.current) {
+      if (!mounted.current || current !== generation.current) {
         stream.getTracks().forEach((track) => track.stop());
         return;
       }
@@ -53,78 +98,91 @@ export function useAudioCapture(onError: (error: string) => void) {
       );
       if (!mimeType)
         throw new Error("Audio recording format is unsupported. Use Chrome.");
-      const capture = new MediaRecorder(
-        new MediaStream(stream.getAudioTracks()),
-        { mimeType },
-      );
-      recorder.current = capture;
-      const chunks: BlobPart[] = [];
-      let size = 0,
-        invalid = false;
-      capture.ondataavailable = (event) => {
-        size += event.data.size;
-        if (size > 4000000) {
+      repeat.current = continuous;
+      const begin = () => {
+        if (
+          !mounted.current ||
+          current !== generation.current ||
+          !media.current
+        )
+          return;
+        const capture = new MediaRecorder(
+          new MediaStream(stream.getAudioTracks()),
+          { mimeType },
+        );
+        recorder.current = capture;
+        const chunks: BlobPart[] = [];
+        let size = 0,
+          invalid = false;
+        capture.ondataavailable = (event) => {
+          size += event.data.size;
+          if (size > 4000000) {
+            invalid = true;
+            stop();
+            errorHandler.current(
+              "Recording exceeds 4 MB. Record a shorter clip.",
+            );
+          } else if (event.data.size) chunks.push(event.data);
+        };
+        capture.onerror = () => {
           invalid = true;
           stop();
-          onError("Recording exceeds 4 MB. Record a shorter clip.");
-        } else if (event.data.size) chunks.push(event.data);
-      };
-      capture.onerror = () => {
-        invalid = true;
-        stop();
-        stopTracks();
-        if (mounted.current) {
-          setRecording(false);
-          setBusy(false);
-          onError("Audio recording failed. Record again.");
-        }
-      };
-      capture.onstop = () => {
-        stopTracks();
-        if (!mounted.current) return;
-        setRecording(false);
-        if (invalid) {
-          setBusy(false);
-          return;
-        }
-        setBusy(true);
-        const controller = new AbortController();
-        abort.current = controller;
-        void fetch("/api/audio", {
-          method: "POST",
-          headers: { "Content-Type": mimeType.split(";")[0] },
-          body: new Blob(chunks, { type: mimeType }),
-          signal: controller.signal,
-        })
-          .then(async (response) => {
-            const result = await response.json();
-            if (!response.ok)
-              throw new Error(result.error ?? "Audio transcription failed.");
-          })
-          .catch((error) => {
-            if (mounted.current) onError(error.message);
-          })
-          .finally(() => {
-            if (mounted.current) setBusy(false);
-          });
+          stopTracks();
+          errorHandler.current("Audio recording failed. Record again.");
+        };
+        capture.onstop = () => {
+          clearTimeout(segment.current);
+          if (!mounted.current || current !== generation.current) return;
+          if (!invalid && !discardFinal.current && size)
+            uploads.current?.enqueue(
+              new Blob(chunks, { type: mimeType }),
+              mimeType,
+              sourceId,
+            );
+          if (repeat.current && !invalid) begin();
+          else {
+            stopTracks();
+            setRecording(false);
+          }
+        };
+        capture.start();
+        setRecording(true);
+        segment.current = setTimeout(
+          () => {
+            if (capture.state === "recording") {
+              if (!continuous) repeat.current = false;
+              capture.stop();
+            }
+          },
+          continuous ? seconds * 1000 : 55000,
+        );
       };
       stream
         .getTracks()
         .forEach((track) =>
           track.addEventListener("ended", stop, { once: true }),
         );
-      capture.start();
-      setRecording(true);
-      limit.current = setTimeout(stop, 55000);
+      begin();
+      session.current = setTimeout(stop, 10 * 60000);
     } catch (error) {
       stopTracks();
-      onError(error instanceof Error ? error.message : "Audio capture failed.");
+      errorHandler.current(
+        error instanceof Error ? error.message : "Audio capture failed.",
+      );
     } finally {
-      if (mounted.current) {
-        setBusy(false);
-        setOpening(false);
-      }
+      if (mounted.current && current === generation.current) setOpening(false);
     }
-  };
-  return { recording, busy, opening, start, stop };
+  }
+  function upload(file: File) {
+    if (file.size > 4000000) {
+      onError("Audio file exceeds 4 MB.");
+      return;
+    }
+    if (!file.type.startsWith("audio/")) {
+      onError("Select an audio file.");
+      return;
+    }
+    uploads.current?.enqueue(file, file.type, sourceId);
+  }
+  return { recording, pending, opening, transcript, start, stop, upload };
 }

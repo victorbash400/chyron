@@ -111,6 +111,8 @@ export default function App() {
         controls={
           <NewsroomControls
             onOpenSettings={() => navigation.navigate(true, "news")}
+            onSimulate={(settings) => act("/api/simulation/start", settings)}
+            onStopSimulation={() => void act("/api/simulation/stop")}
             state={state}
             url={overlayUrl}
             busy={room.pending}

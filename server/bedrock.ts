@@ -8,14 +8,16 @@ const dispatcher = new Agent({
   headersTimeout: 50000,
   bodyTimeout: 50000,
 });
+let provideToken: ReturnType<typeof getTokenProvider> | undefined;
 export async function bedrockModel(
   mode: "fast" | "reasoning" | "audio" = "fast",
 ) {
   const audio = mode === "audio";
-  const token = await getTokenProvider({
+  provideToken ??= getTokenProvider({
     region: region(),
     expiresInSeconds: 300,
-  })();
+  });
+  const token = await provideToken();
   const provider = createOpenAICompatible({
     name: "chyron-bedrock",
     baseURL: audio

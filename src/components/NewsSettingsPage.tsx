@@ -1,3 +1,5 @@
+import CoverageCadenceSettings from "./CoverageCadenceSettings.tsx";
+import CoverageEditorialSettings from "./CoverageEditorialSettings.tsx";
 import {
   defaultCoverageSettings,
   type CoverageModelOption,
@@ -31,6 +33,17 @@ export default function NewsSettingsPage({
           <SettingsNavigation section="news" onChange={onNavigate} />
         </header>
         <div className="news-settings-groups">
+          <CoverageCadenceSettings
+            settings={settings}
+            models={models}
+            disabled={disabled}
+            onChange={onChange}
+          />
+          <CoverageEditorialSettings
+            settings={settings}
+            disabled={disabled}
+            onChange={onChange}
+          />
           <CoverageWritingSettings
             settings={settings}
             models={models}

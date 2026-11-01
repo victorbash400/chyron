@@ -328,3 +328,54 @@ test("news settings validate, merge, and expose only configured model choices", 
     else process.env.BEDROCK_MODEL_ID = fast;
   }
 });
+
+test("audio uploads reject stale source identity before transcription", async () => {
+  const f = await fixture();
+  try {
+    const response = await f.app.inject({
+      method: "POST",
+      url: "/api/audio",
+      headers: {
+        host: "localhost:5173",
+        "content-type": "audio/wav",
+        "x-chyron-source": "stale-source",
+      },
+      payload: Buffer.from([1, 2, 3]),
+    });
+    assert.equal(response.statusCode, 400);
+    assert.equal(
+      response.json().error,
+      "Audio source changed. Start capture again.",
+    );
+    assert.equal(f.room.state.messages.length, 0);
+  } finally {
+    await f.app.close();
+  }
+});
+
+test("simulator rejects real-chat mode and invalid configuration without starting a model", async () => {
+  const f = await fixture();
+  try {
+    const wrongSource = await f.request("/api/simulation/start", {
+      topic: "Test discussion",
+      users: 3,
+      messages: 12,
+      intervalMs: 1500,
+      model: "fast",
+    });
+    assert.equal(wrongSource.statusCode, 400);
+    assert.equal(wrongSource.json().error, "Select Simulation first.");
+    const invalid = await f.request("/api/simulation/start", {
+      topic: "test",
+      users: 100,
+      messages: 1000,
+      intervalMs: 1,
+      model: "fast",
+    });
+    assert.equal(invalid.statusCode, 400);
+    assert.equal(f.room.state.simulator.status, "idle");
+    assert.equal((await f.request("/api/simulation/stop", {})).statusCode, 200);
+  } finally {
+    await f.app.close();
+  }
+});

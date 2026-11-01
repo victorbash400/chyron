@@ -1,3 +1,5 @@
+import { ChatSimulator } from "./chatSimulator.ts";
+import { simulatorSettingsSchema } from "./chatScript.ts";
 import {
   coverageSettingsSchema,
   coverageModelOptions,
@@ -24,6 +26,22 @@ export async function registerRoutes(
   room: Newsroom,
   twitch: TwitchConnection,
 ) {
+  const simulator = new ChatSimulator(room);
+  app.post("/api/simulation/start", async (request, reply) => {
+    const settings = simulatorSettingsSchema.parse(request.body);
+    if (room.state.mode !== "simulation")
+      throw new Error("Select Simulation first.");
+    configuredCoverageModel(settings.model);
+    if (room.state.paused) throw new Error("Resume coverage first.");
+    if (room.state.simulator.status !== "idle")
+      throw new Error("Stop the current simulation first.");
+    void simulator.start(settings).catch((error) => room.fail(error));
+    return reply.code(202).send({ ok: true });
+  });
+  app.post("/api/simulation/stop", async () => {
+    simulator.stop();
+    return { ok: true };
+  });
   app.get("/api/bootstrap", async () => ({
     state: room.state,
     overlayUrl: `${origin()}/overlay/${room.overlayToken}`,
@@ -84,8 +102,9 @@ export async function registerRoutes(
     const appliedRevision = room.state.revision + 1;
     await room.commit();
     if (coverage?.lifetimeSeconds) room.scheduleExpiry();
-    if (patch.paused === false && room.state.messages.length)
-      void room.process().catch((error) => room.fail(error));
+    if (coverage) room.rescheduleCoverage();
+    if (patch.paused) simulator.stop();
+    if (patch.paused === false) room.scheduleCoverage();
     return { ok: true, design: appliedDesign, revision: appliedRevision };
   });
   app.post("/api/coverage", async (_request, reply) => {
@@ -241,7 +260,7 @@ export async function registerRoutes(
     return { ok: true };
   });
   app.addContentTypeParser(
-    ["audio/webm", "audio/mp4", "audio/ogg", "audio/wav"],
+    ["audio/webm", "audio/mp4", "audio/ogg", "audio/wav", "audio/mpeg"],
     { parseAs: "buffer" },
     (_request, body, done) => done(null, body),
   );
@@ -255,17 +274,25 @@ export async function registerRoutes(
       throw new Error("Send an audio recording.");
     if (room.state.paused)
       throw new Error("Resume coverage before adding audio.");
+    const sourceId = request.headers["x-chyron-source"];
+    if (sourceId !== room.state.sourceId)
+      throw new Error("Audio source changed. Start capture again.");
     transcribing = true;
     const mode = room.state.mode,
       channel = room.state.channel?.id;
     try {
       const result = await transcribe(request.body);
-      if (room.state.mode !== mode || room.state.channel?.id !== channel)
+      if (
+        sourceId !== room.state.sourceId ||
+        room.state.paused ||
+        room.state.mode !== mode ||
+        room.state.channel?.id !== channel
+      )
         throw new Error("Source changed during transcription. Record again.");
-      if (result.uncertainties.length)
-        throw new Error("Audio transcription was uncertain. Record again.");
       if (!result.transcript.trim())
-        throw new Error("No speech detected. Record again.");
+        return { transcript: "", status: "silence" };
+      if (result.uncertainties.length)
+        return { transcript: "", status: "uncertain" };
       room.add([
         {
           id: randomUUID(),
@@ -276,7 +303,7 @@ export async function registerRoutes(
           source: "audio",
         },
       ]);
-      return { transcript: result.transcript };
+      return { transcript: result.transcript, status: "speech" };
     } finally {
       transcribing = false;
     }
