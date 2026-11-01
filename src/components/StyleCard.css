@@ -2,12 +2,12 @@
   width: 100%;
   flex-shrink: 0;
   content-visibility: auto;
-  contain-intrinsic-size: auto 76px;
+  contain-intrinsic-size: auto 88px;
 }
 .style-card-preview {
   position: relative;
   background: #303335;
-  padding: 4px;
+  padding: 10px 4px;
 }
 .style-card-preview .broadcast-overlay.is-thumbnail {
   position: relative;
