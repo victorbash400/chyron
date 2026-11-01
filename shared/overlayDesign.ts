@@ -11,6 +11,10 @@ export const overlayStyles = [
   { id: "ribbon", name: "Ribbon", color: "#ff263d" },
   { id: "terminal", name: "Terminal", color: "#00874d" },
   { id: "capsule", name: "Capsule", color: "#f46b18" },
+  { id: "dateline", name: "Dateline", color: "#1767ff" },
+  { id: "split", name: "Split", color: "#ff263d" },
+  { id: "press", name: "Press", color: "#101827" },
+  { id: "pulse", name: "Pulse", color: "#7739ff" },
 ] as const;
 export const overlayColors = [
   "#ff263d",

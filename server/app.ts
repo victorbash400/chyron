@@ -52,6 +52,9 @@ export async function createApp(room = new Newsroom()) {
   });
   const twitch = new TwitchConnection(room);
   await registerRoutes(app, room, twitch);
+  app.addHook("preClose", async () => {
+    room.emit("shutdown");
+  });
   app.addHook("onClose", async () => {
     twitch.disconnect();
     room.dispose();

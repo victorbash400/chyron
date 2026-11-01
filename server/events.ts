@@ -22,10 +22,13 @@ export function streamState(
     }
     reply.raw.write(`event: state\ndata: ${JSON.stringify(snapshot())}\n\n`);
   };
+  const close = () => reply.raw.end();
+  newsroom.once("shutdown", close);
   newsroom.on("state", send);
   send();
   reply.raw.on("close", () => {
     closed = true;
     newsroom.off("state", send);
+    newsroom.off("shutdown", close);
   });
 }

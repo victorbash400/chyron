@@ -1,3 +1,4 @@
+import { get, type IncomingMessage } from "node:http";
 import { overlayStyles } from "../shared/overlayDesign.ts";
 import test from "node:test";
 import assert from "node:assert/strict";
@@ -241,6 +242,33 @@ test("simulation messages preserve chat identity and reject invalid input", asyn
       400,
     );
     assert.equal(f.room.state.messages.length, 1);
+  } finally {
+    await f.app.close();
+  }
+});
+
+test("shutdown closes live streams without leaving the server waiting", async () => {
+  const f = await fixture();
+  try {
+    const address = await f.app.listen({ port: 0, host: "127.0.0.1" });
+    const response = await new Promise<IncomingMessage>((resolve, reject) => {
+      const request = get(
+        `${address}/api/events`,
+        { headers: { host: "localhost:5173" } },
+        resolve,
+      );
+      request.on("error", reject);
+      request.setTimeout(2000, () =>
+        request.destroy(new Error("Stream did not close")),
+      );
+    });
+    assert.equal(response.statusCode, 200);
+    const reader = response[Symbol.asyncIterator]();
+    await reader.next();
+    await f.app.close();
+    assert.equal((await reader.next()).done, true);
+    assert.equal(f.room.listenerCount("state"), 0);
+    assert.equal(f.room.listenerCount("shutdown"), 0);
   } finally {
     await f.app.close();
   }

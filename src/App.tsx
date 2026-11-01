@@ -1,5 +1,4 @@
-import { lazy, Suspense, useCallback, useRef, useState } from "react";
-import type { OverlayDesign } from "../shared/overlayDesign.ts";
+import { lazy, Suspense, useEffect, useRef, useState } from "react";
 import { useNarrowLayout } from "./state/useNarrowLayout.ts";
 import { useWorkspaceNavigation } from "./state/useWorkspaceNavigation.ts";
 import LoadingRegion from "./components/controls/LoadingRegion.tsx";
@@ -30,17 +29,18 @@ export default function App() {
   const [requestedChat, setChatOpen] = useState<boolean>();
   const chatOpen = requestedChat ?? !narrow;
   const navigation = useWorkspaceNavigation();
-  const onDesign = useCallback(
-    (design: Partial<OverlayDesign>) => {
-      void room.act("/api/settings", { design });
-    },
-    [room.act],
-  );
+  const onDesign = room.updateDesign;
+  const [dismissedError, setDismissedError] = useState<string | null>(null);
+  useEffect(() => setDismissedError(null), [room.bootstrap?.state.error]);
   const bootstrap = room.bootstrap;
   const act = room.act;
   if (!bootstrap)
     return room.error ? (
-      <ErrorNotice error={room.error} onRetry={room.reconnect} />
+      <ErrorNotice
+        error={room.error}
+        onRetry={room.reconnect}
+        retryLabel="Reconnect"
+      />
     ) : (
       <LoadingRegion label="Loading Chyron" />
     );
@@ -53,11 +53,7 @@ export default function App() {
         settings={
           navigation.settings ? (
             <Suspense fallback={<LoadingRegion label="Loading appearance" />}>
-              <AppearancePage
-                state={state}
-                busy={room.pending}
-                onChange={onDesign}
-              />
+              <AppearancePage state={state} busy={false} onChange={onDesign} />
             </Suspense>
           ) : undefined
         }
@@ -80,16 +76,6 @@ export default function App() {
             }
           />
         }
-        notice={
-          (room.error || state.error) && (
-            <ErrorNotice
-              error={room.error ?? state.error!}
-              onRetry={
-                !room.online ? room.reconnect : () => void act("/api/coverage")
-              }
-            />
-          )
-        }
         styles={
           <LibrarySidebar
             open={stylesOpen}
@@ -97,7 +83,7 @@ export default function App() {
           >
             <StylePicker
               design={state.design}
-              disabled={room.pending}
+              disabled={false}
               onChange={onDesign}
             />
           </LibrarySidebar>
@@ -155,7 +141,6 @@ export default function App() {
         {editing && (
           <StoryEditor
             story={editing}
-            error={room.error}
             onClose={() => setEditing(null)}
             onSave={(headline, summary) =>
               act(`/api/stories/${editing.id}`, {
@@ -175,7 +160,6 @@ export default function App() {
         )}{" "}
         {setup && (
           <TwitchSetup
-            error={room.error}
             onClose={() => setSetup(false)}
             onSave={(clientId, clientSecret) =>
               act("/api/twitch/configure", { clientId, clientSecret })
@@ -183,6 +167,17 @@ export default function App() {
           />
         )}
       </Suspense>
+      {(room.error || (state.error !== dismissedError && state.error)) && (
+        <ErrorNotice
+          error={room.error ?? state.error!}
+          onDismiss={() => {
+            setDismissedError(state.error);
+            room.setError(null);
+          }}
+          onRetry={!room.online ? room.reconnect : undefined}
+          retryLabel="Reconnect"
+        />
+      )}
     </>
   );
 }

@@ -1,19 +1,58 @@
 .error-notice {
+  position: fixed;
+  inset: 0;
+  margin: auto;
+  width: min(290px, calc(100vw - 32px));
+  max-height: calc(100dvh - 32px);
+  overflow: auto;
+  padding: 26px 20px 20px;
+  border: 1px solid #ffffff80;
+  border-radius: 14px;
+  background: var(--panel);
+  color: var(--ink);
+  text-align: center;
+  box-shadow:
+    0 16px 48px #17232130,
+    0 0 0 1px #17232112;
+}
+.error-notice::backdrop {
+  background: #14211f35;
+}
+.error-notice-symbol {
+  width: 48px;
+  height: 48px;
+  color: #d79c15;
+  fill: #f8d65a;
+  stroke-width: 1.6;
+  margin-bottom: 14px;
+}
+.error-notice h2 {
+  margin: 0;
+  font-size: 13px;
+  line-height: 1.45;
+  font-weight: 650;
+  overflow-wrap: anywhere;
+}
+.error-notice-actions {
   display: flex;
-  align-items: center;
-  gap: 12px;
-  padding: 12px 14px;
-  background: #fbeaec;
-  border-radius: var(--radius);
-  color: #a51823;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 22px;
+}
+.error-notice-actions button {
+  min-height: 30px;
+  border-radius: 7px;
   font-size: 12px;
-  flex-shrink: 0;
+  font-weight: 550;
 }
-.error-notice span {
-  flex: 1;
+.error-notice-actions .error-notice-confirm {
+  color: var(--on-accent);
+  background: var(--accent);
 }
-.error-notice button {
-  display: flex;
-  padding: 4px;
-  border-radius: 4px;
+.error-notice-actions .error-notice-retry {
+  background: var(--hover);
+}
+.error-notice-actions button:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
 }

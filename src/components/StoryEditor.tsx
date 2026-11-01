@@ -2,17 +2,14 @@ import { useState, type FormEvent } from "react";
 import type { Story } from "../../shared/types.ts";
 import SettingsInlineButton from "./settings/SettingsInlineButton.tsx";
 import Dialog from "./Dialog.tsx";
-import ErrorNotice from "./ErrorNotice.tsx";
 import "./StoryEditor.css";
 export default function StoryEditor({
   story,
   onClose,
   onSave,
-  error,
 }: {
   story: Story;
   onClose: () => void;
-  error?: string | null;
   onSave: (headline: string, summary: string) => Promise<boolean>;
 }) {
   const [headline, setHeadline] = useState(story.headline),
@@ -27,7 +24,6 @@ export default function StoryEditor({
   }
   return (
     <Dialog title="Edit story" onClose={onClose}>
-      {error && <ErrorNotice error={error} />}
       <form className="story-editor" onSubmit={(event) => void submit(event)}>
         <label>
           Headline

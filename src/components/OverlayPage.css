@@ -2,13 +2,3 @@ html.overlay-document,
 html.overlay-document body {
   background: transparent;
 }
-.overlay-error {
-  position: absolute;
-  bottom: 20px;
-  left: 20px;
-  font-size: 12px;
-  background: #fff;
-  color: #a51823;
-  border-radius: 6px;
-  padding: 10px 14px;
-}

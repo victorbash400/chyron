@@ -64,10 +64,12 @@ export async function registerRoutes(
     const { design, ...settings } = patch;
     Object.assign(room.state, settings);
     if (design) room.state.design = { ...room.state.design, ...design };
+    const appliedDesign = { ...room.state.design };
+    const appliedRevision = room.state.revision + 1;
     await room.commit();
     if (patch.paused === false && room.state.messages.length)
       void room.process().catch((error) => room.fail(error));
-    return { ok: true };
+    return { ok: true, design: appliedDesign, revision: appliedRevision };
   });
   app.post("/api/coverage", async (_request, reply) => {
     if (room.state.paused) throw new Error("Resume coverage first.");

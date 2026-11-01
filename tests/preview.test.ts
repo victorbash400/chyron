@@ -25,12 +25,51 @@ test("draft previews never publish into the OBS feed", () => {
   const room = new Newsroom();
   try {
     room.state.stories = [story];
-    assert.equal(previewCoverage(room.state).draft, true);
+    assert.equal(previewCoverage(room.state).kind, "draft");
     assert.equal(previewCoverage(room.state).coverage.lead?.id, "draft");
     assert.equal(overlayState(room.state).lead, null);
     room.state.stories = [{ ...story, published: true }];
-    assert.equal(previewCoverage(room.state).draft, false);
+    assert.equal(previewCoverage(room.state).kind, "published");
     assert.equal(overlayState(room.state).lead?.id, "draft");
+  } finally {
+    room.dispose();
+  }
+});
+
+test("an empty newsroom previews the selected design without publishing sample content", () => {
+  const room = new Newsroom();
+  try {
+    room.state.design = {
+      style: "signal",
+      color: "#1767ff",
+      size: 115,
+      speed: 50,
+    };
+    const preview = previewCoverage(room.state);
+    assert.equal(preview.kind, "sample");
+    assert.ok(preview.coverage.lead?.headline);
+    assert.deepEqual(preview.coverage.design, room.state.design);
+    assert.deepEqual(preview.coverage.ticker, [preview.coverage.lead]);
+    assert.equal(preview.coverage.quote, null);
+    assert.equal(overlayState(room.state).lead, null);
+    assert.deepEqual(overlayState(room.state).ticker, []);
+    assert.equal(room.state.stories.length, 0);
+    assert.equal(room.state.messages.length, 0);
+  } finally {
+    room.dispose();
+  }
+});
+
+test("sample previews respect overlay visibility and exclude dismissed stories", () => {
+  const room = new Newsroom();
+  try {
+    room.state.visible = false;
+    room.state.stories = [{ ...story, dismissed: true }];
+    const preview = previewCoverage(room.state);
+    assert.equal(preview.kind, "sample");
+    assert.equal(preview.coverage.visible, false);
+    assert.notEqual(preview.coverage.lead?.id, story.id);
+    assert.equal(overlayState(room.state).lead, null);
   } finally {
     room.dispose();
   }

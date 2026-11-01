@@ -6,7 +6,6 @@ import {
 } from "../../shared/overlayDesign.ts";
 import type { NewsroomState } from "../../shared/types.ts";
 import { previewCoverage } from "../state/previewCoverage.ts";
-import { styleSampleStory } from "../state/styleSample.ts";
 import BroadcastOverlay from "./BroadcastOverlay.tsx";
 import AppearanceControls from "./AppearanceControls.tsx";
 import SettingsInlineButton from "./settings/SettingsInlineButton.tsx";
@@ -23,12 +22,7 @@ export default function AppearancePage({
   onChange: (patch: Partial<OverlayDesign>) => void;
 }) {
   const preview = previewCoverage(state).coverage;
-  const sample = {
-    ...preview,
-    visible: true,
-    lead: preview.lead ?? styleSampleStory,
-    ticker: preview.ticker.length ? preview.ticker : [styleSampleStory],
-  };
+  const sample = { ...preview, visible: true };
   return (
     <main className={`${pageStyles.main} appearance-page`}>
       <div className={pageStyles.content}>

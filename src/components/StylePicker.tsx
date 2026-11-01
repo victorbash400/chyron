@@ -8,6 +8,15 @@ import type { OverlayState } from "../../shared/types.ts";
 import { styleSampleStory } from "../state/styleSample.ts";
 import StyleCard from "./StyleCard.tsx";
 import "./StylePicker.css";
+const samples: OverlayState[] = overlayStyles.map((choice) => ({
+  mode: "twitch",
+  visible: true,
+  lead: styleSampleStory,
+  ticker: [styleSampleStory],
+  quote: null,
+  design: { ...defaultOverlayDesign, style: choice.id, color: choice.color },
+}));
+
 function StylePicker({
   design: selectedDesign,
   disabled,
@@ -17,7 +26,6 @@ function StylePicker({
   disabled: boolean;
   onChange: (patch: Partial<OverlayDesign>) => void;
 }) {
-  const lead = styleSampleStory;
   return (
     <section
       className="workspace-panel style-picker"
@@ -29,22 +37,15 @@ function StylePicker({
       </div>
       <div className="style-picker-scroll">
         {overlayStyles.map((choice, index) => {
-          const design = {
-            ...defaultOverlayDesign,
-            style: choice.id,
-            color:
-              selectedDesign.style === choice.id
-                ? selectedDesign.color
-                : choice.color,
-          };
-          const sample: OverlayState = {
-            mode: "twitch",
-            visible: true,
-            lead,
-            ticker: [lead],
-            quote: null,
-            design,
-          };
+          const base = samples[index]!;
+          const sample =
+            selectedDesign.style === choice.id &&
+            selectedDesign.color !== base.design.color
+              ? {
+                  ...base,
+                  design: { ...base.design, color: selectedDesign.color },
+                }
+              : base;
           return (
             <StyleCard
               key={choice.id}
@@ -53,9 +54,7 @@ function StylePicker({
               selected={selectedDesign.style === choice.id}
               state={sample}
               disabled={disabled}
-              onSelect={() =>
-                onChange({ style: choice.id, color: choice.color })
-              }
+              onChange={onChange}
             />
           );
         })}

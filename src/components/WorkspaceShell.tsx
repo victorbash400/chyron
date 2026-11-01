@@ -6,7 +6,6 @@ import "./WorkspaceShell.css";
 
 export default function WorkspaceShell({
   header,
-  notice,
   styles,
   stories,
   preview,
@@ -17,7 +16,6 @@ export default function WorkspaceShell({
   chatOpen,
 }: {
   header: ReactNode;
-  notice: ReactNode;
   styles: ReactNode;
   stories: ReactNode;
   preview: ReactNode;
@@ -34,7 +32,6 @@ export default function WorkspaceShell({
       {styles}
       <div className="workspace-main" inert={narrow && stylesOpen}>
         {header}
-        {notice && <div className="workspace-notice">{notice}</div>}
         <div className="workspace-body" hidden={Boolean(settings)}>
           <main className="workspace-content">
             <div className="workspace-center" inert={railOverlay && chatOpen}>

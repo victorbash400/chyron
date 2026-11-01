@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import type { OverlayState } from "../../shared/types.ts";
+import ErrorNotice from "./ErrorNotice.tsx";
 import BroadcastOverlay from "./BroadcastOverlay.tsx";
 import { api } from "../state/api.ts";
 import "./OverlayPage.css";
@@ -46,12 +47,11 @@ export default function OverlayPage({ token }: { token: string }) {
     <>
       {state && <BroadcastOverlay state={state} />}{" "}
       {error && (
-        <button
-          className="overlay-error"
-          onClick={() => setAttempt((n) => n + 1)}
-        >
-          {error} Reconnect
-        </button>
+        <ErrorNotice
+          error={error}
+          onRetry={() => setAttempt((n) => n + 1)}
+          retryLabel="Reconnect"
+        />
       )}
     </>
   );

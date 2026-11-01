@@ -265,3 +265,26 @@ test("a pinned lead survives the story retention limit", () => {
     r.dispose();
   }
 });
+
+test("live settings commit emits before storage finishes and surfaces persistence failure", async () => {
+  let rejectSave!: (error: Error) => void;
+  const room = new Newsroom(
+    async () => ({ stories: [] }),
+    () =>
+      new Promise<void>((_resolve, reject) => {
+        rejectSave = reject;
+      }),
+  );
+  let delivered = false;
+  room.on("state", () => {
+    delivered = true;
+  });
+  const commit = room.commit();
+  assert.equal(delivered, true);
+  await Promise.resolve();
+  await Promise.resolve();
+  rejectSave(new Error("Storage unavailable"));
+  await assert.rejects(commit, { message: "Storage unavailable" });
+  assert.equal(room.state.error, "Storage unavailable");
+  room.dispose();
+});

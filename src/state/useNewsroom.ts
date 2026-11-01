@@ -1,4 +1,6 @@
-import { useCallback, useEffect, useState } from "react";
+import type { OverlayDesign } from "../../shared/overlayDesign.ts";
+import { DesignUpdates, type DesignReceipt } from "./designUpdates.ts";
+import { useCallback, useEffect, useRef, useState } from "react";
 import type { Bootstrap, NewsroomState } from "../../shared/types.ts";
 import { api } from "./api.ts";
 export function useNewsroom() {
@@ -7,12 +9,35 @@ export function useNewsroom() {
   const [online, setOnline] = useState(false);
   const [attempt, setAttempt] = useState(0);
   const [pending, setPending] = useState(0);
+  const [designPatch, setDesignPatch] = useState<Partial<OverlayDesign>>({});
+  const designs = useRef<DesignUpdates | null>(null);
+  const designRevision = useRef(0);
+  useEffect(() => {
+    designs.current = new DesignUpdates(
+      async (design) => api<DesignReceipt>("/api/settings", { design }),
+      setDesignPatch,
+      ({ design, revision }) => {
+        designRevision.current = revision;
+        setBootstrap((previous) =>
+          previous && revision >= previous.state.revision
+            ? { ...previous, state: { ...previous.state, design } }
+            : previous,
+        );
+      },
+      setError,
+    );
+    return () => designs.current?.dispose();
+  }, []);
+  const updateDesign = useCallback((patch: Partial<OverlayDesign>) => {
+    designs.current?.update(patch);
+  }, []);
   useEffect(() => {
     let active = true;
     let stream: EventSource | undefined;
     void api<Bootstrap>("/api/bootstrap")
       .then((value) => {
         if (!active) return;
+        designRevision.current = value.state.revision;
         setBootstrap(value);
         setError(null);
         stream = new EventSource("/api/events");
@@ -26,7 +51,18 @@ export function useNewsroom() {
               (event as MessageEvent).data,
             ) as NewsroomState;
             setBootstrap((previous) =>
-              previous ? { ...previous, state } : null,
+              previous && state.revision >= previous.state.revision
+                ? {
+                    ...previous,
+                    state: {
+                      ...state,
+                      design:
+                        state.revision < designRevision.current
+                          ? previous.state.design
+                          : state.design,
+                    },
+                  }
+                : previous,
             );
           } catch {
             setError("Invalid live update. Reconnect Chyron.");
@@ -64,7 +100,16 @@ export function useNewsroom() {
     }
   }, []);
   return {
-    bootstrap,
+    bootstrap: bootstrap
+      ? {
+          ...bootstrap,
+          state: {
+            ...bootstrap.state,
+            design: { ...bootstrap.state.design, ...designPatch },
+          },
+        }
+      : null,
+    updateDesign,
     error,
     setError,
     online,

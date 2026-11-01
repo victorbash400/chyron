@@ -1,15 +1,12 @@
 import { useState, type FormEvent } from "react";
 import SettingsInlineButton from "./settings/SettingsInlineButton.tsx";
 import Dialog from "./Dialog.tsx";
-import ErrorNotice from "./ErrorNotice.tsx";
 import "./TwitchSetup.css";
 export default function TwitchSetup({
   onClose,
   onSave,
-  error,
 }: {
   onClose: () => void;
-  error?: string | null;
   onSave: (clientId: string, clientSecret: string) => Promise<boolean>;
 }) {
   const [clientId, setClientId] = useState(""),
@@ -24,7 +21,6 @@ export default function TwitchSetup({
   }
   return (
     <Dialog title="Twitch application" onClose={onClose}>
-      {error && <ErrorNotice error={error} />}
       <form className="twitch-setup" onSubmit={(event) => void submit(event)}>
         <a
           className="developer-link"

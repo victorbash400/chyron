@@ -31,7 +31,11 @@ export default function OverlayPreview({
     <section className="workspace-panel overlay-preview" aria-label="Preview">
       <div className="panel-heading">
         <h2>Preview</h2>
-        {preview.draft && <span className="draft-label">Draft</span>}
+        {preview.kind !== "published" && (
+          <span className="draft-label">
+            {preview.kind === "sample" ? "Sample" : "Draft"}
+          </span>
+        )}
         <div className="preview-actions">
           <PreviewSourceMenu
             active={Boolean(video.stream)}

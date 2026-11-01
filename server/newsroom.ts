@@ -80,8 +80,8 @@ export class Newsroom extends EventEmitter {
   }
   async commit() {
     try {
-      await this.persist();
       this.emitState();
+      await this.persist();
     } catch (error) {
       this.fail(error);
       throw error;
