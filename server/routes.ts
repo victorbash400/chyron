@@ -1,3 +1,8 @@
+import {
+  coverageSettingsSchema,
+  coverageModelOptions,
+  configuredCoverageModel,
+} from "./coverageSettings.ts";
 import { overlayColors, overlayStyleIds } from "../shared/overlayDesign.ts";
 import { randomBytes, randomUUID, timingSafeEqual } from "node:crypto";
 import type { FastifyInstance } from "fastify";
@@ -23,6 +28,7 @@ export async function registerRoutes(
     state: room.state,
     overlayUrl: `${origin()}/overlay/${room.overlayToken}`,
     twitchConfigured: twitch.configured(),
+    coverageModels: coverageModelOptions(),
   }));
   app.get("/api/events", async (_request, reply) =>
     streamState(reply, room, () => room.state),
@@ -46,6 +52,7 @@ export async function registerRoutes(
   app.post("/api/settings", async (request) => {
     const patch = z
       .object({
+        coverage: coverageSettingsSchema.partial().strict().optional(),
         paused: z.boolean().optional(),
         automatic: z.boolean().optional(),
         visible: z.boolean().optional(),
@@ -61,12 +68,22 @@ export async function registerRoutes(
       })
       .strict()
       .parse(request.body);
-    const { design, ...settings } = patch;
+    const { design, coverage, ...settings } = patch;
+    if (coverage && room.state.working)
+      throw new Error(
+        "Wait for coverage to finish before changing news settings.",
+      );
+    if (coverage?.model) configuredCoverageModel(coverage.model);
     Object.assign(room.state, settings);
+    if (coverage) {
+      room.state.coverage = { ...room.state.coverage, ...coverage };
+      room.state.model = configuredCoverageModel(room.state.coverage.model);
+    }
     if (design) room.state.design = { ...room.state.design, ...design };
     const appliedDesign = { ...room.state.design };
     const appliedRevision = room.state.revision + 1;
     await room.commit();
+    if (coverage?.lifetimeSeconds) room.scheduleExpiry();
     if (patch.paused === false && room.state.messages.length)
       void room.process().catch((error) => room.fail(error));
     return { ok: true, design: appliedDesign, revision: appliedRevision };

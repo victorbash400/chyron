@@ -15,6 +15,7 @@ export default function StoryEvidence({
     <Dialog title="Source messages" onClose={onClose}>
       <div className="story-evidence">
         <h3>{story.headline}</h3>
+        {story.summary && <p>{story.summary}</p>}
         {messages
           .filter((m) => story.messageIds.includes(m.id))
           .map((message) => (

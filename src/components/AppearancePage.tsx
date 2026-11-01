@@ -1,3 +1,6 @@
+import SettingsNavigation, {
+  type SettingsSection,
+} from "./settings/SettingsNavigation.tsx";
 import { RotateCcw } from "lucide-react";
 import {
   defaultOverlayDesign,
@@ -16,7 +19,9 @@ export default function AppearancePage({
   state,
   busy,
   onChange,
+  onNavigate,
 }: {
+  onNavigate: (section: SettingsSection) => void;
   state: NewsroomState;
   busy: boolean;
   onChange: (patch: Partial<OverlayDesign>) => void;
@@ -27,7 +32,7 @@ export default function AppearancePage({
     <main className={`${pageStyles.main} appearance-page`}>
       <div className={pageStyles.content}>
         <header>
-          <h1>Appearance</h1>
+          <SettingsNavigation section="appearance" onChange={onNavigate} />
         </header>
         <div className="appearance-page-content">
           <div className="appearance-preview">

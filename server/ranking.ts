@@ -49,7 +49,9 @@ export function overlayState(
   const stories = sortedStories(
     state.stories.filter(
       (s) =>
-        s.published && !s.dismissed && (s.pinned || now - s.updatedAt < 300000),
+        s.published &&
+        !s.dismissed &&
+        (s.pinned || now - s.updatedAt < state.coverage.lifetimeSeconds * 1000),
     ),
     now,
   );
@@ -60,9 +62,10 @@ export function overlayState(
     visible: state.visible,
     lead,
     ticker: stories,
-    quote:
-      state.messages.find(
-        (m) => m.id === lead?.quoteId && m.source !== "audio",
-      ) ?? null,
+    quote: state.coverage.quotes
+      ? (state.messages.find(
+          (m) => m.id === lead?.quoteId && m.source !== "audio",
+        ) ?? null)
+      : null,
   };
 }

@@ -27,11 +27,12 @@ export function previewCoverage(state: NewsroomState) {
       ...broadcast,
       lead,
       ticker: drafts,
-      quote:
-        state.messages.find(
-          (message) =>
-            message.id === lead.quoteId && message.source !== "audio",
-        ) ?? null,
+      quote: state.coverage.quotes
+        ? (state.messages.find(
+            (message) =>
+              message.id === lead.quoteId && message.source !== "audio",
+          ) ?? null)
+        : null,
     },
   };
 }

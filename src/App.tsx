@@ -13,6 +13,9 @@ import StoryList from "./components/StoryList.tsx";
 import OverlayPreview from "./components/OverlayPreview.tsx";
 import ChatFeed from "./components/ChatFeed.tsx";
 import ErrorNotice from "./components/ErrorNotice.tsx";
+const NewsSettingsPage = lazy(
+  () => import("./components/NewsSettingsPage.tsx"),
+);
 const AppearancePage = lazy(() => import("./components/AppearancePage.tsx"));
 const StoryEditor = lazy(() => import("./components/StoryEditor.tsx"));
 const StoryEvidence = lazy(() => import("./components/StoryEvidence.tsx"));
@@ -52,8 +55,25 @@ export default function App() {
         chatOpen={chatOpen}
         settings={
           navigation.settings ? (
-            <Suspense fallback={<LoadingRegion label="Loading appearance" />}>
-              <AppearancePage state={state} busy={false} onChange={onDesign} />
+            <Suspense fallback={<LoadingRegion label="Loading settings" />}>
+              {navigation.section === "news" ? (
+                <NewsSettingsPage
+                  settings={state.coverage}
+                  models={bootstrap.coverageModels}
+                  disabled={room.pending || state.working}
+                  onChange={(coverage) =>
+                    void act("/api/settings", { coverage })
+                  }
+                  onNavigate={(section) => navigation.navigate(true, section)}
+                />
+              ) : (
+                <AppearancePage
+                  state={state}
+                  busy={false}
+                  onChange={onDesign}
+                  onNavigate={(section) => navigation.navigate(true, section)}
+                />
+              )}
             </Suspense>
           ) : undefined
         }
@@ -90,6 +110,7 @@ export default function App() {
         }
         controls={
           <NewsroomControls
+            onExpand={() => navigation.navigate(true, "news")}
             state={state}
             url={overlayUrl}
             busy={room.pending}

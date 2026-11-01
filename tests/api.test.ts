@@ -273,3 +273,58 @@ test("shutdown closes live streams without leaving the server waiting", async ()
     await f.app.close();
   }
 });
+
+test("news settings validate, merge, and expose only configured model choices", async () => {
+  const reasoning = process.env.BEDROCK_REASONING_MODEL_ID,
+    fast = process.env.BEDROCK_MODEL_ID;
+  process.env.BEDROCK_REASONING_MODEL_ID = "test-reasoning";
+  process.env.BEDROCK_MODEL_ID = "test-fast";
+  const f = await fixture();
+  try {
+    const response = await f.request("/api/settings", {
+      coverage: {
+        model: "fast",
+        summary: "brief",
+        minimumParticipants: 3,
+        quotes: false,
+      },
+    });
+    assert.equal(response.statusCode, 200);
+    const bootstrap = (await f.request("/api/bootstrap")).json();
+    assert.equal(bootstrap.state.coverage.summary, "brief");
+    assert.equal(bootstrap.state.coverage.contextSeconds, 180);
+    assert.equal(bootstrap.state.model, "test-fast");
+    assert.deepEqual(bootstrap.coverageModels, [
+      { value: "reasoning", label: "test-reasoning" },
+      { value: "fast", label: "test-fast" },
+    ]);
+    for (const coverage of [
+      { model: "arbitrary-model" },
+      { summary: "long" },
+      { maxStories: 100 },
+      { minimumParticipants: 0 },
+      { contextSeconds: -1 },
+      { lifetimeSeconds: 0 },
+      { quotes: "yes" },
+      { unknown: true },
+    ]) {
+      assert.equal(
+        (await f.request("/api/settings", { coverage })).statusCode,
+        400,
+      );
+    }
+    f.room.state.working = true;
+    assert.equal(
+      (await f.request("/api/settings", { coverage: { tone: "neutral" } }))
+        .statusCode,
+      400,
+    );
+    assert.equal(f.room.state.coverage.tone, "playful");
+  } finally {
+    await f.app.close();
+    if (reasoning === undefined) delete process.env.BEDROCK_REASONING_MODEL_ID;
+    else process.env.BEDROCK_REASONING_MODEL_ID = reasoning;
+    if (fast === undefined) delete process.env.BEDROCK_MODEL_ID;
+    else process.env.BEDROCK_MODEL_ID = fast;
+  }
+});

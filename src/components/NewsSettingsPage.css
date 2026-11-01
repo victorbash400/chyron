@@ -1,0 +1,8 @@
+.news-settings-groups {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+.news-settings-reset {
+  align-self: flex-end;
+}

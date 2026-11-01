@@ -1,9 +1,14 @@
+import { defaultCoverageSettings } from "../shared/coverageSettings.ts";
 import { defaultOverlayDesign } from "../shared/overlayDesign.ts";
 import { z } from "zod";
 import { randomBytes, randomUUID } from "node:crypto";
 import { EventEmitter } from "node:events";
 import type { ChatMessage, NewsroomState, Story } from "../shared/types.ts";
-import { type Coverage, writeCoverage } from "./editor.ts";
+import {
+  type Coverage,
+  writeCoverage,
+  createCoverageSchema,
+} from "./editor.ts";
 import { readRecord, writeRecord } from "./store.ts";
 import { storyScore } from "./ranking.ts";
 export interface SavedNewsroom {
@@ -26,6 +31,7 @@ export class Newsroom extends EventEmitter {
     audioModel: process.env.BEDROCK_AUDIO_MODEL_ID ?? "",
     revision: 0,
     design: { ...defaultOverlayDesign },
+    coverage: { ...defaultCoverageSettings },
   };
   overlayToken = randomBytes(32).toString("hex");
   private pending = false;
@@ -45,9 +51,13 @@ export class Newsroom extends EventEmitter {
       this.state = {
         ...saved.state,
         design: { ...defaultOverlayDesign, ...saved.state.design },
+        coverage: { ...defaultCoverageSettings, ...saved.state.coverage },
         working: false,
         connection: "disconnected",
-        model: process.env.BEDROCK_REASONING_MODEL_ID ?? "",
+        model:
+          (saved.state.coverage?.model === "fast"
+            ? process.env.BEDROCK_MODEL_ID
+            : process.env.BEDROCK_REASONING_MODEL_ID) ?? "",
         audioModel: process.env.BEDROCK_AUDIO_MODEL_ID ?? "",
         error: null,
       };
@@ -114,10 +124,19 @@ export class Newsroom extends EventEmitter {
     this.emitState();
     try {
       const now = Date.now();
-      const messages = this.state.messages.filter((m) => now - m.at < 180000);
+      const settings = { ...this.state.coverage };
+      const messages = this.state.messages.filter(
+        (m) =>
+          now - m.at < settings.contextSeconds * 1000 &&
+          (settings.includeAudio || m.source !== "audio"),
+      );
       if (!messages.length)
         throw new Error("Add chat messages before generating coverage.");
-      const coverage = await this.editor(messages, this.state.stories);
+      const coverage = await this.editor(
+        messages,
+        this.state.stories,
+        settings,
+      );
       if (epoch !== this.epoch || this.state.paused) return;
       this.apply(coverage, now);
       await this.persist();
@@ -135,7 +154,8 @@ export class Newsroom extends EventEmitter {
   }
   apply(coverage: Coverage, now: number) {
     const next = structuredClone(this.state.stories);
-    for (const update of coverage.stories) {
+    const validated = createCoverageSchema(this.state.coverage).parse(coverage);
+    for (const update of validated.stories) {
       const existing = update.existingId
         ? next.find((s) => s.id === update.existingId)
         : undefined;
@@ -162,15 +182,16 @@ export class Newsroom extends EventEmitter {
       const participants = new Set(
         messages.filter((m) => m.source !== "audio").map((m) => m.userId),
       ).size;
-      if (!existing && participants < 2) continue;
+      if (!existing && participants < this.state.coverage.minimumParticipants)
+        continue;
       if (existing?.dismissed || existing?.edited) continue;
       const story: Story = {
         id: existing?.id ?? randomUUID(),
         headline: update.headline,
-        summary: update.summary,
+        summary: this.state.coverage.summary === "off" ? "" : update.summary,
         status: update.status,
         messageIds: ids,
-        quoteId: update.quoteId,
+        quoteId: this.state.coverage.quotes ? update.quoteId : null,
         participants,
         score: storyScore(messages, update.interest, now),
         interest: update.interest,
@@ -226,9 +247,9 @@ export class Newsroom extends EventEmitter {
           s.published &&
           !s.pinned &&
           !s.dismissed &&
-          s.updatedAt + 300000 > now,
+          s.updatedAt + this.state.coverage.lifetimeSeconds * 1000 > now,
       )
-      .map((s) => s.updatedAt + 300000);
+      .map((s) => s.updatedAt + this.state.coverage.lifetimeSeconds * 1000);
     if (next.length)
       this.expiry = setTimeout(
         () => {

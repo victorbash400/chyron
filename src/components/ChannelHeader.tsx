@@ -70,7 +70,7 @@ export default function ChannelHeader({
         </div>
         <div className={styles.group}>
           <IconButton
-            label="Appearance settings"
+            label="Settings"
             selected={settings}
             onClick={() => onNavigate(!settings)}
           >

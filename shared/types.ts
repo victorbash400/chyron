@@ -1,3 +1,7 @@
+import type {
+  CoverageSettings,
+  CoverageModelOption,
+} from "./coverageSettings.ts";
 import type { OverlayDesign } from "./overlayDesign.ts";
 export type StoryStatus = "BREAKING" | "DEVELOPING" | "UPDATE";
 export type SourceMode = "twitch" | "simulation";
@@ -41,6 +45,7 @@ export interface NewsroomState {
   audioModel: string;
   revision: number;
   design: OverlayDesign;
+  coverage: CoverageSettings;
 }
 export interface OverlayState {
   design: OverlayDesign;
@@ -54,4 +59,5 @@ export interface Bootstrap {
   state: NewsroomState;
   overlayUrl: string;
   twitchConfigured: boolean;
+  coverageModels: CoverageModelOption[];
 }
