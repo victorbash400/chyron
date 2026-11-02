@@ -185,11 +185,10 @@ export class Newsroom extends EventEmitter {
       );
       if (!messages.length)
         throw new Error("Coverage needs chat or audio input.");
-      const coverage = await this.editor(
-        messages,
-        this.state.stories,
-        settings,
+      const activeStories = this.state.stories.filter(
+        (story) => now - story.updatedAt < settings.lifetimeSeconds * 1000,
       );
+      const coverage = await this.editor(messages, activeStories, settings);
       if (epoch !== this.epoch || this.state.paused) return;
       this.apply(coverage, now);
       this.emitState();

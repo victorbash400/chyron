@@ -297,3 +297,22 @@ test("chat ingestion updates the live feed without a generation or publication a
     r.dispose();
   }
 });
+
+test("expired coverage is kept in history but cannot become the target of a new discussion", async () => {
+  let offered: string[] = [];
+  const r = new Newsroom(async (_messages, stories) => {
+    offered = stories.map((story) => story.id);
+    return { stories: [] };
+  }, async () => {});
+  try {
+    const now = Date.now();
+    r.state.messages = messages.map((message) => ({ ...message, at: now }));
+    r.apply(coverage, now);
+    const live = r.state.stories[0];
+    r.state.stories.push({ ...live, id: "expired", updatedAt: now - 61000 });
+    r.state.coverage.lifetimeSeconds = 60;
+    await r.process();
+    assert.deepEqual(offered, [live.id]);
+    assert.equal(r.state.stories.length, 2);
+  } finally { r.dispose(); }
+});
