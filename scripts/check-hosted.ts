@@ -30,6 +30,10 @@ const other = { id: `${id}-other`, name: "Other integration account" };
 const cleanupKeys: { pk: string; sk: string }[] = [];
 const sockets: WebSocket[] = [];
 let work: Promise<unknown>[] = [];
+const dispatch = (request: Request) =>
+  process.argv.includes("--remote")
+    ? fetch(request, { signal: AbortSignal.timeout(30000) })
+    : handleRequest(request, (promise) => work.push(promise));
 try {
   const room = await ensureRoom(account);
   const otherRoom = await ensureRoom(other);
@@ -77,13 +81,11 @@ try {
   assert.equal((await getRoom(id)).state.design.speed, 34);
   const request = (path: string, cookie: string) =>
     new Request(`${process.env.APP_ORIGIN}${path}`, { headers: { cookie } });
-  const firstBootstrap = await handleRequest(
+  const firstBootstrap = await dispatch(
     request("/api/bootstrap", first.cookie),
-    (promise) => work.push(promise),
   );
-  const secondBootstrap = await handleRequest(
+  const secondBootstrap = await dispatch(
     request("/api/bootstrap", second.cookie),
-    (promise) => work.push(promise),
   );
   assert.equal(firstBootstrap.status, 200);
   assert.equal(secondBootstrap.status, 200);
@@ -207,6 +209,33 @@ try {
       ? event.event
       : (event.event as string[])[0];
   assert.deepEqual(Object.keys(JSON.parse(payload)), ["revision"]);
+  if (process.argv.includes("--models")) {
+    assert.ok(process.argv.includes("--remote"), "Model check targets the deployed function.");
+    const mutate = async (path: string, body: unknown) => {
+      const response = await dispatch(new Request(`${process.env.APP_ORIGIN}${path}`, { method: "POST", headers: { cookie: first.cookie, origin: process.env.APP_ORIGIN!, "content-type": "application/json" }, body: JSON.stringify(body) }));
+      assert.ok(response.ok, `${path}: ${response.status} ${await response.text()}`);
+    };
+    await mutate("/api/settings", { coverage: { newsworthiness: "all", minimumMessages: 3, minimumParticipants: 2, updateDelayMs: 800 } });
+    await mutate("/api/mode", { mode: "simulation" });
+    const completion = new Promise<void>((resolve, reject) => {
+      const timeout = setTimeout(() => reject(new Error("Hosted simulation timed out")), 120000);
+      const inspect = async () => {
+        try {
+          const current = await getRoom(id);
+          if (current.state.error) throw new Error(current.state.error);
+          if (current.state.simulator.delivered === 12 && current.state.stories.length > 0 && !current.state.working) {
+            clearTimeout(timeout); valid.ws.off("message", listener); resolve();
+          }
+        } catch (error) { clearTimeout(timeout); valid.ws.off("message", listener); reject(error); }
+      };
+      const listener = (raw: WebSocket.RawData) => { if (JSON.parse(raw.toString()).type === "data") void inspect(); };
+      valid.ws.on("message", listener);
+    });
+    void completion.catch(() => {});
+    await mutate("/api/simulation/start", { topic: "Three fictional viewers discuss a chess match where an underdog wins after a surprising queen sacrifice", users: 3, messages: 12, intervalMs: 500, model: "fast" });
+    await completion;
+    console.log("Hosted model flow passed: Vercel OIDC, AWS simulation, automatic coverage, stories and live updates.");
+  }
   await sessions.logout(new Headers({ cookie: first.cookie }));
   assert.equal(
     await sessions.read(new Headers({ cookie: first.cookie })),

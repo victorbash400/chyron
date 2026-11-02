@@ -12,7 +12,7 @@ import {
   overlayConnection,
   publishRoom,
 } from "./realtime.ts";
-import { connectStream, disconnectStream } from "./twitch.ts";
+import { connectStream, disconnectStream, refreshStream } from "./twitch.ts";
 import { receiveWebhook } from "./webhook.ts";
 import { updateSettings, resetSource } from "./settings.ts";
 import { startSimulation } from "./simulation.ts";
@@ -75,7 +75,9 @@ export async function handleRequest(
       if (url.pathname === "/api/realtime")
         return json(await accountConnection(session));
       if (url.pathname === "/api/bootstrap") {
-        const room = await getRoom(userId);
+        let room = await getRoom(userId);
+        if (room.state.connection === "connecting")
+          room = (await refreshStream(userId)) ?? room;
         return json({
           state: room.state,
           overlayUrl: `${origin()}/overlay/${room.overlayToken}`,

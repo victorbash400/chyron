@@ -10,6 +10,8 @@ await build({
   platform: "node",
   target: "node26",
   format: "esm",
-  banner: { js: 'import { createRequire } from "node:module"; const require = createRequire(import.meta.url);' },
+  banner: {
+    js: 'import { createRequire } from "node:module"; const require = createRequire(import.meta.url);',
+  },
   alias: { "ffmpeg-static": "./server/hosted/decoder.mjs" },
 });

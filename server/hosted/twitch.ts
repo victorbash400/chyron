@@ -236,3 +236,21 @@ export async function disconnectStream(userId: string) {
     room.state.connection = "disconnected";
   });
 }
+
+export async function refreshStream(userId: string) {
+  const verified = await subscriptions(userId);
+  if (
+    types.every((type) =>
+      verified.some(
+        (subscription) =>
+          subscription.type === type && subscription.status === "enabled",
+      ),
+    )
+  ) {
+    return changeRoom(userId, (room) => {
+      if (room.state.connection === "connecting")
+        room.state.connection = "connected";
+    });
+  }
+  return null;
+}
