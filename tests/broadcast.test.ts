@@ -73,7 +73,6 @@ test("broadcast waits for encoder acceptance, reports live output and stops on u
   }
   class Recorder {
     static instance: Recorder;
-    timeslice = 0;
     state = "inactive";
     ondataavailable?: (event: { data: Blob }) => void;
     onerror?: () => void;
@@ -81,8 +80,7 @@ test("broadcast waits for encoder acceptance, reports live output and stops on u
     constructor() {
       Recorder.instance = this;
     }
-    start(timeslice: number) {
-      this.timeslice = timeslice;
+    start() {
       this.state = "recording";
     }
     stop() {
@@ -110,11 +108,10 @@ test("broadcast waits for encoder acceptance, reports live output and stops on u
     assert.equal(Socket.instance.protocols[0], "chyron.opaque-ticket");
     Socket.instance.onmessage?.({ data: JSON.stringify({ type: "ready" }) });
     assert.equal(Recorder.instance.state, "recording");
-    assert.equal(Recorder.instance.timeslice, 250);
     assert.equal(statuses.includes("live"), false);
     Socket.instance.onmessage?.({ data: JSON.stringify({ type: "live" }) });
     assert.equal(statuses.at(-1), "live");
-    Socket.instance.bufferedAmount = 1000000;
+    Socket.instance.bufferedAmount = 8000001;
     Recorder.instance.ondataavailable?.({ data: new Blob(["clip"]) });
     assert.equal(statuses.at(-1), "idle");
     assert.equal(ended, true);
