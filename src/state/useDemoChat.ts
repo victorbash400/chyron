@@ -8,6 +8,7 @@ export function useDemoChat(
   online: boolean,
   act: (path: string, body?: unknown) => Promise<boolean>,
 ) {
+  const [queued, setQueued] = useState<SimulatorSettings | null>(null);
   const [active, setActive] = useState(false);
   const controller = useRef<DemoChat | null>(null);
   useEffect(() => {
@@ -17,13 +18,39 @@ export function useDemoChat(
   }, [act]);
   useEffect(() => {
     if (state) controller.current?.observe(state, online);
-  }, [state, online]);
+    if (queued && state?.mode === "simulation" && !state.paused && online) {
+      setQueued(null);
+      void controller.current?.start(state, queued);
+    }
+  }, [state, online, queued]);
   return {
-    active,
-    start: (settings: SimulatorSettings) =>
-      state && controller.current
-        ? controller.current.start(state, settings)
-        : Promise.resolve(false),
-    stop: () => void controller.current?.stop(),
+    active: active || Boolean(queued),
+    start: async (settings: SimulatorSettings) => {
+      if (!state || !controller.current) return false;
+      if (
+        !state.coverage.includeChat &&
+        !(await act("/api/settings", { coverage: { includeChat: true } }))
+      )
+        return false;
+      if (state.mode === "simulation" && !state.paused)
+        return controller.current.start(state, settings);
+      setQueued(settings);
+      if (state.paused && !(await act("/api/settings", { paused: false }))) {
+        setQueued(null);
+        return false;
+      }
+      if (
+        state.mode !== "simulation" &&
+        !(await act("/api/mode", { mode: "simulation" }))
+      ) {
+        setQueued(null);
+        return false;
+      }
+      return true;
+    },
+    stop: () => {
+      setQueued(null);
+      void controller.current?.stop();
+    },
   };
 }

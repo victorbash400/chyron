@@ -4,6 +4,7 @@ export function useAudioCapture(
   sourceId: string,
   onError: (error: string) => void,
   disabled = false,
+  input: string | MediaStream | null = null,
 ) {
   const [opening, setOpening] = useState(false),
     [recording, setRecording] = useState(false),
@@ -13,6 +14,7 @@ export function useAudioCapture(
     media = useRef<MediaStream | null>(null);
   const segment = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
   const generation = useRef(0);
+  const acquiring = useRef(false);
   const discardFinal = useRef(false);
   const mounted = useRef(true),
     repeat = useRef(false),
@@ -24,16 +26,21 @@ export function useAudioCapture(
     media.current = null;
     clearTimeout(segment.current);
   }, []);
-  const stop = useCallback(() => {
-    repeat.current = false;
-    clearTimeout(segment.current);
-    if (recorder.current?.state === "recording") recorder.current.stop();
-    else stopTracks();
-    if (mounted.current) setRecording(false);
-  }, [stopTracks]);
+  const stop = useCallback(
+    (discard = false) => {
+      if (discard) discardFinal.current = true;
+      repeat.current = false;
+      clearTimeout(segment.current);
+      if (recorder.current?.state === "recording") recorder.current.stop();
+      else stopTracks();
+      if (mounted.current) setRecording(false);
+    },
+    [stopTracks],
+  );
   useEffect(() => {
     mounted.current = true;
     generation.current++;
+    acquiring.current = false;
     setRecording(false);
     setOpening(false);
     setPending(0);
@@ -61,9 +68,10 @@ export function useAudioCapture(
       if (recorder.current?.state === "recording") recorder.current.stop();
       stopTracks();
     };
-  }, [sourceId, disabled, stop, stopTracks]);
+  }, [sourceId, disabled, input, stop, stopTracks]);
   async function start(source: "microphone" | "tab" | MediaStream) {
-    if (disabled || opening || recording || pending) return;
+    if (disabled || acquiring.current || media.current) return;
+    acquiring.current = true;
     const current = generation.current;
     discardFinal.current = false;
     setOpening(true);
@@ -154,16 +162,20 @@ export function useAudioCapture(
       stream
         .getTracks()
         .forEach((track) =>
-          track.addEventListener("ended", stop, { once: true }),
+          track.addEventListener("ended", () => stop(true), { once: true }),
         );
       begin();
     } catch (error) {
+      if (current !== generation.current) return;
       stopTracks();
       errorHandler.current(
         error instanceof Error ? error.message : "Audio capture failed.",
       );
     } finally {
-      if (mounted.current && current === generation.current) setOpening(false);
+      if (mounted.current && current === generation.current) {
+        acquiring.current = false;
+        setOpening(false);
+      }
     }
   }
   return { recording, pending, opening, transcript, start, stop };

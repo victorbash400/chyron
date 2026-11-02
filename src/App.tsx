@@ -1,4 +1,6 @@
-import { useBroadcastAudio } from "./broadcast/useBroadcastAudio.ts";
+import { useVoiceSummaries } from "./state/useVoiceSummaries.ts";
+import ChatSimulatorControls from "./components/ChatSimulatorControls.tsx";
+import ChatSummaryControls from "./components/ChatSummaryControls.tsx";
 import { lazy, Suspense, useEffect, useState } from "react";
 import { useWorkspaceNavigation } from "./state/useWorkspaceNavigation.ts";
 import { useDemoChat } from "./state/useDemoChat.ts";
@@ -37,12 +39,10 @@ export default function App({
   const [broadcastAudio, setBroadcastAudio] = useState<MediaStream | null>(
     null,
   );
-  useBroadcastAudio(
+  const voice = useVoiceSummaries(
+    room.bootstrap?.state,
     broadcastAudio,
-    room.bootstrap?.state.sourceId ?? "",
-    !room.bootstrap ||
-      room.bootstrap.state.paused ||
-      !room.bootstrap.state.coverage.includeAudio,
+    room.act,
     room.setError,
   );
   const navigation = useWorkspaceNavigation();
@@ -114,13 +114,10 @@ export default function App({
             onClose={() => navigation.navigate(null)}
             controls={
               <ChyronControls
-                broadcastAudioActive={Boolean(broadcastAudio)}
+                audio={voice}
                 state={state}
                 url={overlayUrl}
                 busy={room.pending}
-                demoActive={demo.active}
-                onSimulate={demo.start}
-                onStopSimulation={demo.stop}
                 onSettings={(patch) => void act("/api/settings", patch)}
                 onMode={(mode) => void act("/api/mode", { mode })}
                 onError={room.setError}
@@ -151,7 +148,31 @@ export default function App({
             chat={
               <ChatFeed
                 open={navigation.panel === "chat"}
-                onClose={() => navigation.navigate(null)}
+                controls={
+                  <>
+                    <ChatSimulatorControls
+                      simulator={state.simulator}
+                      demoActive={demo.active}
+                      disabled={
+                        room.pending ||
+                        (state.working && state.mode !== "simulation")
+                      }
+                      onStart={demo.start}
+                      onStop={demo.stop}
+                    />
+                    <ChatSummaryControls
+                      state={state}
+                      voice={voice}
+                      busy={room.pending}
+                      onChat={(includeChat) =>
+                        void act("/api/settings", {
+                          ...(includeChat ? { paused: false } : {}),
+                          coverage: { includeChat },
+                        })
+                      }
+                    />
+                  </>
+                }
                 state={state}
                 busy={room.pending}
                 onMessage={(author, text) =>

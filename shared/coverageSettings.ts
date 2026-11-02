@@ -11,6 +11,7 @@ export interface CoverageSettings {
   minimumParticipants: 1 | 2 | 3 | 5;
   contextSeconds: 60 | 180 | 300;
   lifetimeSeconds: 60 | 300 | 600;
+  includeChat: boolean;
   includeAudio: boolean;
   quotes: boolean;
 }
@@ -27,6 +28,7 @@ export const defaultCoverageSettings: CoverageSettings = {
   minimumParticipants: 2,
   contextSeconds: 180,
   lifetimeSeconds: 300,
+  includeChat: true,
   includeAudio: true,
   quotes: true,
 };

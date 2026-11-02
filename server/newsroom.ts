@@ -1,3 +1,8 @@
+import {
+  coverageInput,
+  includesCoverageSource,
+  sameCoverageSources,
+} from "../shared/coverageInput.ts";
 import { defaultCoverageSettings } from "../shared/coverageSettings.ts";
 import { defaultOverlayDesign } from "../shared/overlayDesign.ts";
 import { z } from "zod";
@@ -133,9 +138,8 @@ export class Newsroom extends EventEmitter {
     this.state.messages = [...this.state.messages, ...unique].slice(-200);
     this.emitState();
     void this.persist().catch((error) => this.fail(error));
-    this.unseenMessages += unique.filter(
-      (message) =>
-        this.state.coverage.includeAudio || message.source !== "audio",
+    this.unseenMessages += unique.filter((message) =>
+      includesCoverageSource(message, this.state.coverage),
     ).length;
     this.pendingAudio ||=
       this.state.coverage.includeAudio &&
@@ -147,6 +151,7 @@ export class Newsroom extends EventEmitter {
     if (this.batch) return;
     if (
       this.state.paused ||
+      (!this.state.coverage.includeChat && !this.state.coverage.includeAudio) ||
       this.state.working ||
       !this.pending ||
       (!this.pendingAudio &&
@@ -178,18 +183,18 @@ export class Newsroom extends EventEmitter {
     try {
       const now = Date.now();
       const settings = { ...this.state.coverage };
-      const messages = this.state.messages.filter(
-        (m) =>
-          now - m.at < settings.contextSeconds * 1000 &&
-          (settings.includeAudio || m.source !== "audio"),
-      );
-      if (!messages.length)
-        throw new Error("Coverage needs chat or audio input.");
+      const messages = coverageInput(this.state.messages, settings, now);
+      if (!messages.length) return;
       const activeStories = this.state.stories.filter(
         (story) => now - story.updatedAt < settings.lifetimeSeconds * 1000,
       );
       const coverage = await this.editor(messages, activeStories, settings);
-      if (epoch !== this.epoch || this.state.paused) return;
+      if (
+        epoch !== this.epoch ||
+        this.state.paused ||
+        !sameCoverageSources(settings, this.state.coverage)
+      )
+        return;
       this.apply(coverage, now);
       this.emitState();
       await this.persist();

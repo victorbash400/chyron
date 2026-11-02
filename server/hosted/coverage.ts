@@ -1,3 +1,7 @@
+import {
+  coverageInput,
+  sameCoverageSources,
+} from "../../shared/coverageInput.ts";
 import { randomUUID } from "node:crypto";
 import { setTimeout as delay } from "node:timers/promises";
 import { Newsroom } from "../newsroom.ts";
@@ -11,9 +15,13 @@ import {
 import { publishRoom } from "./realtime.ts";
 export async function analyzeRoom(userId: string) {
   const pending = await getRoom(userId);
+  const pendingInput = coverageInput(
+    pending.state.messages,
+    pending.state.coverage,
+  ).filter((message) => message.at > pending.lastAnalysisAt);
   const audioPending =
     pending.state.coverage.includeAudio &&
-    pending.state.messages.some(
+    pendingInput.some(
       (message) =>
         message.source === "audio" && message.at > pending.lastAnalysisAt,
     );
@@ -21,8 +29,7 @@ export async function analyzeRoom(userId: string) {
     pending.state.paused ||
     pending.received <= pending.processed ||
     (!audioPending &&
-      pending.received - pending.processed <
-        pending.state.coverage.minimumMessages)
+      pendingInput.length < pending.state.coverage.minimumMessages)
   )
     return;
   const owner = randomUUID();
@@ -35,10 +42,14 @@ export async function analyzeRoom(userId: string) {
       if (before.leaseOwner !== owner || before.state.paused) break;
       await delay(before.state.coverage.updateDelayMs);
       const room = await getRoom(userId);
-      const unread = room.received - room.processed;
+      const unreadInput = coverageInput(
+        room.state.messages,
+        room.state.coverage,
+      ).filter((message) => message.at > room.lastAnalysisAt);
+      const unread = unreadInput.length;
       const audio =
         room.state.coverage.includeAudio &&
-        room.state.messages.some(
+        unreadInput.some(
           (message) =>
             message.source === "audio" && message.at > room.lastAnalysisAt,
         );
@@ -48,11 +59,7 @@ export async function analyzeRoom(userId: string) {
       }
       const cutoff = Date.now();
       const settings = room.state.coverage;
-      const messages = room.state.messages.filter(
-        (message) =>
-          cutoff - message.at < settings.contextSeconds * 1000 &&
-          (settings.includeAudio || message.source !== "audio"),
-      );
+      const messages = coverageInput(room.state.messages, settings, cutoff);
       if (!messages.length) {
         await changeRoom(userId, (current) => {
           current.processed = room.received;
@@ -68,6 +75,7 @@ export async function analyzeRoom(userId: string) {
         if (
           current.state.sourceId !== room.state.sourceId ||
           current.state.paused ||
+          !sameCoverageSources(settings, current.state.coverage) ||
           current.leaseOwner !== owner
         )
           return;

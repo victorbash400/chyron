@@ -1,6 +1,7 @@
 import { randomUUID } from "node:crypto";
 import { z } from "zod";
 import {
+  changesCoverageConfiguration,
   coverageSettingsSchema,
   configuredCoverageModel,
 } from "../coverageSettings.ts";
@@ -27,7 +28,11 @@ export async function updateSettings(userId: string, input: unknown) {
   const patch = settingsSchema.parse(input);
   if (patch.coverage?.model) configuredCoverageModel(patch.coverage.model);
   return changeRoom(userId, (room) => {
-    if (patch.coverage && room.state.working)
+    if (
+      patch.coverage &&
+      room.state.working &&
+      changesCoverageConfiguration(patch.coverage)
+    )
       throw new HttpError(
         409,
         "Wait for coverage to finish before changing Chyron settings.",

@@ -1,6 +1,7 @@
 import { ChatSimulator } from "./chatSimulator.ts";
 import { simulatorSettingsSchema } from "./chatScript.ts";
 import {
+  changesCoverageConfiguration,
   coverageSettingsSchema,
   coverageModelOptions,
   configuredCoverageModel,
@@ -91,7 +92,7 @@ export async function registerRoutes(
       .strict()
       .parse(request.body);
     const { design, coverage, ...settings } = patch;
-    if (coverage && room.state.working)
+    if (coverage && room.state.working && changesCoverageConfiguration(coverage))
       throw new Error(
         "Wait for coverage to finish before changing Chyron settings.",
       );

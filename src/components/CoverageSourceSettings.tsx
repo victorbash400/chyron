@@ -39,14 +39,6 @@ export default function CoverageSourceSettings({
           onChange={(contextSeconds) => onChange({ contextSeconds })}
         />
       </SettingsRow>
-      <SettingsRow label="Audio context">
-        <ToggleSwitch
-          label="Audio context"
-          checked={settings.includeAudio}
-          disabled={disabled}
-          onChange={(includeAudio) => onChange({ includeAudio })}
-        />
-      </SettingsRow>
       <SettingsRow label="Viewer quotes">
         <ToggleSwitch
           label="Viewer quotes"

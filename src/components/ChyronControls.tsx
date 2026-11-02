@@ -1,5 +1,3 @@
-import ChatSimulatorControls from "./ChatSimulatorControls.tsx";
-import type { SimulatorSettings } from "../../shared/simulator.ts";
 import { Check, Link, Pause, Play } from "lucide-react";
 import { useState, type ReactNode } from "react";
 import type { NewsroomState, SourceMode } from "../../shared/types.ts";
@@ -7,27 +5,22 @@ import SettingsInlineButton from "./settings/SettingsInlineButton.tsx";
 import SettingsRow from "./settings/SettingsRow.tsx";
 import SettingsGroup from "./settings/SettingsGroup.tsx";
 import SourceSwitch from "./SourceSwitch.tsx";
+import type { useVoiceSummaries } from "../state/useVoiceSummaries.ts";
 import AudioCapture from "./AudioCapture.tsx";
 import "./ChyronControls.css";
 
 export default function ChyronControls({
   state,
-  demoActive,
+  audio,
   children,
-  broadcastAudioActive,
   url,
   busy,
   onSettings,
   onError,
   onMode,
-  onSimulate,
-  onStopSimulation,
 }: {
   children: ReactNode;
-  demoActive: boolean;
-  onSimulate: (settings: SimulatorSettings) => Promise<boolean>;
-  onStopSimulation: () => void;
-  broadcastAudioActive: boolean;
+  audio: ReturnType<typeof useVoiceSummaries>;
   state: NewsroomState;
   url: string;
   busy: boolean;
@@ -58,20 +51,7 @@ export default function ChyronControls({
             />
           </SettingsRow>
         </SettingsGroup>
-        {state.mode === "simulation" && (
-          <ChatSimulatorControls
-            simulator={state.simulator}
-            demoActive={demoActive}
-            disabled={busy || state.paused}
-            onStart={onSimulate}
-            onStop={onStopSimulation}
-          />
-        )}
-        <AudioCapture
-          sourceId={state.sourceId}
-          disabled={state.paused || broadcastAudioActive}
-          onError={onError}
-        />
+        <AudioCapture audio={audio} />
         <SettingsGroup>
           <SettingsRow compact label="Coverage">
             <SettingsInlineButton

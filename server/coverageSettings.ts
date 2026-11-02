@@ -27,6 +27,7 @@ export const coverageSettingsSchema = z.object({
   ]),
   contextSeconds: z.union([z.literal(60), z.literal(180), z.literal(300)]),
   lifetimeSeconds: z.union([z.literal(60), z.literal(300), z.literal(600)]),
+  includeChat: z.boolean(),
   includeAudio: z.boolean(),
   quotes: z.boolean(),
 });
@@ -45,4 +46,10 @@ export function coverageModelOptions(): CoverageModelOption[] {
   if (process.env.BEDROCK_MODEL_ID)
     options.push({ value: "fast", label: process.env.BEDROCK_MODEL_ID });
   return options;
+}
+
+export function changesCoverageConfiguration(patch: Record<string, unknown>) {
+  return Object.keys(patch).some(
+    (key) => key !== "includeChat" && key !== "includeAudio",
+  );
 }

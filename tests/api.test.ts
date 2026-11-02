@@ -437,3 +437,19 @@ test("pausing invalidates in-flight audio even after coverage resumes", async ()
     await f.app.close();
   }
 });
+
+test("summary source switches can change during generation while other configuration stays protected", async () => {
+  const f = await fixture();
+  process.env.BEDROCK_REASONING_MODEL_ID = "test-reasoning-model";
+  try {
+    f.room.state.working = true;
+    const disabled = await f.request("/api/settings", { coverage: { includeChat: false, includeAudio: false } });
+    assert.equal(disabled.statusCode, 200, disabled.body);
+    assert.equal(f.room.state.coverage.includeChat, false);
+    assert.equal(f.room.state.coverage.includeAudio, false);
+    const enabled = await f.request("/api/settings", { coverage: { includeChat: true, includeAudio: true } });
+    assert.equal(enabled.statusCode, 200, enabled.body);
+    const configuration = await f.request("/api/settings", { coverage: { tone: "neutral" } });
+    assert.ok(configuration.statusCode >= 400);
+  } finally { f.room.state.working = false; await f.app.close(); }
+});

@@ -235,3 +235,105 @@ test("audio starts coverage automatically without waiting for chat participants"
     room.dispose();
   }
 });
+
+test("chat and voice summaries independently filter inputs without removing messages", async () => {
+  for (const [includeChat, includeAudio, expected] of [
+    [true, true, ["chat", "simulation", "audio"]],
+    [true, false, ["chat", "simulation"]],
+    [false, true, ["audio"]],
+    [false, false, []],
+  ] as const) {
+    let received: string[] = [];
+    let calls = 0;
+    const room = new Newsroom(
+      async (messages) => {
+        calls++;
+        received = messages.map((message) => message.id);
+        return { stories: [] };
+      },
+      async () => {},
+    );
+    try {
+      room.state.coverage = {
+        ...defaultCoverageSettings,
+        includeChat,
+        includeAudio,
+      };
+      room.state.messages = (["chat", "simulation", "audio"] as const).map(
+        (source) => ({
+          id: source,
+          userId: source,
+          author: source,
+          source,
+          text: "Stream discussion",
+          at: Date.now(),
+        }),
+      );
+      await room.process();
+      assert.deepEqual(received, expected);
+      assert.equal(calls, expected.length ? 1 : 0);
+      assert.equal(room.state.messages.length, 3);
+      assert.equal(room.state.error, null);
+    } finally {
+      room.dispose();
+    }
+  }
+});
+
+test("disabled chat does not trigger voice-only coverage and in-flight source changes discard stale output", async (context) => {
+  context.mock.timers.enable({ apis: ["setTimeout"] });
+  let release!: (value: { stories: [] }) => void;
+  let calls = 0;
+  const room = new Newsroom(
+    async () => {
+      calls++;
+      return new Promise<{ stories: [] }>((resolve) => {
+        release = resolve;
+      });
+    },
+    async () => {},
+  );
+  try {
+    room.state.coverage = {
+      ...defaultCoverageSettings,
+      includeChat: false,
+      minimumMessages: 1,
+    };
+    room.add([
+      {
+        id: "chat",
+        userId: "viewer",
+        author: "Viewer",
+        source: "chat",
+        text: "A chat message",
+        at: Date.now(),
+      },
+    ]);
+    context.mock.timers.tick(1000);
+    assert.equal(calls, 0);
+    room.add([
+      {
+        id: "audio",
+        userId: "streamer",
+        author: "Streamer",
+        source: "audio",
+        text: "The challenge is starting",
+        at: Date.now(),
+      },
+    ]);
+    context.mock.timers.tick(800);
+    assert.equal(calls, 1);
+    let applied = false;
+    room.apply = () => {
+      applied = true;
+    };
+    room.state.coverage.includeAudio = false;
+    release({ stories: [] });
+    await new Promise((resolve) => setImmediate(resolve));
+    assert.equal(applied, false);
+    assert.equal(room.state.working, false);
+    assert.equal(room.state.error, null);
+  } finally {
+    room.dispose();
+  }
+});

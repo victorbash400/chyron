@@ -1,3 +1,4 @@
+import type { ReactNode } from "react";
 import { useEffect, useMemo, useRef } from "react";
 import type { NewsroomState } from "../../shared/types.ts";
 import { chatMessages } from "../state/chatMessages.ts";
@@ -7,12 +8,12 @@ import "./ChatFeed.css";
 export default function ChatFeed({
   state,
   open,
-  onClose,
+  controls,
   busy,
   onMessage,
 }: {
   open: boolean;
-  onClose: () => void;
+  controls: ReactNode;
   state: NewsroomState;
   busy: boolean;
   onMessage: (author: string, text: string) => Promise<boolean>;
@@ -63,6 +64,7 @@ export default function ChatFeed({
             }}
           />
         )}
+        {controls}
       </div>
     </section>
   );

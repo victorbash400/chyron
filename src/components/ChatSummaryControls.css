@@ -1,0 +1,25 @@
+.chat-summary-controls {
+  display: flex;
+  gap: 6px;
+}
+.chat-summary-controls button {
+  flex: 1;
+  min-width: 0;
+}
+.chat-summary-controls button[aria-pressed="true"] {
+  background: var(--selection);
+  color: var(--accent);
+}
+.chat-summary-controls svg {
+  width: 16px;
+  height: 16px;
+  flex-shrink: 0;
+}
+.summary-working {
+  animation: summary-spin 1s linear infinite;
+}
+@keyframes summary-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}

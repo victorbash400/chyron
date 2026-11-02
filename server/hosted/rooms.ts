@@ -1,3 +1,4 @@
+import { defaultCoverageSettings } from "../../shared/coverageSettings.ts";
 import { TransactionCanceledException } from "@aws-sdk/client-dynamodb";
 import { randomBytes } from "node:crypto";
 import {
@@ -37,6 +38,7 @@ function snapshot(item: Record<string, unknown>): RoomSnapshot {
     ...data,
     state: {
       ...data.state,
+      coverage: { ...defaultCoverageSettings, ...data.state.coverage },
       revision: item.revision as number,
       working: Number(item.leaseUntil) > Date.now(),
     },
