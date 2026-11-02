@@ -14,12 +14,12 @@ export default function CoverageEditorialSettings({
 }) {
   return (
     <SettingsGroup>
-      <SettingsRow label="News format">
+      <SettingsRow label="Chyron format">
         <SettingsPicker
-          label="News format"
+          label="Chyron format"
           value={settings.focus}
           options={[
-            { value: "headlines", label: "Headlines" },
+            { value: "headlines", label: "Updates" },
             { value: "recap", label: "Chat recap" },
             { value: "developments", label: "Developments" },
           ]}
@@ -27,9 +27,9 @@ export default function CoverageEditorialSettings({
           onChange={(focus) => onChange({ focus })}
         />
       </SettingsRow>
-      <SettingsRow label="Newsworthiness">
+      <SettingsRow label="Update threshold">
         <SettingsPicker
-          label="Newsworthiness"
+          label="Update threshold"
           value={settings.newsworthiness}
           options={[
             { value: "all", label: "All discussions" },
@@ -40,13 +40,13 @@ export default function CoverageEditorialSettings({
           onChange={(newsworthiness) => onChange({ newsworthiness })}
         />
       </SettingsRow>
-      <SettingsRow label="Editorial direction">
+      <SettingsRow label="Update direction">
         <textarea
           className="editorial-direction"
           key={settings.instructions}
           defaultValue={settings.instructions}
-          aria-label="Editorial direction"
-          placeholder="Topics, wording and reporting priorities"
+          aria-label="Update direction"
+          placeholder="Topics and wording"
           maxLength={600}
           rows={3}
           disabled={disabled}

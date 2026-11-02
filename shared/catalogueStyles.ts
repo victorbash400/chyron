@@ -1,6 +1,6 @@
 export const catalogueStyles = [
-  { id: "breaking-plus", name: "Breaking news", color: "#ff263d" },
-  { id: "newsline", name: "Newsline", color: "#1767ff" },
+  { id: "breaking-plus", name: "Breaking update", color: "#ff263d" },
+  { id: "newsline", name: "Update line", color: "#1767ff" },
   { id: "alert", name: "Alert", color: "#ffd20a" },
   { id: "frost", name: "Frost", color: "#ffffff" },
   { id: "modern-flow", name: "Modern flow", color: "#7739ff" },

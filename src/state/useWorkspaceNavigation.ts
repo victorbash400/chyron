@@ -1,11 +1,11 @@
 import { useEffect, useState } from "react";
-export type WorkspacePanel = "news" | "settings" | "chat" | "account";
+export type WorkspacePanel = "chyron" | "settings" | "chat" | "account";
 function currentPanel(): WorkspacePanel {
-  if (location.pathname === "/settings/news") return "news";
+  if (location.pathname === "/settings/news") return "chyron";
   if (location.pathname.startsWith("/settings")) return "settings";
   if (location.pathname === "/chat") return "chat";
   if (location.pathname === "/account") return "account";
-  return "news";
+  return "chyron";
 }
 export function useWorkspaceNavigation() {
   const [panel, setPanel] = useState<WorkspacePanel | null>(currentPanel);

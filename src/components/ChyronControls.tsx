@@ -8,9 +8,9 @@ import SettingsRow from "./settings/SettingsRow.tsx";
 import SettingsGroup from "./settings/SettingsGroup.tsx";
 import SourceSwitch from "./SourceSwitch.tsx";
 import AudioCapture from "./AudioCapture.tsx";
-import "./NewsroomControls.css";
+import "./ChyronControls.css";
 
-export default function NewsroomControls({
+export default function ChyronControls({
   state,
   children,
   broadcastAudioActive,
@@ -45,8 +45,8 @@ export default function NewsroomControls({
     }
   }
   return (
-    <section className="newsroom-controls" aria-label="News controls">
-      <div className="newsroom-control-groups">
+    <section className="chyron-controls" aria-label="Chyron controls">
+      <div className="chyron-control-groups">
         <SettingsGroup>
           <SettingsRow compact label="Source">
             <SourceSwitch

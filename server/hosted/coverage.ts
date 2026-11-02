@@ -94,7 +94,7 @@ export async function analyzeRoom(userId: string) {
       room.state.error =
         error instanceof Error
           ? error.message
-          : "Coverage failed. Check news settings.";
+          : "Coverage failed. Check Chyron settings.";
     });
   } finally {
     await releaseCoverage(userId, owner);

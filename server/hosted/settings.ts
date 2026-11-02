@@ -30,7 +30,7 @@ export async function updateSettings(userId: string, input: unknown) {
     if (patch.coverage && room.state.working)
       throw new HttpError(
         409,
-        "Wait for coverage to finish before changing news settings.",
+        "Wait for coverage to finish before changing Chyron settings.",
       );
     if (patch.coverage) {
       room.state.coverage = { ...room.state.coverage, ...patch.coverage };

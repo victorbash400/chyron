@@ -14,9 +14,9 @@ export default function CoverageSourceSettings({
 }) {
   return (
     <SettingsGroup>
-      <SettingsRow label="Authors for new story">
+      <SettingsRow label="Authors per update">
         <SettingsPicker
-          label="Authors for new story"
+          label="Authors per update"
           value={settings.minimumParticipants}
           options={([1, 2, 3, 5] as const).map((value) => ({
             value,
@@ -55,9 +55,9 @@ export default function CoverageSourceSettings({
           onChange={(quotes) => onChange({ quotes })}
         />
       </SettingsRow>
-      <SettingsRow label="Story duration">
+      <SettingsRow label="Update duration">
         <SettingsPicker
-          label="Story duration"
+          label="Update duration"
           value={settings.lifetimeSeconds}
           options={[
             { value: 60, label: "1 min" },

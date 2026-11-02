@@ -45,7 +45,7 @@ export default function CoverageControls({
         onChange={onChange}
       />
       <SettingsInlineButton
-        className="news-settings-reset"
+        className="coverage-settings-reset"
         disabled={
           disabled ||
           !models.some((model) => model.value === defaultCoverageSettings.model)

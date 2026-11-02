@@ -109,10 +109,10 @@ export class Newsroom extends EventEmitter {
   fail(error: unknown) {
     this.state.error =
       error instanceof z.ZodError
-        ? "Invalid coverage. Check the news model settings."
+        ? "Invalid coverage. Check the Chyron model settings."
         : error instanceof Error
           ? error.message
-          : "Newsroom failed.";
+          : "Chyron failed.";
     this.emitState();
   }
   async commit() {

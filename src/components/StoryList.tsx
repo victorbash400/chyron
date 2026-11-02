@@ -28,13 +28,13 @@ export default function StoryList({
   return (
     <section
       className="workspace-panel story-list-panel"
-      aria-label="Newsroom stories"
+      aria-label="Chyron updates"
     >
       <div className="panel-heading">
-        <h2>{dismissed ? "Dismissed" : "Stories"}</h2>
+        <h2>{dismissed ? "Dismissed" : "Updates"}</h2>
         <div className="story-list-tools">
           <IconButton
-            label={dismissed ? "Show stories" : "Show dismissed stories"}
+            label={dismissed ? "Show updates" : "Show dismissed updates"}
             selected={dismissed}
             onClick={() => setDismissed(!dismissed)}
           >

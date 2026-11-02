@@ -90,7 +90,7 @@ export async function registerRoutes(
     const { design, coverage, ...settings } = patch;
     if (coverage && room.state.working)
       throw new Error(
-        "Wait for coverage to finish before changing news settings.",
+        "Wait for coverage to finish before changing Chyron settings.",
       );
     if (coverage?.model) configuredCoverageModel(coverage.model);
     Object.assign(room.state, settings);

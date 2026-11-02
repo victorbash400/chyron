@@ -1,11 +1,11 @@
-.newsroom-controls {
+.chyron-controls {
   display: flex;
   flex-direction: column;
   min-height: 0;
   flex: 1;
   min-width: 0;
 }
-.newsroom-control-groups {
+.chyron-control-groups {
   display: flex;
   flex-direction: column;
   flex: 1;
@@ -14,6 +14,6 @@
   overflow-y: auto;
   padding: 0 12px 12px;
 }
-.newsroom-control-groups > * {
+.chyron-control-groups > * {
   flex-shrink: 0;
 }

@@ -5,7 +5,7 @@ import { useRailOverlay } from "../state/useRailOverlay.ts";
 import IconButton from "./controls/IconButton.tsx";
 import "./WorkspaceRail.css";
 const titles = {
-  news: "News controls",
+  chyron: "Chyron controls",
   settings: "Settings",
   chat: "Chat",
   account: "Account",
@@ -77,7 +77,7 @@ export default function WorkspaceRail({
             <X />
           </IconButton>
         </div>
-        <div className="workspace-rail-pane" hidden={panel !== "news"}>
+        <div className="workspace-rail-pane" hidden={panel !== "chyron"}>
           {controls}
         </div>
         <div className="workspace-rail-pane" hidden={panel !== "settings"}>

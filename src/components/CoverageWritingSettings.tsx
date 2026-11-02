@@ -18,9 +18,9 @@ export default function CoverageWritingSettings({
 }) {
   return (
     <SettingsGroup>
-      <SettingsRow label="News model">
+      <SettingsRow label="Chyron model">
         <SettingsPicker
-          label="News model"
+          label="Chyron model"
           value={settings.model}
           options={models}
           disabled={disabled}
@@ -52,9 +52,9 @@ export default function CoverageWritingSettings({
           onChange={(tone) => onChange({ tone })}
         />
       </SettingsRow>
-      <SettingsRow label="Stories per update">
+      <SettingsRow label="Updates per batch">
         <SettingsPicker
-          label="Stories per update"
+          label="Updates per batch"
           value={settings.maxStories}
           options={([1, 3, 5] as const).map((value) => ({
             value,

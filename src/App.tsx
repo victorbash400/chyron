@@ -5,7 +5,7 @@ import { useNewsroom } from "./state/useNewsroom.ts";
 import type { StreamerAccount } from "../shared/session.ts";
 import type { Story } from "../shared/types.ts";
 import LoadingRegion from "./components/controls/LoadingRegion.tsx";
-import NewsroomControls from "./components/NewsroomControls.tsx";
+import ChyronControls from "./components/ChyronControls.tsx";
 import LibrarySidebar from "./components/LibrarySidebar.tsx";
 import WorkspaceShell from "./components/WorkspaceShell.tsx";
 import WorkspaceRail from "./components/WorkspaceRail.tsx";
@@ -110,7 +110,7 @@ export default function App({
             panel={navigation.panel}
             onClose={() => navigation.navigate(null)}
             controls={
-              <NewsroomControls
+              <ChyronControls
                 broadcastAudioActive={Boolean(broadcastAudio)}
                 state={state}
                 url={overlayUrl}
@@ -124,7 +124,7 @@ export default function App({
                 onError={room.setError}
               >
                 <Suspense
-                  fallback={<LoadingRegion label="Loading news controls" />}
+                  fallback={<LoadingRegion label="Loading Chyron controls" />}
                 >
                   <CoverageControls
                     settings={state.coverage}
@@ -135,7 +135,7 @@ export default function App({
                     }
                   />
                 </Suspense>
-              </NewsroomControls>
+              </ChyronControls>
             }
             settings={
               <Suspense fallback={<LoadingRegion label="Loading settings" />}>

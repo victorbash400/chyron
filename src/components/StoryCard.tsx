@@ -22,7 +22,7 @@ export default function StoryCard({
       >
         <h3>{story.headline}</h3>
       </button>
-      <IconButton label="Dismiss story" disabled={busy} onClick={onDismiss}>
+      <IconButton label="Dismiss update" disabled={busy} onClick={onDismiss}>
         <X />
       </IconButton>
     </article>

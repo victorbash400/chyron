@@ -1,5 +1,5 @@
 import {
-  Newspaper,
+  Captions,
   MessageCircle,
   Settings2,
   CircleUserRound,
@@ -35,12 +35,12 @@ export default function ChannelHeader({
       </div>
       <ToolbarGroup className={styles.actions} label="Workspace panels">
         <IconButton
-          label="News controls"
-          title="News controls"
-          selected={panel === "news"}
-          onClick={() => onPanel("news")}
+          label="Chyron controls"
+          title="Chyron controls"
+          selected={panel === "chyron"}
+          onClick={() => onPanel("chyron")}
         >
-          <Newspaper />
+          <Captions />
         </IconButton>
         <IconButton
           label="Settings"
