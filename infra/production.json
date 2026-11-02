@@ -1,0 +1,351 @@
+{
+  "AWSTemplateFormatVersion": "2010-09-09",
+  "Description": "Chyron account-isolated production data, read-only realtime channels and Vercel OIDC access",
+  "Parameters": {
+    "BedrockProjectArn": {
+      "Type": "String"
+    }
+  },
+  "Resources": {
+    "Data": {
+      "Type": "AWS::DynamoDB::Table",
+      "DeletionPolicy": "Retain",
+      "UpdateReplacePolicy": "Retain",
+      "Properties": {
+        "TableName": "Chyron-prod",
+        "BillingMode": "PAY_PER_REQUEST",
+        "AttributeDefinitions": [
+          {
+            "AttributeName": "pk",
+            "AttributeType": "S"
+          },
+          {
+            "AttributeName": "sk",
+            "AttributeType": "S"
+          }
+        ],
+        "KeySchema": [
+          {
+            "AttributeName": "pk",
+            "KeyType": "HASH"
+          },
+          {
+            "AttributeName": "sk",
+            "KeyType": "RANGE"
+          }
+        ],
+        "TimeToLiveSpecification": {
+          "AttributeName": "expiresAt",
+          "Enabled": true
+        },
+        "PointInTimeRecoverySpecification": {
+          "PointInTimeRecoveryEnabled": true
+        },
+        "SSESpecification": {
+          "SSEEnabled": true
+        },
+        "Tags": [
+          {
+            "Key": "Project",
+            "Value": "Chyron"
+          },
+          {
+            "Key": "Environment",
+            "Value": "production"
+          }
+        ]
+      }
+    },
+    "IdentityProvider": {
+      "Type": "AWS::IAM::OIDCProvider",
+      "Properties": {
+        "Url": "https://oidc.vercel.com/victor-bashs-projects",
+        "ClientIdList": [
+          "https://vercel.com/victor-bashs-projects"
+        ],
+        "Tags": [
+          {
+            "Key": "Project",
+            "Value": "Chyron"
+          }
+        ]
+      }
+    },
+    "AuthorizerLogs": {
+      "Type": "AWS::Logs::LogGroup",
+      "Properties": {
+        "LogGroupName": "/aws/lambda/chyron-prod-events-auth",
+        "RetentionInDays": 14
+      }
+    },
+    "AuthorizerRole": {
+      "Type": "AWS::IAM::Role",
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Effect": "Allow",
+              "Principal": {
+                "Service": "lambda.amazonaws.com"
+              },
+              "Action": "sts:AssumeRole"
+            }
+          ]
+        },
+        "Policies": [
+          {
+            "PolicyName": "ReadChyronCapabilities",
+            "PolicyDocument": {
+              "Version": "2012-10-17",
+              "Statement": [
+                {
+                  "Effect": "Allow",
+                  "Action": [
+                    "dynamodb:GetItem"
+                  ],
+                  "Resource": {
+                    "Fn::GetAtt": [
+                      "Data",
+                      "Arn"
+                    ]
+                  }
+                },
+                {
+                  "Effect": "Allow",
+                  "Action": [
+                    "logs:CreateLogStream",
+                    "logs:PutLogEvents"
+                  ],
+                  "Resource": {
+                    "Fn::Sub": "arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/lambda/chyron-prod-events-auth:*"
+                  }
+                }
+              ]
+            }
+          }
+        ]
+      }
+    },
+    "Authorizer": {
+      "Type": "AWS::Lambda::Function",
+      "DependsOn": [
+        "AuthorizerLogs"
+      ],
+      "Properties": {
+        "FunctionName": "chyron-prod-events-auth",
+        "Runtime": "nodejs22.x",
+        "Handler": "index.handler",
+        "Timeout": 5,
+        "MemorySize": 128,
+        "Role": {
+          "Fn::GetAtt": [
+            "AuthorizerRole",
+            "Arn"
+          ]
+        },
+        "Environment": {
+          "Variables": {
+            "TABLE_NAME": {
+              "Ref": "Data"
+            }
+          }
+        },
+        "Code": {
+          "ZipFile": "const { createHash } = require(\"node:crypto\");\nconst { DynamoDBClient, GetItemCommand } = require(\"@aws-sdk/client-dynamodb\");\nconst client = new DynamoDBClient({ maxAttempts: 1 });\nexports.handler = async (event) => {\n  const token = event.authorizationToken;\n  if (typeof token !== \"string\" || token.length > 200) return { isAuthorized: false };\n  const overlay = token.startsWith(\"overlay:\");\n  if (!overlay && !token.startsWith(\"session:\")) return { isAuthorized: false };\n  const raw = token.slice(8);\n  if (raw.length < 32) return { isAuthorized: false };\n  const hash = createHash(\"sha256\").update(raw).digest(\"hex\");\n  const result = await client.send(new GetItemCommand({\n    TableName: process.env.TABLE_NAME,\n    Key: { pk: { S: `${overlay ? \"OVERLAY\" : \"CAPABILITY\"}#${hash}` }, sk: { S: \"TOKEN\" } },\n    ConsistentRead: true,\n  }));\n  const item = result.Item;\n  if (!item || (item.expiresAt && Number(item.expiresAt.N) <= Date.now() / 1000)) return { isAuthorized: false };\n  const userId = item.data?.M?.userId?.S;\n  if (!userId) return { isAuthorized: false };\n  if (!overlay) {\n    const sessionId = item.data?.M?.sessionId?.S;\n    if (!sessionId) return { isAuthorized: false };\n    const session = await client.send(new GetItemCommand({ TableName: process.env.TABLE_NAME, Key: { pk: { S: `USER#${userId}` }, sk: { S: `SESSION#${sessionId}` } }, ConsistentRead: true }));\n    if (!session.Item || Number(session.Item.expiresAt?.N ?? 0) <= Date.now() / 1000) return { isAuthorized: false };\n  }\n  const operation = event.requestContext?.operation;\n  const channel = event.requestContext?.channel;\n  const allowed = operation === \"EVENT_CONNECT\" ||\n    (operation === \"EVENT_SUBSCRIBE\" && channel === `/${overlay ? \"overlay\" : \"newsroom\"}/${userId}`);\n  return { isAuthorized: allowed, ttlOverride: 0 };\n};\n"
+        }
+      }
+    },
+    "Events": {
+      "Type": "AWS::AppSync::Api",
+      "Properties": {
+        "Name": "Chyron-production",
+        "EventConfig": {
+          "AuthProviders": [
+            {
+              "AuthType": "AWS_IAM"
+            },
+            {
+              "AuthType": "AWS_LAMBDA",
+              "LambdaAuthorizerConfig": {
+                "AuthorizerUri": {
+                  "Fn::GetAtt": [
+                    "Authorizer",
+                    "Arn"
+                  ]
+                },
+                "AuthorizerResultTtlInSeconds": 0
+              }
+            }
+          ],
+          "ConnectionAuthModes": [
+            {
+              "AuthType": "AWS_LAMBDA"
+            }
+          ],
+          "DefaultSubscribeAuthModes": [
+            {
+              "AuthType": "AWS_LAMBDA"
+            }
+          ],
+          "DefaultPublishAuthModes": [
+            {
+              "AuthType": "AWS_IAM"
+            }
+          ]
+        }
+      }
+    },
+    "AuthorizerPermission": {
+      "Type": "AWS::Lambda::Permission",
+      "Properties": {
+        "Action": "lambda:InvokeFunction",
+        "FunctionName": {
+          "Ref": "Authorizer"
+        },
+        "Principal": "appsync.amazonaws.com",
+        "SourceArn": {
+          "Fn::GetAtt": [
+            "Events",
+            "ApiArn"
+          ]
+        }
+      }
+    },
+    "NewsroomChannel": {
+      "Type": "AWS::AppSync::ChannelNamespace",
+      "Properties": {
+        "ApiId": {
+          "Fn::GetAtt": [
+            "Events",
+            "ApiId"
+          ]
+        },
+        "Name": "newsroom"
+      }
+    },
+    "OverlayChannel": {
+      "Type": "AWS::AppSync::ChannelNamespace",
+      "Properties": {
+        "ApiId": {
+          "Fn::GetAtt": [
+            "Events",
+            "ApiId"
+          ]
+        },
+        "Name": "overlay"
+      }
+    },
+    "RuntimeRole": {
+      "Type": "AWS::IAM::Role",
+      "Properties": {
+        "RoleName": "chyron-production-vercel",
+        "AssumeRolePolicyDocument": {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Effect": "Allow",
+              "Principal": {
+                "Federated": {
+                  "Ref": "IdentityProvider"
+                }
+              },
+              "Action": "sts:AssumeRoleWithWebIdentity",
+              "Condition": {
+                "StringEquals": {
+                  "oidc.vercel.com/victor-bashs-projects:aud": "https://vercel.com/victor-bashs-projects",
+                  "oidc.vercel.com/victor-bashs-projects:sub": "owner:victor-bashs-projects:project:chyron:environment:production"
+                }
+              }
+            }
+          ]
+        },
+        "Policies": [
+          {
+            "PolicyName": "ChyronRuntime",
+            "PolicyDocument": {
+              "Version": "2012-10-17",
+              "Statement": [
+                {
+                  "Effect": "Allow",
+                  "Action": [
+                    "dynamodb:GetItem",
+                    "dynamodb:PutItem",
+                    "dynamodb:UpdateItem",
+                    "dynamodb:DeleteItem",
+                    "dynamodb:Query",
+                    "dynamodb:ConditionCheckItem"
+                  ],
+                  "Resource": {
+                    "Fn::GetAtt": [
+                      "Data",
+                      "Arn"
+                    ]
+                  }
+                },
+                {
+                  "Effect": "Allow",
+                  "Action": [
+                    "bedrock-mantle:CreateInference",
+                    "bedrock-mantle:GetProject",
+                    "bedrock-mantle:ListTagsForResource"
+                  ],
+                  "Resource": {
+                    "Ref": "BedrockProjectArn"
+                  }
+                },
+                {
+                  "Effect": "Allow",
+                  "Action": [
+                    "bedrock-mantle:CallWithBearerToken"
+                  ],
+                  "Resource": "*"
+                },
+                {
+                  "Effect": "Allow",
+                  "Action": [
+                    "appsync:EventPublish"
+                  ],
+                  "Resource": {
+                    "Fn::Sub": "${Events.ApiArn}/channelNamespace/*"
+                  }
+                }
+              ]
+            }
+          }
+        ]
+      }
+    }
+  },
+  "Outputs": {
+    "TableName": {
+      "Value": {
+        "Ref": "Data"
+      }
+    },
+    "RuntimeRoleArn": {
+      "Value": {
+        "Fn::GetAtt": [
+          "RuntimeRole",
+          "Arn"
+        ]
+      }
+    },
+    "RealtimeHttpHost": {
+      "Value": {
+        "Fn::GetAtt": [
+          "Events",
+          "Dns.Http"
+        ]
+      }
+    },
+    "RealtimeWebSocketHost": {
+      "Value": {
+        "Fn::GetAtt": [
+          "Events",
+          "Dns.Realtime"
+        ]
+      }
+    }
+  }
+}

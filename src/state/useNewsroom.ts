@@ -2,6 +2,7 @@ import type { OverlayDesign } from "../../shared/overlayDesign.ts";
 import { DesignUpdates, type DesignReceipt } from "./designUpdates.ts";
 import { useCallback, useEffect, useRef, useState } from "react";
 import type { Bootstrap, NewsroomState } from "../../shared/types.ts";
+import { connectRealtime } from "./realtime.ts";
 import { api } from "./api.ts";
 export function useNewsroom() {
   const [bootstrap, setBootstrap] = useState<Bootstrap | null>(null);
@@ -34,12 +35,46 @@ export function useNewsroom() {
   useEffect(() => {
     let active = true;
     let stream: EventSource | undefined;
+    let disconnect: (() => void) | undefined;
     void api<Bootstrap>("/api/bootstrap")
       .then((value) => {
         if (!active) return;
         designRevision.current = value.state.revision;
         setBootstrap(value);
         setError(null);
+        if (value.transport === "appsync") {
+          disconnect = connectRealtime(
+            "/api/realtime",
+            async () => {
+              const next = await api<Bootstrap>("/api/bootstrap");
+              if (!active) return;
+              setBootstrap((previous) =>
+                previous && next.state.revision >= previous.state.revision
+                  ? {
+                      ...next,
+                      state: {
+                        ...next.state,
+                        design:
+                          next.state.revision < designRevision.current
+                            ? previous.state.design
+                            : next.state.design,
+                      },
+                    }
+                  : previous,
+              );
+            },
+            () => {
+              if (active) setOnline(true);
+            },
+            (message) => {
+              if (active) {
+                setOnline(false);
+                setError(message);
+              }
+            },
+          );
+          return;
+        }
         stream = new EventSource("/api/events");
         stream.onopen = () => {
           if (active) setOnline(true);
@@ -84,6 +119,7 @@ export function useNewsroom() {
     return () => {
       active = false;
       stream?.close();
+      disconnect?.();
     };
   }, [attempt]);
   const act = useCallback(async (path: string, body: unknown = {}) => {

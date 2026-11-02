@@ -7,7 +7,7 @@ import LoadingRegion from "./components/controls/LoadingRegion.tsx";
 import ApplicationErrorBoundary from "./components/ApplicationErrorBoundary.tsx";
 import OverlayPage from "./components/OverlayPage.tsx";
 import "./global.css";
-const App = lazy(() => import("./App.tsx"));
+const SessionGate = lazy(() => import("./components/SessionGate.tsx"));
 const overlayToken = location.pathname.startsWith("/overlay/")
   ? location.pathname.split("/")[2]
   : null;
@@ -26,7 +26,7 @@ root.render(
         <OverlayPage token={overlayToken} />
       ) : (
         <Suspense fallback={<LoadingRegion label="Loading Chyron" />}>
-          <App />
+          <SessionGate />
         </Suspense>
       )}
     </ApplicationErrorBoundary>

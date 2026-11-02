@@ -26,6 +26,8 @@ export async function registerRoutes(
   twitch: TwitchConnection,
 ) {
   const simulator = new ChatSimulator(room);
+  app.get("/api/session", async (request) => ({ account: request.cookies.chyron_local_logged_out ? null : room.state.channel, local: !request.cookies.chyron_local_logged_out, canSignIn: twitch.configured() }));
+  app.post("/api/auth/logout", async (_request, reply) => { reply.setCookie("chyron_local_logged_out", "1", { path: "/", httpOnly: true, sameSite: "lax" }); return { ok: true }; });
   app.post("/api/simulation/start", async (request, reply) => {
     const settings = simulatorSettingsSchema.parse(request.body);
     if (room.state.mode !== "simulation")
@@ -196,6 +198,7 @@ export async function registerRoutes(
     if (query.error || !query.code)
       throw new Error("Twitch authorization was declined.");
     await twitch.authorize(query.code);
+    reply.clearCookie("chyron_local_logged_out", { path: "/" });
     return reply.redirect("/");
   });
   app.post("/api/twitch/reconnect", async () => {

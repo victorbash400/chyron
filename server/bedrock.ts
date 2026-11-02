@@ -2,6 +2,7 @@ import { getTokenProvider } from "@aws/bedrock-token-generator";
 import { createOpenAICompatible } from "@ai-sdk/openai-compatible";
 import { Agent, fetch as request } from "undici";
 import { awsLookup } from "./aws-dns.ts";
+import { credentials } from "./aws.ts";
 import { required, region } from "./config.ts";
 const dispatcher = new Agent({
   connect: { lookup: awsLookup, family: 4, timeout: 10000 },
@@ -15,6 +16,7 @@ export async function bedrockModel(
   const audio = mode === "audio";
   provideToken ??= getTokenProvider({
     region: region(),
+    credentials,
     expiresInSeconds: 300,
   });
   const token = await provideToken();

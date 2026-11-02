@@ -33,7 +33,6 @@ function StylePicker({
     >
       <div className="panel-heading">
         <h2>Styles</h2>
-        <span className="count-badge">{overlayStyles.length}</span>
       </div>
       <div className="style-picker-scroll">
         {overlayStyles.map((choice, index) => {

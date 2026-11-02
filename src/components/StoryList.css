@@ -1,8 +1,10 @@
 .story-list-panel {
   display: flex;
   flex-direction: column;
-  flex: 1;
-  min-height: 220px;
+  flex: 0 0 150px;
+  min-height: 80px;
+  border: 1px solid var(--border);
+  border-radius: 14px;
 }
 .story-list-panel > .panel-heading {
   min-height: 42px;
@@ -33,8 +35,6 @@
     transform: rotate(360deg);
   }
 }
-@media (max-width: 760px) {
-  .story-list-panel {
-    flex: 1;
-  }
+@media (max-height: 650px) {
+  .story-list-panel { flex-basis: 100px; }
 }

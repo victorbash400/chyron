@@ -1,16 +1,20 @@
-import type { SettingsSection } from "../components/settings/SettingsNavigation.tsx";
 import { useEffect, useState } from "react";
-
+import type { SettingsSection } from "../components/settings/SettingsNavigation.tsx";
+export type WorkspacePanel = "news" | "settings" | "chat" | "account";
+function currentPanel(): WorkspacePanel {
+  if (location.pathname.startsWith("/settings")) return "settings";
+  if (location.pathname === "/chat") return "chat";
+  if (location.pathname === "/account") return "account";
+  return "news";
+}
 export function useWorkspaceNavigation() {
-  const [settings, setSettings] = useState(
-    location.pathname.startsWith("/settings"),
-  );
+  const [panel, setPanel] = useState<WorkspacePanel | null>(currentPanel);
   const [section, setSection] = useState<SettingsSection>(
     location.pathname === "/settings/news" ? "news" : "appearance",
   );
   useEffect(() => {
     const update = () => {
-      setSettings(location.pathname.startsWith("/settings"));
+      setPanel(currentPanel());
       setSection(
         location.pathname === "/settings/news" ? "news" : "appearance",
       );
@@ -19,16 +23,27 @@ export function useWorkspaceNavigation() {
     return () => window.removeEventListener("popstate", update);
   }, []);
   function navigate(
-    settings: boolean,
-    section: SettingsSection = "appearance",
+    next: WorkspacePanel | null,
+    nextSection: SettingsSection = section,
   ) {
-    history.pushState(
-      null,
-      "",
-      settings ? (section === "news" ? "/settings/news" : "/settings") : "/",
-    );
-    setSettings(settings);
-    setSection(section);
+    const path =
+      next === "settings"
+        ? nextSection === "news"
+          ? "/settings/news"
+          : "/settings"
+        : next === "chat"
+          ? "/chat"
+          : next === "account"
+            ? "/account"
+            : "/";
+    history.pushState(null, "", path);
+    setPanel(next);
+    setSection(nextSection);
   }
-  return { settings, section, navigate };
+  return {
+    panel,
+    section,
+    navigate,
+    toggle: (next: WorkspacePanel) => navigate(panel === next ? null : next),
+  };
 }

@@ -50,6 +50,8 @@ export interface NewsroomState {
   coverage: CoverageSettings;
 }
 export interface OverlayState {
+  transport?: "appsync";
+  validUntil?: number;
   design: OverlayDesign;
   mode: SourceMode;
   visible: boolean;
@@ -58,6 +60,7 @@ export interface OverlayState {
   quote: ChatMessage | null;
 }
 export interface Bootstrap {
+  transport?: "appsync";
   state: NewsroomState;
   overlayUrl: string;
   twitchConfigured: boolean;

@@ -2,7 +2,6 @@ import { useEffect, useRef, type ReactNode } from "react";
 import { PanelLeftClose } from "lucide-react";
 import { useNarrowLayout } from "../state/useNarrowLayout.ts";
 import IconButton from "./controls/IconButton.tsx";
-import ChyronBrand from "./ChyronBrand.tsx";
 import styles from "./LibrarySidebar.module.css";
 
 export default function LibrarySidebar({
@@ -59,7 +58,6 @@ export default function LibrarySidebar({
         }}
       >
         <div className={styles.brand}>
-          <ChyronBrand />
           <div className={styles.close}>
             <IconButton label="Close styles" onClick={onClose}>
               <PanelLeftClose />

@@ -1,90 +1,63 @@
-import type { Ref } from "react";
-import type { NewsroomState } from "../../shared/types.ts";
 import {
-  SlidersHorizontal,
-  ArrowLeft,
+  Newspaper,
   MessageCircle,
+  Settings2,
+  CircleUserRound,
   PanelLeft,
 } from "lucide-react";
+import type { WorkspacePanel } from "../state/useWorkspaceNavigation.ts";
+import ChyronBrand from "./ChyronBrand.tsx";
 import IconButton from "./controls/IconButton.tsx";
-import AccountMenu from "./AccountMenu.tsx";
 import styles from "./ChannelHeader.module.css";
-import "./ChannelHeader.css";
-
 export default function ChannelHeader({
-  state,
-  busy,
-  onReconnect,
-  onDisconnect,
-  onSetup,
-  settings,
-  onNavigate,
+  panel,
+  onPanel,
   onStyles,
-  chatOpen,
-  onChat,
-  chatTrigger,
 }: {
-  chatTrigger?: Ref<HTMLButtonElement>;
+  panel: WorkspacePanel | null;
+  onPanel: (panel: WorkspacePanel) => void;
   onStyles: () => void;
-  chatOpen: boolean;
-  onChat: () => void;
-  settings: boolean;
-  onNavigate: (settings: boolean) => void;
-  state: NewsroomState;
-  busy: boolean;
-  onReconnect: () => void;
-  onDisconnect: () => void;
-  onSetup: () => void;
 }) {
   return (
-    <header className={`${styles.toolbar} channel-header`}>
+    <header className={styles.toolbar}>
       <div className={styles.navigation}>
         <div className={styles.mobile}>
           <IconButton label="Open styles" onClick={onStyles}>
             <PanelLeft />
           </IconButton>
         </div>
-        {settings ? (
-          <IconButton
-            className={styles.back}
-            label="Back to preview"
-            onClick={() => onNavigate(false)}
-          >
-            <ArrowLeft />
-          </IconButton>
-        ) : null}
+        <ChyronBrand />
       </div>
-      <div className={styles.actions}>
-        <div className={styles.group}>
-          <IconButton
-            ref={chatTrigger}
-            label="Chat"
-            selected={chatOpen && !settings}
-            onClick={() => {
-              if (settings) onNavigate(false);
-              onChat();
-            }}
-          >
-            <MessageCircle />
-          </IconButton>
-        </div>
-        <div className={styles.group}>
-          <IconButton
-            label="Settings"
-            selected={settings}
-            onClick={() => onNavigate(!settings)}
-          >
-            <SlidersHorizontal />
-          </IconButton>
-        </div>
-        <AccountMenu
-          state={state}
-          busy={busy}
-          onReconnect={onReconnect}
-          onDisconnect={onDisconnect}
-          onSetup={onSetup}
-        />
-      </div>
+      <nav className={styles.actions} aria-label="Workspace panels">
+        <IconButton
+          label="News controls"
+          selected={panel === "news"}
+          onClick={() => onPanel("news")}
+        >
+          <Newspaper />
+        </IconButton>
+        <IconButton
+          label="Settings"
+          selected={panel === "settings"}
+          onClick={() => onPanel("settings")}
+        >
+          <Settings2 />
+        </IconButton>
+        <IconButton
+          label="Chat"
+          selected={panel === "chat"}
+          onClick={() => onPanel("chat")}
+        >
+          <MessageCircle />
+        </IconButton>
+        <IconButton
+          label="Account"
+          selected={panel === "account"}
+          onClick={() => onPanel("account")}
+        >
+          <CircleUserRound />
+        </IconButton>
+      </nav>
     </header>
   );
 }

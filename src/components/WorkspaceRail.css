@@ -1,32 +1,42 @@
 .workspace-rail {
-  display: grid;
-  grid-template-rows: minmax(0, 1fr) minmax(0, 1fr);
-  width: 340px;
+  display: flex;
+  flex-direction: column;
+  width: 360px;
   flex-shrink: 0;
-  gap: 12px;
-  margin: 8px 12px 12px 8px;
   min-height: 0;
+  border: 1px solid var(--border);
+  border-radius: 14px;
   background: var(--panel);
+  overflow: hidden;
 }
-.workspace-rail:has(.chat-feed[hidden]) {
-  grid-template-rows: minmax(0, 1fr);
+.workspace-rail[hidden],
+.workspace-rail-pane[hidden] {
+  display: none;
 }
-@container workspace (max-width:849px) {
+.workspace-rail > .panel-heading {
+  min-height: 44px;
+  justify-content: space-between;
+}
+.workspace-rail-pane {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
+}
+.workspace-rail-backdrop {
+  position: fixed;
+  inset: 64px 0 0;
+  z-index: 29;
+  background: #263e3b20;
+}
+@media (max-width: 1129px) {
   .workspace-rail {
-    display: none;
-    position: absolute;
-    inset: 56px 0 0 auto;
-    width: min(340px, calc(100% - 20px));
-    z-index: 15;
-  }
-  .workspace-rail[data-open="true"] {
-    display: grid;
-  }
-}
-@media (max-width: 760px) {
-  .workspace-rail {
-    inset: 56px 0 0;
-    width: auto;
-    margin: 8px 12px 12px;
+    position: fixed;
+    top: 64px;
+    bottom: 12px;
+    right: 12px;
+    width: min(360px, calc(100vw - 24px));
+    z-index: 30;
   }
 }

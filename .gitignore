@@ -18,3 +18,7 @@ public/**/*.ico
 public/**/*.bmp
 public/**/*.tif
 public/**/*.tiff
+
+.vercel/
+server/hosted/bundle.mjs
+server/hosted/ffmpeg

@@ -1,8 +1,0 @@
-.channel-header {
-  background: transparent;
-}
-@media (max-width: 760px) {
-  .account-name {
-    display: none;
-  }
-}

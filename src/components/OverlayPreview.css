@@ -1,8 +1,8 @@
 .overlay-preview {
   display: flex;
   flex-direction: column;
-  flex: 1.2;
-  min-height: 160px;
+  flex: 1;
+  min-height: 0;
   padding: 0 12px 12px;
   background: var(--panel);
 }
@@ -44,17 +44,4 @@
 .preview-stage .preview-canvas {
   width: min(100cqw, calc(100cqh * 16 / 9));
 }
-@media (max-width: 760px) {
-  .overlay-preview {
-    flex: 0 0 auto;
-    min-height: 0;
-  }
-  .preview-stage {
-    container-type: normal;
-    display: block;
-    flex: none;
-  }
-  .preview-stage .preview-canvas {
-    width: 100%;
-  }
-}
+@media (max-width: 760px) { .overlay-preview { padding: 0 8px 8px; } }

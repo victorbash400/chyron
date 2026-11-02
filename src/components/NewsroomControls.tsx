@@ -1,7 +1,6 @@
 import ChatSimulatorControls from "./ChatSimulatorControls.tsx";
 import type { SimulatorSettings } from "../../shared/simulator.ts";
-import IconButton from "./controls/IconButton.tsx";
-import { Check, Link, Pause, Play, Settings2 } from "lucide-react";
+import { Check, Link, Pause, Play } from "lucide-react";
 import { useState } from "react";
 import type { NewsroomState, SourceMode } from "../../shared/types.ts";
 import SettingsInlineButton from "./settings/SettingsInlineButton.tsx";
@@ -18,11 +17,9 @@ export default function NewsroomControls({
   onSettings,
   onError,
   onMode,
-  onOpenSettings,
   onSimulate,
   onStopSimulation,
 }: {
-  onOpenSettings: () => void;
   onSimulate: (settings: SimulatorSettings) => Promise<boolean>;
   onStopSimulation: () => void;
   state: NewsroomState;
@@ -44,13 +41,7 @@ export default function NewsroomControls({
     }
   }
   return (
-    <section className="workspace-panel newsroom-controls" aria-label="News controls">
-      <div className="panel-heading">
-        <h2>News controls</h2>
-        <IconButton label="Open news settings" onClick={onOpenSettings}>
-          <Settings2 />
-        </IconButton>
-      </div>
+    <section className="newsroom-controls" aria-label="News controls">
       <div className="newsroom-control-groups">
         <SettingsGroup>
           <SettingsRow compact label="Source">

@@ -1,47 +1,30 @@
 import type { ReactNode } from "react";
-import { useRailOverlay } from "../state/useRailOverlay.ts";
-import { useNarrowLayout } from "../state/useNarrowLayout.ts";
-import WorkspaceRail from "./WorkspaceRail.tsx";
 import "./WorkspaceShell.css";
-
 export default function WorkspaceShell({
   header,
   styles,
   stories,
   preview,
-  controls,
-  chat,
-  settings,
-  stylesOpen,
-  chatOpen,
+  sidebar,
 }: {
   header: ReactNode;
   styles: ReactNode;
   stories: ReactNode;
   preview: ReactNode;
-  controls: ReactNode;
-  chat: ReactNode;
-  settings?: ReactNode;
-  stylesOpen: boolean;
-  chatOpen: boolean;
+  sidebar: ReactNode;
 }) {
-  const narrow = useNarrowLayout();
-  const railOverlay = useRailOverlay();
   return (
     <div className="workspace-shell">
-      {styles}
-      <div className="workspace-main" inert={narrow && stylesOpen}>
-        {header}
-        <div className="workspace-body" hidden={Boolean(settings)}>
-          <main className="workspace-content">
-            <div className="workspace-center" inert={railOverlay && chatOpen}>
-              {preview}
-              {stories}
-            </div>
-            <WorkspaceRail chat={chat} controls={controls} open={chatOpen} />
-          </main>
-        </div>
-        {settings}
+      {header}
+      <div className="workspace-layout">
+        <main className="workspace-board" aria-label="Broadcast workspace">
+          {styles}
+          <div className="workspace-center">
+            {preview}
+            {stories}
+          </div>
+        </main>
+        {sidebar}
       </div>
     </div>
   );

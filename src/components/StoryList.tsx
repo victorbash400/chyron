@@ -32,7 +32,6 @@ export default function StoryList({
     >
       <div className="panel-heading">
         <h2>{dismissed ? "Dismissed" : "Stories"}</h2>
-        <span className="count-badge">{shown.length}</span>
         <div className="story-list-tools">
           <IconButton
             label={dismissed ? "Show stories" : "Show dismissed stories"}
