@@ -24,6 +24,10 @@ export function useDemoChat(
     }
   }, [state, online, queued]);
   return {
+    cancel: () => {
+      setQueued(null);
+      controller.current?.cancel();
+    },
     active: active || Boolean(queued),
     start: async (settings: SimulatorSettings) => {
       if (!state || !controller.current) return false;

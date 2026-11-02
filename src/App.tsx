@@ -1,6 +1,7 @@
 import { useVoiceSummaries } from "./state/useVoiceSummaries.ts";
 import ChatSimulatorControls from "./components/ChatSimulatorControls.tsx";
 import ChatSummaryControls from "./components/ChatSummaryControls.tsx";
+import ClearChatButton from "./components/ClearChatButton.tsx";
 import { lazy, Suspense, useEffect, useState } from "react";
 import { useWorkspaceNavigation } from "./state/useWorkspaceNavigation.ts";
 import { useDemoChat } from "./state/useDemoChat.ts";
@@ -111,6 +112,20 @@ export default function App({
         sidebar={
           <WorkspaceRail
             panel={navigation.panel}
+            actions={
+              navigation.panel === "chat" && (
+                <ClearChatButton
+                  disabled={
+                    room.pending ||
+                    (!demo.active && !state.messages.some((message) => message.source !== "audio"))
+                  }
+                  onClear={() => {
+                    demo.cancel();
+                    void act("/api/chat/clear");
+                  }}
+                />
+              )
+            }
             onClose={() => navigation.navigate(null)}
             controls={
               <ChyronControls

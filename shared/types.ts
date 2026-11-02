@@ -29,6 +29,7 @@ export interface Story {
 }
 export interface NewsroomState {
   sourceId: string;
+  chatClearedAt?: number;
   simulator: {
     batchId?: string;
     status: "idle" | "generating" | "running";

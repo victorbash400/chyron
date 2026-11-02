@@ -215,6 +215,22 @@ test("every style can be saved and is returned in the broadcast feed", async () 
   }
 });
 
+test("clear chat is scoped to Chyron and preserves connection and overlay settings", async () => {
+  const f = await fixture();
+  try {
+    f.room.state.connection = "connected";
+    f.room.state.messages = [{ id: "viewer", userId: "viewer", author: "Viewer", text: "Old chat", source: "chat", at: Date.now() - 1000 }];
+    const design = { ...f.room.state.design };
+    const response = await f.request("/api/chat/clear", {});
+    assert.equal(response.statusCode, 200);
+    assert.deepEqual(f.room.state.messages, []);
+    assert.equal(f.room.state.connection, "connected");
+    assert.deepEqual(f.room.state.design, design);
+    assert.equal((await f.request("/api/chat/clear", { userId: "another-account" })).statusCode, 400);
+  } finally {
+    await f.app.close();
+  }
+});
 test("simulation messages preserve chat identity and reject invalid input", async () => {
   const f = await fixture();
   try {

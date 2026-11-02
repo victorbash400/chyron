@@ -17,6 +17,9 @@
   min-height: 44px;
   justify-content: space-between;
 }
+.workspace-rail > .panel-heading h2 {
+  margin-right: auto;
+}
 .workspace-rail-pane {
   display: flex;
   flex-direction: column;

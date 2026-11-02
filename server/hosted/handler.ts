@@ -19,6 +19,7 @@ import { updateSettings, resetSource } from "./settings.ts";
 import { startSimulation } from "./simulation.ts";
 import { receiveAudio } from "./audio.ts";
 import { analyzeRoom } from "./coverage.ts";
+import { clearChatState } from "../../shared/clearChat.ts";
 export type Defer = (work: Promise<unknown>) => void;
 export function checkOrigin(request: Request) {
   if (
@@ -100,7 +101,17 @@ export async function handleRequest(
     }
     const body = await jsonBody(request);
     let result: unknown = { ok: true };
-    if (url.pathname === "/api/settings") {
+    if (url.pathname === "/api/chat/clear") {
+      z.object({}).strict().parse(body);
+      await changeRoom(userId, (room) => {
+        room.state = clearChatState(room.state, randomUUID());
+        room.simulationId = "";
+        room.leaseOwner = "";
+        room.leaseUntil = 0;
+        room.processed = room.received;
+        room.lastAnalysisAt = Date.now();
+      });
+    } else if (url.pathname === "/api/settings") {
       const room = await updateSettings(userId, body);
       result = { ok: true, design: room.state.design, revision: room.revision, visible: room.state.visible };
     } else if (parts.length === 3 && parts[1] === "stories") {

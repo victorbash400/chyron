@@ -48,6 +48,15 @@ test("hosted mutations reject missing and foreign origins before session or data
   );
 });
 test("private cloud routes require a session and do not trust body-selected accounts", async () => {
+  const clear = await handleRequest(
+    new Request("https://chyron.example/api/chat/clear", {
+      method: "POST",
+      headers: { origin: "https://chyron.example", "content-type": "application/json" },
+      body: JSON.stringify({}),
+    }),
+    () => assert.fail("No background work"),
+  );
+  assert.equal(clear.status, 401);
   const response = await handleRequest(
     new Request("https://chyron.example/api/bootstrap?userId=someone-else"),
     () => assert.fail("No background work"),

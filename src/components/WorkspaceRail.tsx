@@ -17,6 +17,7 @@ export default function WorkspaceRail({
   settings,
   chat,
   account,
+  actions,
 }: {
   panel: WorkspacePanel | null;
   onClose: () => void;
@@ -24,6 +25,7 @@ export default function WorkspaceRail({
   settings: ReactNode;
   chat: ReactNode;
   account: ReactNode;
+  actions?: ReactNode;
 }) {
   const overlay = useRailOverlay();
   const root = useRef<HTMLElement>(null);
@@ -73,6 +75,7 @@ export default function WorkspaceRail({
       >
         <div className="panel-heading">
           <h2>{panel ? titles[panel] : ""}</h2>
+          {actions}
           <IconButton label="Close sidebar" onClick={onClose}>
             <X />
           </IconButton>

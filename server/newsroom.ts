@@ -16,6 +16,7 @@ import {
 } from "./editor.ts";
 import { readRecord, writeRecord } from "./store.ts";
 import { storyScore } from "./ranking.ts";
+import { clearChatState } from "../shared/clearChat.ts";
 export interface SavedNewsroom {
   state: NewsroomState;
   overlayToken: string;
@@ -132,7 +133,9 @@ export class Newsroom extends EventEmitter {
   add(messages: ChatMessage[]) {
     const seen = new Set(this.state.messages.map((m) => m.id));
     const unique = messages.filter(
-      (m) => !seen.has(m.id) && (seen.add(m.id), true),
+      (m) =>
+        (m.source === "audio" || m.at > (this.state.chatClearedAt ?? 0)) &&
+        !seen.has(m.id) && (seen.add(m.id), true),
     );
     if (!unique.length) return;
     this.state.messages = [...this.state.messages, ...unique].slice(-200);
@@ -199,6 +202,8 @@ export class Newsroom extends EventEmitter {
       this.emitState();
       await this.persist();
       this.scheduleExpiry();
+    } catch (error) {
+      if (epoch === this.epoch) throw error;
     } finally {
       this.state.working = false;
       this.emitState();
@@ -286,6 +291,18 @@ export class Newsroom extends EventEmitter {
       messageIds: s.messageIds.filter((id) => !ids.includes(id)),
     }));
     await this.commit();
+  }
+  async clearChat() {
+    this.epoch++;
+    this.pending = false;
+    this.pendingAudio = false;
+    this.unseenMessages = 0;
+    clearTimeout(this.batch);
+    this.batch = undefined;
+    this.state = clearChatState(this.state, randomUUID());
+    this.emit("source");
+    await this.commit();
+    this.scheduleExpiry();
   }
   async reset(mode: NewsroomState["mode"]) {
     this.epoch++;

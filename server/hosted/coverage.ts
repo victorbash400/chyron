@@ -99,6 +99,7 @@ export async function analyzeRoom(userId: string) {
     }
   } catch (error) {
     await changeRoom(userId, (room) => {
+      if (room.leaseOwner !== owner) return;
       room.state.error =
         error instanceof Error
           ? error.message

@@ -139,6 +139,11 @@ export async function getRoom(userId: string): Promise<RoomSnapshot> {
   );
   room.state.messages = (messages.Items ?? [])
     .map((item) => item.data as ChatMessage)
+    .filter(
+      (message) =>
+        message.source === "audio" ||
+        message.at > (room.state.chatClearedAt ?? 0),
+    )
     .reverse();
   return room;
 }

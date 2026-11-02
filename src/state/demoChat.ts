@@ -62,7 +62,7 @@ export class DemoChat {
     this.session = null;
   }
 
-  private cancel() {
+  cancel() {
     this.dispose();
     this.onActive(false);
   }

@@ -43,7 +43,7 @@ export default function OverlayPreview({
   const canvas = useRef<HTMLDivElement>(null);
   const allowSample = broadcast.status === "idle";
   const preview = previewCoverage(state);
-  const chat = previewChat(state.messages, allowSample);
+  const chat = previewChat(state.messages, allowSample && !state.chatClearedAt);
   return (
     <section className="workspace-panel overlay-preview" aria-label="Preview">
       <div className="panel-heading">
