@@ -17,8 +17,8 @@ import ChatFeed from "./components/ChatFeed.tsx";
 import AccountPanel from "./components/AccountPanel.tsx";
 import LogoutDialog from "./components/LogoutDialog.tsx";
 import ErrorNotice from "./components/ErrorNotice.tsx";
-const NewsSettingsPage = lazy(
-  () => import("./components/NewsSettingsPage.tsx"),
+const CoverageControls = lazy(
+  () => import("./components/CoverageControls.tsx"),
 );
 const AppearancePage = lazy(() => import("./components/AppearancePage.tsx"));
 const StoryEvidence = lazy(() => import("./components/StoryEvidence.tsx"));
@@ -122,32 +122,28 @@ export default function App({
                 onSettings={(patch) => void act("/api/settings", patch)}
                 onMode={(mode) => void act("/api/mode", { mode })}
                 onError={room.setError}
-              />
-            }
-            settings={
-              <Suspense fallback={<LoadingRegion label="Loading settings" />}>
-                {navigation.section === "news" ? (
-                  <NewsSettingsPage
+              >
+                <Suspense
+                  fallback={<LoadingRegion label="Loading news controls" />}
+                >
+                  <CoverageControls
                     settings={state.coverage}
                     models={bootstrap.coverageModels}
                     disabled={room.pending || state.working}
                     onChange={(coverage) =>
                       void act("/api/settings", { coverage })
                     }
-                    onNavigate={(section) =>
-                      navigation.navigate("settings", section)
-                    }
                   />
-                ) : (
-                  <AppearancePage
-                    state={state}
-                    busy={room.pending}
-                    onChange={room.updateDesign}
-                    onNavigate={(section) =>
-                      navigation.navigate("settings", section)
-                    }
-                  />
-                )}
+                </Suspense>
+              </NewsroomControls>
+            }
+            settings={
+              <Suspense fallback={<LoadingRegion label="Loading settings" />}>
+                <AppearancePage
+                  state={state}
+                  busy={room.pending}
+                  onChange={room.updateDesign}
+                />
               </Suspense>
             }
             chat={

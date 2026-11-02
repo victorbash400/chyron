@@ -1,7 +1,7 @@
 import ChatSimulatorControls from "./ChatSimulatorControls.tsx";
 import type { SimulatorSettings } from "../../shared/simulator.ts";
 import { Check, Link, Pause, Play } from "lucide-react";
-import { useState } from "react";
+import { useState, type ReactNode } from "react";
 import type { NewsroomState, SourceMode } from "../../shared/types.ts";
 import SettingsInlineButton from "./settings/SettingsInlineButton.tsx";
 import SettingsRow from "./settings/SettingsRow.tsx";
@@ -12,6 +12,7 @@ import "./NewsroomControls.css";
 
 export default function NewsroomControls({
   state,
+  children,
   broadcastAudioActive,
   url,
   busy,
@@ -21,6 +22,7 @@ export default function NewsroomControls({
   onSimulate,
   onStopSimulation,
 }: {
+  children: ReactNode;
   onSimulate: (settings: SimulatorSettings) => Promise<boolean>;
   onStopSimulation: () => void;
   broadcastAudioActive: boolean;
@@ -87,6 +89,7 @@ export default function NewsroomControls({
             </SettingsInlineButton>
           </SettingsRow>
         </SettingsGroup>
+        {children}
       </div>
     </section>
   );
