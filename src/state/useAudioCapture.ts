@@ -3,6 +3,7 @@ import { AudioUploads } from "./audioUploads.ts";
 export function useAudioCapture(
   sourceId: string,
   onError: (error: string) => void,
+  disabled = false,
 ) {
   const [opening, setOpening] = useState(false),
     [recording, setRecording] = useState(false),
@@ -10,8 +11,7 @@ export function useAudioCapture(
   const [transcript, setTranscript] = useState<string | null>(null);
   const recorder = useRef<MediaRecorder | null>(null),
     media = useRef<MediaStream | null>(null);
-  const segment = useRef<ReturnType<typeof setTimeout> | undefined>(undefined),
-    session = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
+  const segment = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
   const generation = useRef(0);
   const discardFinal = useRef(false);
   const mounted = useRef(true),
@@ -23,12 +23,10 @@ export function useAudioCapture(
     media.current?.getTracks().forEach((track) => track.stop());
     media.current = null;
     clearTimeout(segment.current);
-    clearTimeout(session.current);
   }, []);
   const stop = useCallback(() => {
     repeat.current = false;
     clearTimeout(segment.current);
-    clearTimeout(session.current);
     if (recorder.current?.state === "recording") recorder.current.stop();
     else stopTracks();
     if (mounted.current) setRecording(false);
@@ -48,7 +46,7 @@ export function useAudioCapture(
             ? result.transcript
             : result.status === "uncertain"
               ? "Speech unclear."
-              : "No speech detected.",
+              : null,
         ),
       (message) => {
         discardFinal.current = true;
@@ -63,13 +61,9 @@ export function useAudioCapture(
       if (recorder.current?.state === "recording") recorder.current.stop();
       stopTracks();
     };
-  }, [sourceId, stop, stopTracks]);
-  async function start(
-    source: "microphone" | "tab",
-    continuous: boolean,
-    seconds: 6 | 12,
-  ) {
-    if (opening || recording || pending) return;
+  }, [sourceId, disabled, stop, stopTracks]);
+  async function start(source: "microphone" | "tab") {
+    if (disabled || opening || recording || pending) return;
     const current = generation.current;
     discardFinal.current = false;
     setOpening(true);
@@ -98,7 +92,7 @@ export function useAudioCapture(
       );
       if (!mimeType)
         throw new Error("Audio recording format is unsupported. Use Chrome.");
-      repeat.current = continuous;
+      repeat.current = true;
       const begin = () => {
         if (
           !mounted.current ||
@@ -147,15 +141,11 @@ export function useAudioCapture(
         };
         capture.start();
         setRecording(true);
-        segment.current = setTimeout(
-          () => {
-            if (capture.state === "recording") {
-              if (!continuous) repeat.current = false;
-              capture.stop();
-            }
-          },
-          continuous ? seconds * 1000 : 55000,
-        );
+        segment.current = setTimeout(() => {
+          if (capture.state === "recording") {
+            capture.stop();
+          }
+        }, 6000);
       };
       stream
         .getTracks()
@@ -163,7 +153,6 @@ export function useAudioCapture(
           track.addEventListener("ended", stop, { once: true }),
         );
       begin();
-      session.current = setTimeout(stop, 10 * 60000);
     } catch (error) {
       stopTracks();
       errorHandler.current(
@@ -173,16 +162,5 @@ export function useAudioCapture(
       if (mounted.current && current === generation.current) setOpening(false);
     }
   }
-  function upload(file: File) {
-    if (file.size > 4000000) {
-      onError("Audio file exceeds 4 MB.");
-      return;
-    }
-    if (!file.type.startsWith("audio/")) {
-      onError("Select an audio file.");
-      return;
-    }
-    uploads.current?.enqueue(file, file.type, sourceId);
-  }
-  return { recording, pending, opening, transcript, start, stop, upload };
+  return { recording, pending, opening, transcript, start, stop };
 }

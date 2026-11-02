@@ -1,35 +1,28 @@
 import { useMemo, useState } from "react";
-import { Archive, RefreshCw } from "lucide-react";
+import { Archive, LoaderCircle } from "lucide-react";
 import type { Story } from "../../shared/types.ts";
 import { sortedStories } from "../../server/ranking.ts";
 import IconButton from "./controls/IconButton.tsx";
+import DismissedStory from "./DismissedStory.tsx";
 import StoryCard from "./StoryCard.tsx";
 import "./StoryList.css";
 export default function StoryList({
   stories,
   busy,
   working,
-  canGenerate,
   onAction,
-  onEdit,
   onEvidence,
-  onGenerate,
 }: {
   stories: Story[];
   busy: boolean;
   working: boolean;
-  canGenerate: boolean;
   onAction: (id: string, action: string) => void;
-  onEdit: (story: Story) => void;
   onEvidence: (story: Story) => void;
-  onGenerate: () => void;
 }) {
   const [dismissed, setDismissed] = useState(false);
   const shown = useMemo(
     () =>
-      sortedStories(
-        stories.filter((story) => story.dismissed === dismissed),
-      ).sort((a, b) => Number(b.published) - Number(a.published)),
+      sortedStories(stories.filter((story) => story.dismissed === dismissed)),
     [stories, dismissed],
   );
   return (
@@ -48,35 +41,30 @@ export default function StoryList({
           >
             <Archive />
           </IconButton>
-          <IconButton
-            className={working ? "is-working" : ""}
-            label={working ? "Generating coverage" : "Generate coverage"}
-            disabled={busy || working || !canGenerate}
-            onClick={onGenerate}
-          >
-            <RefreshCw />
-          </IconButton>
+          {working && (
+            <LoaderCircle
+              className="coverage-working"
+              role="status"
+              aria-label="Updating coverage"
+            />
+          )}
         </div>
       </div>
       <div className="story-list">
         {shown.map((story) =>
           dismissed ? (
-            <article className="dismissed-story" key={story.id}>
-              <span>{story.headline}</span>
-              <button
-                onClick={() => onAction(story.id, "restore")}
-                disabled={busy}
-              >
-                Restore
-              </button>
-            </article>
+            <DismissedStory
+              key={story.id}
+              story={story}
+              busy={busy}
+              onRestore={() => onAction(story.id, "restore")}
+            />
           ) : (
             <StoryCard
               key={story.id}
               story={story}
               busy={busy}
-              onAction={(action) => onAction(story.id, action)}
-              onEdit={() => onEdit(story)}
+              onDismiss={() => onAction(story.id, "dismiss")}
               onEvidence={() => onEvidence(story)}
             />
           ),

@@ -47,14 +47,6 @@ export default function CoverageSourceSettings({
           onChange={(includeAudio) => onChange({ includeAudio })}
         />
       </SettingsRow>
-      <SettingsRow label="Stories from audio">
-        <ToggleSwitch
-          label="Stories from audio"
-          checked={settings.audioStories}
-          disabled={disabled || !settings.includeAudio}
-          onChange={(audioStories) => onChange({ audioStories })}
-        />
-      </SettingsRow>
       <SettingsRow label="Viewer quotes">
         <ToggleSwitch
           label="Viewer quotes"

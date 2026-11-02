@@ -4,7 +4,6 @@ import IconButton from "./controls/IconButton.tsx";
 import { Check, Link, Pause, Play, Settings2 } from "lucide-react";
 import { useState } from "react";
 import type { NewsroomState, SourceMode } from "../../shared/types.ts";
-import ToggleSwitch from "./controls/ToggleSwitch.tsx";
 import SettingsInlineButton from "./settings/SettingsInlineButton.tsx";
 import SettingsRow from "./settings/SettingsRow.tsx";
 import SettingsGroup from "./settings/SettingsGroup.tsx";
@@ -19,7 +18,6 @@ export default function NewsroomControls({
   onSettings,
   onError,
   onMode,
-  onScenario,
   onOpenSettings,
   onSimulate,
   onStopSimulation,
@@ -30,10 +28,9 @@ export default function NewsroomControls({
   state: NewsroomState;
   url: string;
   busy: boolean;
-  onSettings: (patch: { automatic?: boolean; paused?: boolean }) => void;
+  onSettings: (patch: { paused?: boolean }) => void;
   onError: (error: string) => void;
   onMode: (mode: SourceMode) => void;
-  onScenario: (scenario: string) => void;
 }) {
   const [copied, setCopied] = useState(false);
   async function copy() {
@@ -47,7 +44,7 @@ export default function NewsroomControls({
     }
   }
   return (
-    <section className="newsroom-controls" aria-label="News controls">
+    <section className="workspace-panel newsroom-controls" aria-label="News controls">
       <div className="panel-heading">
         <h2>News controls</h2>
         <IconButton label="Open news settings" onClick={onOpenSettings}>
@@ -70,12 +67,10 @@ export default function NewsroomControls({
             disabled={busy || state.paused}
             onStart={onSimulate}
             onStop={onStopSimulation}
-            onScenario={onScenario}
           />
         )}
         <AudioCapture
           sourceId={state.sourceId}
-          model={state.audioModel}
           disabled={state.paused}
           onError={onError}
         />
@@ -88,14 +83,6 @@ export default function NewsroomControls({
               {state.paused ? <Play /> : <Pause />}
               {state.paused ? "Resume" : "Pause"}
             </SettingsInlineButton>
-          </SettingsRow>
-          <SettingsRow compact label="Auto publish">
-            <ToggleSwitch
-              label="Auto publish"
-              checked={state.automatic}
-              onChange={(automatic) => onSettings({ automatic })}
-              disabled={busy}
-            />
           </SettingsRow>
           <SettingsRow compact label="Overlay">
             <SettingsInlineButton

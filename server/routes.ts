@@ -14,7 +14,6 @@ import type { TwitchConnection } from "./twitch.ts";
 import { origin } from "./config.ts";
 import { overlayState } from "./ranking.ts";
 import { streamState } from "./events.ts";
-import { simulationMessages } from "./simulation.ts";
 import { transcribe } from "./transcription.ts";
 function equal(left: string, right: string) {
   const a = Buffer.from(left),
@@ -72,7 +71,6 @@ export async function registerRoutes(
       .object({
         coverage: coverageSettingsSchema.partial().strict().optional(),
         paused: z.boolean().optional(),
-        automatic: z.boolean().optional(),
         visible: z.boolean().optional(),
         design: z
           .object({
@@ -98,6 +96,7 @@ export async function registerRoutes(
       room.state.model = configuredCoverageModel(room.state.coverage.model);
     }
     if (design) room.state.design = { ...room.state.design, ...design };
+    if (patch.paused) room.state.sourceId = randomUUID();
     const appliedDesign = { ...room.state.design };
     const appliedRevision = room.state.revision + 1;
     await room.commit();
@@ -107,59 +106,16 @@ export async function registerRoutes(
     if (patch.paused === false) room.scheduleCoverage();
     return { ok: true, design: appliedDesign, revision: appliedRevision };
   });
-  app.post("/api/coverage", async (_request, reply) => {
-    if (room.state.paused) throw new Error("Resume coverage first.");
-    if (room.state.working)
-      return reply.code(409).send({ error: "Coverage is already running." });
-    void room.process().catch((error) => room.fail(error));
-    return reply.code(202).send({ ok: true });
-  });
   app.post<{ Params: { id: string } }>("/api/stories/:id", async (request) => {
-    const patch = z
-      .object({
-        action: z.enum([
-          "publish",
-          "unpublish",
-          "pin",
-          "dismiss",
-          "restore",
-          "edit",
-        ]),
-        headline: z.string().trim().min(1).max(110).optional(),
-        summary: z.string().max(180).optional(),
-      })
+    const { action } = z
+      .object({ action: z.enum(["dismiss", "restore"]) })
       .strict()
       .parse(request.body);
-    const story = room.state.stories.find((s) => s.id === request.params.id);
+    const story = room.state.stories.find(
+      (item) => item.id === request.params.id,
+    );
     if (!story) throw new Error("Story not found.");
-    if (patch.action === "publish") {
-      story.published = true;
-      story.dismissed = false;
-      story.updatedAt = Date.now();
-    }
-    if (patch.action === "unpublish") story.published = false;
-    if (patch.action === "pin") {
-      const pinned = !story.pinned;
-      for (const item of room.state.stories) item.pinned = false;
-      story.pinned = pinned;
-      if (pinned) {
-        story.published = true;
-        story.dismissed = false;
-        story.updatedAt = Date.now();
-      }
-    }
-    if (patch.action === "dismiss") {
-      story.dismissed = true;
-      story.published = false;
-      story.pinned = false;
-    }
-    if (patch.action === "restore") story.dismissed = false;
-    if (patch.action === "edit") {
-      if (!patch.headline) throw new Error("Enter a headline.");
-      story.headline = patch.headline;
-      story.summary = patch.summary ?? story.summary;
-      story.edited = true;
-    }
+    story.dismissed = action === "dismiss";
     await room.commit();
     room.scheduleExpiry();
     return { ok: true };
@@ -172,15 +128,6 @@ export async function registerRoutes(
       throw new Error("Wait for coverage to finish before changing source.");
     twitch.disconnect();
     await room.reset(mode);
-    return { ok: true };
-  });
-  app.post("/api/simulation", async (request) => {
-    if (room.state.mode !== "simulation")
-      throw new Error("Select Simulation first.");
-    const { scenario } = z
-      .object({ scenario: z.enum(["keyboard", "reversal"]) })
-      .parse(request.body);
-    room.add(simulationMessages(scenario));
     return { ok: true };
   });
   app.post("/api/simulation/message", async (request) => {

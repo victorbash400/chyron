@@ -19,7 +19,6 @@ export default function OverlayPreview({
   url: string;
   busy: boolean;
   onSettings: (patch: {
-    automatic?: boolean;
     paused?: boolean;
     visible?: boolean;
   }) => void;
@@ -31,9 +30,9 @@ export default function OverlayPreview({
     <section className="workspace-panel overlay-preview" aria-label="Preview">
       <div className="panel-heading">
         <h2>Preview</h2>
-        {preview.kind !== "published" && (
+        {preview.kind === "sample" && (
           <span className="draft-label">
-            {preview.kind === "sample" ? "Sample" : "Draft"}
+            Sample
           </span>
         )}
         <div className="preview-actions">

@@ -6,8 +6,7 @@ export interface SimulatorSettings {
   model: "fast" | "reasoning";
 }
 export const defaultSimulatorSettings: SimulatorSettings = {
-  topic:
-    "A streamer tries a very expensive keyboard and chat debates whether it is worth it",
+  topic: "",
   users: 3,
   messages: 12,
   intervalMs: 1500,

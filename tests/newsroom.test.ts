@@ -44,12 +44,10 @@ function room() {
   room.state.messages = structuredClone(messages);
   return room;
 }
-test("coverage is a draft until published and overlay excludes private chat", () => {
+test("coverage reaches the overlay automatically and excludes private chat", () => {
   const r = room();
   try {
     r.apply(coverage, at);
-    assert.equal(overlayState(r.state, at).lead, null);
-    r.state.stories[0].published = true;
     const overlay = overlayState(r.state, at);
     assert.equal(overlay.lead?.headline, coverage.stories[0].headline);
     assert.equal(overlay.quote?.text, messages[1].text);
@@ -58,12 +56,11 @@ test("coverage is a draft until published and overlay excludes private chat", ()
     r.dispose();
   }
 });
-test("an update preserves story identity and publication", () => {
+test("an update preserves story identity and updates the live overlay", () => {
   const r = room();
   try {
     r.apply(coverage, at);
     const story = r.state.stories[0];
-    story.published = true;
     r.apply(
       {
         stories: [
@@ -79,7 +76,10 @@ test("an update preserves story identity and publication", () => {
     );
     assert.equal(r.state.stories.length, 1);
     assert.equal(r.state.stories[0].id, story.id);
-    assert.equal(r.state.stories[0].published, true);
+    assert.equal(
+      overlayState(r.state, at + 100).lead?.headline,
+      "Keyboard debate develops",
+    );
   } finally {
     r.dispose();
   }
@@ -142,26 +142,11 @@ test("repetition by one viewer cannot start a new story", () => {
     r.dispose();
   }
 });
-test("edited and dismissed stories resist AI overwrites", () => {
+test("dismissed stories resist AI overwrites", () => {
   const r = room();
   try {
     r.apply(coverage, at);
     const story = r.state.stories[0];
-    story.edited = true;
-    r.apply(
-      {
-        stories: [
-          {
-            ...coverage.stories[0],
-            existingId: story.id,
-            headline: "Overwrite",
-          },
-        ],
-      },
-      at + 1,
-    );
-    assert.equal(r.state.stories[0].headline, story.headline);
-    r.state.stories[0].edited = false;
     r.state.stories[0].dismissed = true;
     r.apply(
       {
@@ -180,14 +165,13 @@ test("edited and dismissed stories resist AI overwrites", () => {
     r.dispose();
   }
 });
-test("deleting a supporting message removes its quote and unpublishes coverage", async () => {
+test("deleting a supporting message removes its quote and removes coverage from the overlay", async () => {
   const r = room();
   try {
     r.apply(coverage, at);
-    r.state.stories[0].published = true;
     await r.removeMessages(["m2"]);
     assert.equal(r.state.stories[0].quoteId, null);
-    assert.equal(r.state.stories[0].published, false);
+    assert.equal(overlayState(r.state, at).lead, null);
     assert.equal(r.state.messages.length, 1);
   } finally {
     r.dispose();
@@ -204,15 +188,12 @@ test("rank counts distinct viewers rather than repeated messages", () => {
   );
   assert.ok(storyScore(messages, 0.5, at) > storyScore(repeated, 0.5, at));
 });
-test("old coverage expires while pinned stories stay on screen", () => {
+test("all coverage expires after the configured story duration", () => {
   const r = room();
   try {
     r.apply(coverage, at);
-    const story = r.state.stories[0];
-    story.published = true;
+    assert.ok(overlayState(r.state, at + 299999).lead);
     assert.equal(overlayState(r.state, at + 300001).lead, null);
-    story.pinned = true;
-    assert.equal(overlayState(r.state, at + 300001).lead?.id, story.id);
   } finally {
     r.dispose();
   }
@@ -248,19 +229,18 @@ test("message delivery is deduplicated", () => {
     r.dispose();
   }
 });
-test("a pinned lead survives the story retention limit", () => {
+test("the story retention limit drops the oldest coverage", () => {
   const r = room();
   try {
     r.apply(coverage, at);
-    const lead = r.state.stories[0];
-    lead.pinned = true;
-    lead.published = true;
+    const first = r.state.stories[0].id;
     for (let index = 0; index < 35; index++) r.apply(coverage, at + index + 1);
     assert.equal(r.state.stories.length, 30);
-    assert.ok(
-      r.state.stories.some((story) => story.id === lead.id && story.pinned),
+    assert.equal(
+      r.state.stories.some((story) => story.id === first),
+      false,
     );
-    assert.equal(overlayState(r.state, at + 100).lead?.id, lead.id);
+    assert.ok(overlayState(r.state, at + 100).lead);
   } finally {
     r.dispose();
   }
@@ -287,4 +267,33 @@ test("live settings commit emits before storage finishes and surfaces persistenc
   await assert.rejects(commit, { message: "Storage unavailable" });
   assert.equal(room.state.error, "Storage unavailable");
   room.dispose();
+});
+
+test("chat ingestion updates the live feed without a generation or publication action", async (context) => {
+  context.mock.timers.enable({ apis: ["setTimeout"] });
+  const r = new Newsroom(
+    async () => structuredClone(coverage),
+    async () => {},
+  );
+  const delivered: string[] = [];
+  r.on("state", () => {
+    const lead = overlayState(r.state).lead;
+    if (lead) delivered.push(lead.headline);
+  });
+  try {
+    r.state.coverage.minimumMessages = 1;
+    r.add(messages.map((message) => ({ ...message, at: Date.now() })));
+    assert.equal(overlayState(r.state).lead, null);
+    context.mock.timers.tick(800);
+    await new Promise((resolve) => setImmediate(resolve));
+    assert.equal(
+      overlayState(r.state).lead?.headline,
+      coverage.stories[0].headline,
+    );
+    assert.ok(delivered.includes(coverage.stories[0].headline));
+    assert.equal("published" in r.state.stories[0], false);
+    assert.equal("pinned" in r.state.stories[0], false);
+  } finally {
+    r.dispose();
+  }
 });

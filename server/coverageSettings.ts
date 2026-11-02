@@ -8,7 +8,6 @@ export const coverageSettingsSchema = z.object({
   focus: z.enum(["headlines", "recap", "developments"]),
   newsworthiness: z.enum(["all", "notable", "major"]),
   instructions: z.string().trim().max(600),
-  generation: z.enum(["automatic", "manual"]),
   updateDelayMs: z.union([
     z.literal(0),
     z.literal(800),
@@ -29,7 +28,6 @@ export const coverageSettingsSchema = z.object({
   contextSeconds: z.union([z.literal(60), z.literal(180), z.literal(300)]),
   lifetimeSeconds: z.union([z.literal(60), z.literal(300), z.literal(600)]),
   includeAudio: z.boolean(),
-  audioStories: z.boolean(),
   quotes: z.boolean(),
 });
 export function configuredCoverageModel(model: CoverageSettings["model"]) {

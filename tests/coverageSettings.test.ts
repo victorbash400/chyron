@@ -115,7 +115,6 @@ test("participant threshold, viewer quotes and story duration affect coverage", 
       },
       now,
     );
-    room.state.stories[0]!.published = true;
     assert.equal(overlayState(room.state, now).quote?.id, "a");
     room.state.coverage.quotes = false;
     assert.equal(overlayState(room.state, now).quote, null);
@@ -123,8 +122,7 @@ test("participant threshold, viewer quotes and story duration affect coverage", 
     assert.equal(overlayState(room.state, now + 61000).lead, null);
     room.state.coverage.lifetimeSeconds = 600;
     assert.ok(overlayState(room.state, now + 61000).lead);
-    room.state.stories[0]!.pinned = true;
-    assert.ok(overlayState(room.state, now + 601000).lead);
+    assert.equal(overlayState(room.state, now + 601000).lead, null);
   } finally {
     room.dispose();
   }
@@ -163,14 +161,17 @@ test("automatic batching waits for the message threshold and does not starve dur
   context.mock.timers.tick(400);
   assert.equal(calls, 1);
   await new Promise((resolve) => setImmediate(resolve));
-  room.state.coverage.generation = "manual";
+  room.state.paused = true;
   room.rescheduleCoverage();
   add("e");
   add("f");
   add("g");
   context.mock.timers.tick(10000);
   assert.equal(calls, 1);
-  await room.process();
+  room.state.paused = false;
+  room.rescheduleCoverage();
+  context.mock.timers.tick(800);
+  await new Promise((resolve) => setImmediate(resolve));
   assert.equal(calls, 2);
   room.dispose();
 });
@@ -187,11 +188,17 @@ test("editorial format, newsworthiness and user direction reach the newsroom pro
   assert.ok(prompt.includes("Only cover major developments"));
   assert.ok(prompt.includes("Focus on cooking and ingredient changes."));
   assert.ok(prompt.includes("Never invent facts"));
-  assert.ok(prompt.includes("A discussion on a different topic must become a new story"));
-  assert.ok(prompt.includes("cite messageIds from at least 2 distinct userId values"));
+  assert.ok(
+    prompt.includes(
+      "A discussion on a different topic must become a new story",
+    ),
+  );
+  assert.ok(
+    prompt.includes("cite messageIds from at least 2 distinct userId values"),
+  );
 });
 
-test("audio can start news only when explicitly enabled and triggers generation without waiting for chat", async (context) => {
+test("audio starts coverage automatically without waiting for chat participants", async (context) => {
   context.mock.timers.enable({ apis: ["setTimeout"] });
   let calls = 0;
   const room = new Newsroom(
@@ -220,11 +227,10 @@ test("audio can start news only when explicitly enabled and triggers generation 
       stories: [{ ...draft, messageIds: ["voice"], quoteId: null }],
     };
     room.apply(output, Date.now());
-    assert.equal(room.state.stories.length, 0);
-    room.state.coverage.audioStories = true;
-    room.apply(output, Date.now());
+
     assert.equal(room.state.stories.length, 1);
     assert.equal(room.state.stories[0]?.quoteId, null);
+    assert.equal(overlayState(room.state).lead?.id, room.state.stories[0]?.id);
   } finally {
     room.dispose();
   }

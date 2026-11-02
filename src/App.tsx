@@ -17,15 +17,13 @@ const NewsSettingsPage = lazy(
   () => import("./components/NewsSettingsPage.tsx"),
 );
 const AppearancePage = lazy(() => import("./components/AppearancePage.tsx"));
-const StoryEditor = lazy(() => import("./components/StoryEditor.tsx"));
 const StoryEvidence = lazy(() => import("./components/StoryEvidence.tsx"));
 const TwitchSetup = lazy(() => import("./components/TwitchSetup.tsx"));
 
 export default function App() {
   const room = useNewsroom();
   const chatTrigger = useRef<HTMLButtonElement>(null);
-  const [editing, setEditing] = useState<Story | null>(null),
-    [evidence, setEvidence] = useState<Story | null>(null),
+  const [evidence, setEvidence] = useState<Story | null>(null),
     [setup, setSetup] = useState(false);
   const narrow = useNarrowLayout();
   const [stylesOpen, setStylesOpen] = useState(false);
@@ -118,7 +116,6 @@ export default function App() {
             busy={room.pending}
             onSettings={(patch) => void act("/api/settings", patch)}
             onMode={(mode) => void act("/api/mode", { mode })}
-            onScenario={(scenario) => void act("/api/simulation", { scenario })}
             onError={room.setError}
           />
         }
@@ -126,13 +123,10 @@ export default function App() {
           <StoryList
             stories={state.stories}
             working={state.working}
-            canGenerate={!state.paused && state.messages.length > 0}
-            onGenerate={() => void act("/api/coverage")}
             busy={room.pending}
             onAction={(id, action) =>
               void act(`/api/stories/${id}`, { action })
             }
-            onEdit={setEditing}
             onEvidence={setEvidence}
           />
         }
@@ -160,20 +154,7 @@ export default function App() {
           />
         }
       />
-      <Suspense fallback={<LoadingRegion label="Loading editor" overlay />}>
-        {editing && (
-          <StoryEditor
-            story={editing}
-            onClose={() => setEditing(null)}
-            onSave={(headline, summary) =>
-              act(`/api/stories/${editing.id}`, {
-                action: "edit",
-                headline,
-                summary,
-              })
-            }
-          />
-        )}{" "}
+      <Suspense fallback={<LoadingRegion label="Loading details" overlay />}>
         {evidence && (
           <StoryEvidence
             story={evidence}

@@ -1,32 +1,30 @@
+import { X } from "lucide-react";
 import type { Story } from "../../shared/types.ts";
-import StoryActions from "./StoryActions.tsx";
+import IconButton from "./controls/IconButton.tsx";
 import "./StoryCard.css";
 export default function StoryCard({
   story,
   busy,
-  onAction,
-  onEdit,
+  onDismiss,
   onEvidence,
 }: {
   story: Story;
   busy: boolean;
-  onAction: (action: string) => void;
-  onEdit: () => void;
+  onDismiss: () => void;
   onEvidence: () => void;
 }) {
   return (
-    <article className={`story-card ${story.published ? "is-published" : ""}`}>
-      <button className="story-title" onClick={onEvidence}>
-        {story.published && <span className="story-status">PUBLISHED</span>}
+    <article className="story-card">
+      <button
+        className="story-title"
+        aria-label={`Source messages: ${story.headline}`}
+        onClick={onEvidence}
+      >
         <h3>{story.headline}</h3>
       </button>
-      <StoryActions
-        story={story}
-        busy={busy}
-        onAction={onAction}
-        onEdit={onEdit}
-        onEvidence={onEvidence}
-      />
+      <IconButton label="Dismiss story" disabled={busy} onClick={onDismiss}>
+        <X />
+      </IconButton>
     </article>
   );
 }

@@ -16,21 +16,18 @@ const story: Story = {
   interest: 0.5,
   updatedAt: Date.now(),
   createdAt: Date.now(),
-  published: false,
-  pinned: false,
   dismissed: false,
-  edited: false,
 };
-test("draft previews never publish into the OBS feed", () => {
+test("real coverage appears identically in the preview and the OBS feed", () => {
   const room = new Newsroom();
   try {
     room.state.stories = [story];
-    assert.equal(previewCoverage(room.state).kind, "draft");
-    assert.equal(previewCoverage(room.state).coverage.lead?.id, "draft");
-    assert.equal(overlayState(room.state).lead, null);
-    room.state.stories = [{ ...story, published: true }];
-    assert.equal(previewCoverage(room.state).kind, "published");
-    assert.equal(overlayState(room.state).lead?.id, "draft");
+    assert.equal(previewCoverage(room.state).kind, "live");
+    assert.deepEqual(
+      previewCoverage(room.state).coverage,
+      overlayState(room.state),
+    );
+    assert.equal(overlayState(room.state).lead?.id, story.id);
   } finally {
     room.dispose();
   }

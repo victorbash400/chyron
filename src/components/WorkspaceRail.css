@@ -9,8 +9,7 @@
   background: var(--panel);
 }
 .workspace-rail:has(.chat-feed[hidden]) {
-  grid-template-rows: auto;
-  align-content: start;
+  grid-template-rows: minmax(0, 1fr);
 }
 @container workspace (max-width:849px) {
   .workspace-rail {

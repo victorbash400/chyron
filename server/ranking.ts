@@ -37,9 +37,8 @@ export function storyScore(
 export function sortedStories(stories: Story[], now = Date.now()) {
   return [...stories].sort(
     (a, b) =>
-      Number(b.pinned) - Number(a.pinned) ||
       b.score * Math.exp(-(now - b.updatedAt) / 120000) -
-        a.score * Math.exp(-(now - a.updatedAt) / 120000),
+      a.score * Math.exp(-(now - a.updatedAt) / 120000),
   );
 }
 export function overlayState(
@@ -49,9 +48,8 @@ export function overlayState(
   const stories = sortedStories(
     state.stories.filter(
       (s) =>
-        s.published &&
         !s.dismissed &&
-        (s.pinned || now - s.updatedAt < state.coverage.lifetimeSeconds * 1000),
+        now - s.updatedAt < state.coverage.lifetimeSeconds * 1000,
     ),
     now,
   );

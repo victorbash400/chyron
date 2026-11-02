@@ -25,10 +25,7 @@ export interface Story {
   interest: number;
   updatedAt: number;
   createdAt: number;
-  published: boolean;
-  pinned: boolean;
   dismissed: boolean;
-  edited: boolean;
 }
 export interface NewsroomState {
   sourceId: string;
@@ -41,7 +38,6 @@ export interface NewsroomState {
   channel: { id: string; name: string } | null;
   connection: "disconnected" | "connecting" | "connected" | "error";
   paused: boolean;
-  automatic: boolean;
   visible: boolean;
   working: boolean;
   error: string | null;

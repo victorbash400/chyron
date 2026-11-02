@@ -23,7 +23,6 @@ export class Newsroom extends EventEmitter {
     channel: null,
     connection: "disconnected",
     paused: false,
-    automatic: false,
     visible: true,
     working: false,
     error: null,
@@ -52,10 +51,32 @@ export class Newsroom extends EventEmitter {
   async restore() {
     const saved = await readRecord<SavedNewsroom>("NEWSROOM");
     if (saved) {
+      const { automatic: _automatic, ...previous } =
+        saved.state as NewsroomState & { automatic?: boolean };
+      const {
+        generation: _generation,
+        audioStories: _audioStories,
+        ...coverage
+      } = previous.coverage as NewsroomState["coverage"] & {
+        generation?: string;
+        audioStories?: boolean;
+      };
       this.state = {
-        ...saved.state,
+        ...previous,
+        stories: previous.stories.map(
+          ({
+            published: _published,
+            pinned: _pinned,
+            edited: _edited,
+            ...story
+          }: Story & {
+            published?: boolean;
+            pinned?: boolean;
+            edited?: boolean;
+          }) => story,
+        ),
         design: { ...defaultOverlayDesign, ...saved.state.design },
-        coverage: { ...defaultCoverageSettings, ...saved.state.coverage },
+        coverage: { ...defaultCoverageSettings, ...coverage },
         sourceId: randomUUID(),
         simulator: { status: "idle", delivered: 0, total: 0 },
         working: false,
@@ -88,7 +109,7 @@ export class Newsroom extends EventEmitter {
   fail(error: unknown) {
     this.state.error =
       error instanceof z.ZodError
-        ? "Model returned invalid coverage. Generate coverage again."
+        ? "Invalid coverage. Check the news model settings."
         : error instanceof Error
           ? error.message
           : "Newsroom failed.";
@@ -127,7 +148,6 @@ export class Newsroom extends EventEmitter {
     if (
       this.state.paused ||
       this.state.working ||
-      this.state.coverage.generation === "manual" ||
       !this.pending ||
       (!this.pendingAudio &&
         this.unseenMessages < this.state.coverage.minimumMessages)
@@ -164,7 +184,7 @@ export class Newsroom extends EventEmitter {
           (settings.includeAudio || m.source !== "audio"),
       );
       if (!messages.length)
-        throw new Error("Add chat messages before generating coverage.");
+        throw new Error("Coverage needs chat or audio input.");
       const coverage = await this.editor(
         messages,
         this.state.stories,
@@ -215,12 +235,12 @@ export class Newsroom extends EventEmitter {
         !existing &&
         participants < this.state.coverage.minimumParticipants &&
         !(
-          this.state.coverage.audioStories &&
+          this.state.coverage.includeAudio &&
           messages.some((message) => message.source === "audio")
         )
       )
         continue;
-      if (existing?.dismissed || existing?.edited) continue;
+      if (existing?.dismissed) continue;
       const story: Story = {
         id: existing?.id ?? randomUUID(),
         headline: update.headline,
@@ -233,20 +253,13 @@ export class Newsroom extends EventEmitter {
         interest: update.interest,
         createdAt: existing?.createdAt ?? now,
         updatedAt: now,
-        published: existing?.published || this.state.automatic,
-        pinned: existing?.pinned ?? false,
         dismissed: false,
-        edited: false,
       };
       const index = next.findIndex((s) => s.id === story.id);
       if (index >= 0) next[index] = story;
       else next.push(story);
     }
-    const pinned = next.filter((story) => story.pinned);
-    const remaining = next
-      .filter((story) => !story.pinned)
-      .slice(-(30 - pinned.length));
-    this.state.stories = [...pinned, ...remaining];
+    this.state.stories = next.slice(-30);
   }
   async removeMessages(ids: string[]) {
     this.epoch++;
@@ -256,9 +269,7 @@ export class Newsroom extends EventEmitter {
     this.state.stories = this.state.stories.map((s) => ({
       ...s,
       quoteId: s.quoteId && ids.includes(s.quoteId) ? null : s.quoteId,
-      published: s.messageIds.some((id) => ids.includes(id))
-        ? false
-        : s.published,
+      dismissed: s.dismissed || s.messageIds.some((id) => ids.includes(id)),
       messageIds: s.messageIds.filter((id) => !ids.includes(id)),
     }));
     await this.commit();
@@ -284,8 +295,6 @@ export class Newsroom extends EventEmitter {
     const next = this.state.stories
       .filter(
         (s) =>
-          s.published &&
-          !s.pinned &&
           !s.dismissed &&
           s.updatedAt + this.state.coverage.lifetimeSeconds * 1000 > now,
       )

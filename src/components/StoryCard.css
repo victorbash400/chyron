@@ -2,54 +2,19 @@
   display: flex;
   align-items: center;
   gap: 12px;
-  padding: 9px 12px;
-  min-height: 48px;
-  border: 1px solid var(--border);
-  border-radius: 12px;
-  background: var(--surface);
-}
-.story-card.is-published {
-  background: var(--panel);
+  padding: 8px 0;
+  min-height: 40px;
 }
 .story-title {
-  display: flex;
-  align-items: center;
-  gap: 8px;
   min-width: 0;
   flex: 1;
   text-align: left;
   padding: 0;
   border-radius: 4px;
 }
-.story-title:hover:not(:disabled) {
-  background: transparent;
-}
 .story-title h3 {
   font-size: 12px;
-  line-height: 1.4;
+  line-height: 1.5;
   font-weight: 500;
   overflow-wrap: anywhere;
-}
-.story-status {
-  color: #30734e;
-  border: 1px solid #b7cdbd;
-  border-radius: 10px;
-  padding: 3px 6px;
-  white-space: nowrap;
-  font-size: 9px;
-  font-weight: 500;
-  line-height: 1;
-  flex-shrink: 0;
-}
-@media (max-width: 1200px) {
-  .story-card {
-    flex-wrap: wrap;
-    gap: 8px;
-  }
-  .story-title {
-    flex-basis: 100%;
-  }
-  .story-actions {
-    margin-left: auto;
-  }
 }

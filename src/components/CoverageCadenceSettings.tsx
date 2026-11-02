@@ -51,18 +51,6 @@ export default function CoverageCadenceSettings({
           Balanced
         </SettingsInlineButton>
       </SettingsRow>
-      <SettingsRow label="Generate news">
-        <SettingsPicker
-          label="Generate news"
-          value={settings.generation}
-          options={[
-            { value: "automatic", label: "Automatically" },
-            { value: "manual", label: "Manually" },
-          ]}
-          disabled={disabled}
-          onChange={(generation) => onChange({ generation })}
-        />
-      </SettingsRow>
       <SettingsRow label="Batch window">
         <SettingsPicker
           label="Batch window"

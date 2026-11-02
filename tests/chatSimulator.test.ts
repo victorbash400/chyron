@@ -17,7 +17,6 @@ function fixture() {
     async () => {},
   );
   room.state.mode = "simulation";
-  room.state.coverage.generation = "manual";
   return room;
 }
 test("simulator delivers model messages over time and stops without leaking into another source", async (context) => {

@@ -1,0 +1,9 @@
+.chyron-brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+.chyron-brand img {
+  display: block;
+  flex-shrink: 0;
+}

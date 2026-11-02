@@ -51,13 +51,13 @@ test("API rejects foreign hosts and cross-site mutations", async () => {
       (
         await f.request(
           "/api/settings",
-          { automatic: true },
+          { paused: true },
           { origin: "https://foreign.example" },
         )
       ).statusCode,
       403,
     );
-    assert.equal(f.room.state.automatic, false);
+    assert.equal(f.room.state.paused, false);
   } finally {
     await f.app.close();
   }
@@ -84,7 +84,12 @@ test("simulation is explicit and settings are validated", async () => {
   const f = await fixture();
   try {
     assert.equal(
-      (await f.request("/api/simulation", { scenario: "keyboard" })).statusCode,
+      (
+        await f.request("/api/simulation/message", {
+          author: "Ada",
+          text: "Hello chat",
+        })
+      ).statusCode,
       400,
     );
     assert.equal(
@@ -96,12 +101,17 @@ test("simulation is explicit and settings are validated", async () => {
       200,
     );
     assert.equal(
-      (await f.request("/api/simulation", { scenario: "keyboard" })).statusCode,
+      (
+        await f.request("/api/simulation/message", {
+          author: "Ada",
+          text: "Hello chat",
+        })
+      ).statusCode,
       200,
     );
     assert.ok(f.room.state.messages.every((m) => m.source === "simulation"));
     assert.equal(
-      (await f.request("/api/settings", { automatic: "yes" })).statusCode,
+      (await f.request("/api/settings", { paused: "yes" })).statusCode,
       400,
     );
   } finally {
@@ -155,7 +165,7 @@ test("overlay design updates reach the read-only broadcast feed and preserve oth
       size: 115,
       speed: 60,
     });
-    assert.equal(f.room.state.automatic, false);
+    assert.equal(f.room.state.paused, false);
     assert.equal(
       (await f.request("/api/settings", { design: { size: 400 } })).statusCode,
       400,
@@ -375,6 +385,54 @@ test("simulator rejects real-chat mode and invalid configuration without startin
     assert.equal(invalid.statusCode, 400);
     assert.equal(f.room.state.simulator.status, "idle");
     assert.equal((await f.request("/api/simulation/stop", {})).statusCode, 200);
+  } finally {
+    await f.app.close();
+  }
+});
+
+test("retired publishing, pinning, manual generation and scenario controls cannot be enabled", async () => {
+  const f = await fixture();
+  try {
+    assert.equal(
+      (await f.request("/api/settings", { automatic: false })).statusCode,
+      400,
+    );
+    assert.equal(
+      (await f.request("/api/settings", { coverage: { generation: "manual" } }))
+        .statusCode,
+      400,
+    );
+    assert.equal((await f.request("/api/coverage", {})).statusCode, 404);
+    assert.equal(
+      (await f.request("/api/simulation", { scenario: "keyboard" })).statusCode,
+      404,
+    );
+    for (const action of ["publish", "unpublish", "pin", "edit"]) {
+      assert.equal(
+        (await f.request("/api/stories/unused", { action })).statusCode,
+        400,
+      );
+    }
+    assert.equal(f.room.state.stories.length, 0);
+  } finally {
+    await f.app.close();
+  }
+});
+
+test("pausing invalidates in-flight audio even after coverage resumes", async () => {
+  const f = await fixture();
+  try {
+    const before = f.room.state.sourceId;
+    assert.equal(
+      (await f.request("/api/settings", { paused: true })).statusCode,
+      200,
+    );
+    assert.notEqual(f.room.state.sourceId, before);
+    assert.equal(
+      (await f.request("/api/settings", { paused: false })).statusCode,
+      200,
+    );
+    assert.notEqual(f.room.state.sourceId, before);
   } finally {
     await f.app.close();
   }

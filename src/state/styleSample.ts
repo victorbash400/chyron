@@ -11,8 +11,5 @@ export const styleSampleStory: Story = {
   interest: 0,
   updatedAt: 0,
   createdAt: 0,
-  published: false,
-  pinned: false,
   dismissed: false,
-  edited: false,
 };
