@@ -28,17 +28,21 @@ export class BroadcastUplink {
         const message = JSON.parse(event.data) as BroadcastEvent;
         if (message.type === "ready") {
           clearTimeout(this.timeout);
-          const recorder = new MediaRecorder(stream, {
+          const options: MediaRecorderOptions & {
+            videoKeyFrameIntervalDuration: number;
+          } = {
             mimeType: "video/webm;codecs=vp8,opus",
             videoBitsPerSecond: 3500000,
             audioBitsPerSecond: 128000,
-          });
+            videoKeyFrameIntervalDuration: 2000,
+          };
+          const recorder = new MediaRecorder(stream, options);
           this.recorder = recorder;
           recorder.ondataavailable = (event) => {
             if (!event.data.size || this.finished) return;
             if (
               socket.readyState !== WebSocket.OPEN ||
-              socket.bufferedAmount > 8000000
+              socket.bufferedAmount + event.data.size > 1000000
             ) {
               this.fail("Upload is too slow. Broadcast stopped.");
               return;
@@ -51,7 +55,7 @@ export class BroadcastUplink {
             if (!this.finished && socket.readyState === WebSocket.OPEN)
               socket.send(JSON.stringify({ type: "stop" }));
           };
-          recorder.start(1000);
+          recorder.start(250);
           this.timeout = setTimeout(
             () => this.fail("Twitch connection timed out. Start again."),
             45000,
