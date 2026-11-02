@@ -30,6 +30,7 @@ export interface Story {
 export interface NewsroomState {
   sourceId: string;
   simulator: {
+    batchId?: string;
     status: "idle" | "generating" | "running";
     delivered: number;
     total: number;

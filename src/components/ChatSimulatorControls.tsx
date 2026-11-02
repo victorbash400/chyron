@@ -12,17 +12,19 @@ import "./ChatSimulatorControls.css";
 
 export default function ChatSimulatorControls({
   simulator,
+  demoActive,
   disabled,
   onStart,
   onStop,
 }: {
+  demoActive: boolean;
   simulator: NewsroomState["simulator"];
   disabled: boolean;
   onStart: (settings: SimulatorSettings) => Promise<boolean>;
   onStop: () => void;
 }) {
-  const [topic, setTopic] = useState("");
-  const active = simulator.status !== "idle";
+  const [topic, setTopic] = useState("Live stream discussion");
+  const active = demoActive || simulator.status !== "idle";
   async function start(event: FormEvent) {
     event.preventDefault();
     if (!active && topic.trim())
@@ -31,23 +33,23 @@ export default function ChatSimulatorControls({
   return (
     <form className="chat-simulator" onSubmit={(event) => void start(event)}>
       <SettingsGroup>
-        <SettingsRow compact label="Test topic">
+        <SettingsRow compact label="Topic">
           <input
-            aria-label="Simulation topic"
+            aria-label="Demo chat topic"
             maxLength={500}
             value={topic}
             disabled={active || disabled}
             onChange={(event) => setTopic(event.target.value)}
           />
         </SettingsRow>
-        <SettingsRow compact label="Simulation">
+        <SettingsRow compact label="Demo chat">
           {simulator.total > 0 && (
             <output aria-live="polite">
               {simulator.delivered} / {simulator.total}
             </output>
           )}
           <SettingsInlineButton
-            aria-label={active ? "Stop simulation" : "Start simulation"}
+            aria-label={active ? "Stop demo chat" : "Start demo chat"}
             type={active ? "button" : "submit"}
             onClick={active ? onStop : undefined}
             disabled={active ? false : disabled || !topic.trim()}

@@ -15,7 +15,7 @@ export default function SourceSwitch({
       value={mode}
       options={[
         { value: "twitch", label: "Twitch" },
-        { value: "simulation", label: "Simulation" },
+        { value: "simulation", label: "Demo chat" },
       ]}
       disabled={disabled}
       onChange={onChange}

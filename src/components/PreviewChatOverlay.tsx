@@ -10,7 +10,11 @@ export default function PreviewChatOverlay({
   if (!messages.length) return null;
   return (
     <div className="preview-chat-overlay" aria-label="Video chat overlay">
-      <span className="preview-chat-heading">Chat</span>
+      <span className="preview-chat-heading">
+        {messages.some((message) => message.source === "simulation")
+          ? "Demo chat"
+          : "Chat"}
+      </span>
       <div className="preview-chat-messages">
         {messages.map((message) => (
           <PreviewChatMessage key={message.id} message={message} />

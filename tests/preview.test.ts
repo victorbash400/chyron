@@ -127,3 +127,16 @@ test("real news stays in the video composition while samples are disabled", () =
     room.dispose();
   }
 });
+
+test("generated demo messages remain in the Twitch video composition during broadcast", () => {
+  const demo = {
+    id: "demo",
+    userId: "sim-Ada",
+    author: "Ada",
+    text: "Try the stealth route.",
+    source: "simulation" as const,
+    at: Date.now(),
+  };
+  assert.deepEqual(previewChat([demo], false).messages, [demo]);
+  assert.equal(previewChat([demo], false).kind, "live");
+});

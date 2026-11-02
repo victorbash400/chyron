@@ -159,7 +159,7 @@ export async function handleRequest(
     } else if (url.pathname === "/api/simulation/stop") {
       await changeRoom(userId, (room) => {
         room.simulationId = "";
-        room.state.simulator.status = "idle";
+        room.state.simulator = { status: "idle", delivered: 0, total: 0 };
       });
     } else throw new HttpError(404, "Not found.");
     await publishRoom(userId);

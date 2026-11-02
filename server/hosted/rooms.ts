@@ -222,6 +222,7 @@ export async function appendMessage(
   if (simulation) {
     values[":simulation"] = simulation.id;
     values[":progress"] = {
+      batchId: simulation.id,
       status: simulation.delivered === simulation.total ? "idle" : "running",
       delivered: simulation.delivered,
       total: simulation.total,

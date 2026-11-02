@@ -1,6 +1,7 @@
 import { useBroadcastAudio } from "./broadcast/useBroadcastAudio.ts";
 import { lazy, Suspense, useEffect, useState } from "react";
 import { useWorkspaceNavigation } from "./state/useWorkspaceNavigation.ts";
+import { useDemoChat } from "./state/useDemoChat.ts";
 import { useNewsroom } from "./state/useNewsroom.ts";
 import type { StreamerAccount } from "../shared/session.ts";
 import type { Story } from "../shared/types.ts";
@@ -32,6 +33,7 @@ export default function App({
 }) {
   const [loggingOut, setLoggingOut] = useState(false);
   const room = useNewsroom();
+  const demo = useDemoChat(room.bootstrap?.state, room.online, room.act);
   const [broadcastAudio, setBroadcastAudio] = useState<MediaStream | null>(
     null,
   );
@@ -86,6 +88,7 @@ export default function App({
         }
         preview={
           <OverlayPreview
+            demoActive={demo.active}
             onBroadcastAudio={setBroadcastAudio}
             state={state}
             url={overlayUrl}
@@ -115,10 +118,9 @@ export default function App({
                 state={state}
                 url={overlayUrl}
                 busy={room.pending}
-                onSimulate={(settings) =>
-                  act("/api/simulation/start", settings)
-                }
-                onStopSimulation={() => void act("/api/simulation/stop")}
+                demoActive={demo.active}
+                onSimulate={demo.start}
+                onStopSimulation={demo.stop}
                 onSettings={(patch) => void act("/api/settings", patch)}
                 onMode={(mode) => void act("/api/mode", { mode })}
                 onError={room.setError}

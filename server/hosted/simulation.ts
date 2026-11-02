@@ -1,7 +1,11 @@
 import { randomUUID } from "node:crypto";
 import { setTimeout as delay } from "node:timers/promises";
-import type { SimulatorSettings } from "../../shared/simulator.ts";
-import { chatScriptSchema, generateChatScript } from "../chatScript.ts";
+import type { SimulatorRequest } from "../../shared/simulator.ts";
+import {
+  chatScriptSchema,
+  generateChatScript,
+  chatScriptContext,
+} from "../chatScript.ts";
 import { configuredCoverageModel } from "../coverageSettings.ts";
 import { appendMessage, changeRoom } from "./rooms.ts";
 import { publishRoom } from "./realtime.ts";
@@ -9,7 +13,7 @@ import { analyzeRoom } from "./coverage.ts";
 import { HttpError } from "./http.ts";
 export async function startSimulation(
   userId: string,
-  settings: SimulatorSettings,
+  settings: SimulatorRequest,
 ) {
   configuredCoverageModel(settings.model);
   const id = randomUUID();
@@ -19,9 +23,16 @@ export async function startSimulation(
     if (room.state.paused) throw new HttpError(409, "Resume coverage first.");
     if (room.state.simulator.status !== "idle")
       throw new HttpError(409, "Stop the current simulation first.");
+    if (
+      (settings.sourceId && settings.sourceId !== room.state.sourceId) ||
+      (settings.previousBatchId &&
+        settings.previousBatchId !== room.state.simulator.batchId)
+    )
+      throw new HttpError(409, "Demo chat changed. Start again.");
     room.simulationId = id;
     room.state.error = null;
     room.state.simulator = {
+      batchId: id,
       status: "generating",
       total: settings.messages,
       delivered: 0,
@@ -31,8 +42,9 @@ export async function startSimulation(
   return async () => {
     const analyses = new Set<Promise<void>>();
     try {
-      const script = chatScriptSchema(settings).parse(
-        await generateChatScript(settings, AbortSignal.timeout(45000)),
+      const recent = chatScriptContext(context.state.messages, settings.users);
+      const script = chatScriptSchema(settings, recent.users).parse(
+        await generateChatScript(settings, AbortSignal.timeout(45000), recent),
       );
       for (let index = 0; index < script.messages.length; index++) {
         if (index) await delay(settings.intervalMs);
@@ -42,7 +54,7 @@ export async function startSimulation(
           context,
           {
             id: randomUUID(),
-            userId: `sim-${id}-${message.user}`,
+            userId: `sim-${script.users[message.user]}`,
             author: script.users[message.user],
             text: message.text,
             at: Date.now(),

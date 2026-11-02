@@ -12,3 +12,8 @@ export const defaultSimulatorSettings: SimulatorSettings = {
   intervalMs: 1500,
   model: "fast",
 };
+
+export interface SimulatorRequest extends SimulatorSettings {
+  sourceId?: string;
+  previousBatchId?: string;
+}

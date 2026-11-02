@@ -12,6 +12,7 @@ import "./ChyronControls.css";
 
 export default function ChyronControls({
   state,
+  demoActive,
   children,
   broadcastAudioActive,
   url,
@@ -23,6 +24,7 @@ export default function ChyronControls({
   onStopSimulation,
 }: {
   children: ReactNode;
+  demoActive: boolean;
   onSimulate: (settings: SimulatorSettings) => Promise<boolean>;
   onStopSimulation: () => void;
   broadcastAudioActive: boolean;
@@ -59,6 +61,7 @@ export default function ChyronControls({
         {state.mode === "simulation" && (
           <ChatSimulatorControls
             simulator={state.simulator}
+            demoActive={demoActive}
             disabled={busy || state.paused}
             onStart={onSimulate}
             onStop={onStopSimulation}

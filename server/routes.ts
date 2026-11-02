@@ -37,6 +37,9 @@ export async function registerRoutes(
     if (room.state.paused) throw new Error("Resume coverage first.");
     if (room.state.simulator.status !== "idle")
       throw new Error("Stop the current simulation first.");
+    if ((settings.sourceId && settings.sourceId !== room.state.sourceId) ||
+      (settings.previousBatchId && settings.previousBatchId !== room.state.simulator.batchId))
+      throw new Error("Demo chat changed. Start again.");
     void simulator.start(settings).catch((error) => room.fail(error));
     return reply.code(202).send({ ok: true });
   });

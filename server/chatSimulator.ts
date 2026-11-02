@@ -1,8 +1,12 @@
 import { z } from "zod";
 import { randomUUID } from "node:crypto";
-import type { SimulatorSettings } from "../shared/simulator.ts";
+import type { SimulatorRequest } from "../shared/simulator.ts";
 import type { Newsroom } from "./newsroom.ts";
-import { generateChatScript, chatScriptSchema } from "./chatScript.ts";
+import {
+  generateChatScript,
+  chatScriptSchema,
+  chatScriptContext,
+} from "./chatScript.ts";
 export class ChatSimulator {
   private timer: ReturnType<typeof setTimeout> | undefined;
   private controller: AbortController | undefined;
@@ -19,29 +23,37 @@ export class ChatSimulator {
     clearTimeout(this.timer);
     this.controller?.abort();
     this.controller = undefined;
-    this.room.state.simulator.status = "idle";
+    this.room.state.simulator = { status: "idle", delivered: 0, total: 0 };
     if (notify) this.room.emitState();
   }
-  async start(settings: SimulatorSettings) {
+  async start(settings: SimulatorRequest) {
     if (this.room.state.mode !== "simulation")
       throw new Error("Select Simulation first.");
     if (this.room.state.paused)
       throw new Error("Resume coverage before starting the simulator.");
     if (this.room.state.simulator.status !== "idle")
       throw new Error("Stop the current simulation first.");
+    if (
+      (settings.sourceId && settings.sourceId !== this.room.state.sourceId) ||
+      (settings.previousBatchId &&
+        settings.previousBatchId !== this.room.state.simulator.batchId)
+    )
+      throw new Error("Demo chat changed. Start again.");
+    const context = chatScriptContext(this.room.state.messages, settings.users);
     const run = ++this.run,
       source = this.room.state.sourceId;
     this.controller = new AbortController();
     this.room.state.error = null;
     this.room.state.simulator = {
+      batchId: randomUUID(),
       status: "generating",
       total: settings.messages,
       delivered: 0,
     };
     this.room.emitState();
     try {
-      const script = chatScriptSchema(settings).parse(
-        await this.generate(settings, this.controller.signal),
+      const script = chatScriptSchema(settings, context.users).parse(
+        await this.generate(settings, this.controller.signal, context),
       );
       if (run !== this.run || source !== this.room.state.sourceId) return;
       this.room.state.simulator.status = "running";
@@ -65,7 +77,7 @@ export class ChatSimulator {
         this.room.add([
           {
             id: randomUUID(),
-            userId: `sim-${run}-${message.user}`,
+            userId: `sim-${author}`,
             author,
             text: message.text,
             at: Date.now(),
