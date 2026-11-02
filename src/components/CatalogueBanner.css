@@ -51,6 +51,7 @@
 .catalogue-copy {
   flex: 1;
   min-width: 0;
+  text-align: left;
   padding: 1.2cqw 3cqw 1.35cqw 2.4cqw;
   z-index: 1;
 }
