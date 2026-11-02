@@ -24,7 +24,9 @@ test("simulator delivers model messages over time and stops without leaking into
   const room = fixture(),
     simulator = new ChatSimulator(room, async () => script);
   try {
+    room.state.error = "Previous simulation failed";
     await simulator.start(defaultSimulatorSettings);
+    assert.equal(room.state.error, null);
     assert.equal(room.state.messages.length, 1);
     assert.equal(room.state.simulator.status, "running");
     context.mock.timers.tick(1500);

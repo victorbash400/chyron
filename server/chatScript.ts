@@ -14,15 +14,28 @@ export const simulatorSettingsSchema = z
 export function chatScriptSchema(settings: SimulatorSettings) {
   return z
     .object({
-      users: z.array(z.string().trim().min(1).max(25)).length(settings.users),
+      users: z
+        .array(
+          z
+            .string()
+            .trim()
+            .min(1)
+            .max(25)
+            .describe(
+              "A distinct username using only ASCII letters, digits and underscores.",
+            ),
+        )
+        .length(settings.users),
       messages: z
         .array(
           z.object({
-            user: z
-              .number()
-              .int()
-              .min(0)
-              .max(settings.users - 1),
+            user: z.union([
+              z.literal(0),
+              z.literal(1),
+              ...Array.from({ length: settings.users - 2 }, (_, index) =>
+                z.literal(index + 2),
+              ),
+            ]),
             text: z.string().trim().min(1).max(300),
           }),
         )
@@ -78,6 +91,10 @@ export async function generateChatScript(
     prompt: JSON.stringify({
       topic: settings.topic,
       users: settings.users,
+      allowedUserIndexes: Array.from(
+        { length: settings.users },
+        (_, index) => index,
+      ),
       messages: settings.messages,
     }),
     tools: {

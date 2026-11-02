@@ -32,6 +32,7 @@ export class ChatSimulator {
     const run = ++this.run,
       source = this.room.state.sourceId;
     this.controller = new AbortController();
+    this.room.state.error = null;
     this.room.state.simulator = {
       status: "generating",
       total: settings.messages,
