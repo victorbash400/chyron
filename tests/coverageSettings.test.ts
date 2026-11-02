@@ -4,7 +4,12 @@ import {
   defaultCoverageSettings,
   type CoverageSettings,
 } from "../shared/coverageSettings.ts";
-import { createCoverageSchema } from "../server/editor.ts";
+import {
+  createCoverageSchema,
+  createCoverageToolSchema,
+  parseCoverageOutput,
+  coveragePrompt,
+} from "../server/editor.ts";
 import { Newsroom } from "../server/newsroom.ts";
 import { overlayState } from "../server/ranking.ts";
 import type { ChatMessage } from "../shared/types.ts";
@@ -58,6 +63,26 @@ test("quote selection is constrained to supplied chat IDs and disabled for voice
   const voice = createCoverageSchema({ ...defaultCoverageSettings, includeChat: false }, [chat, audio]);
   assert.equal(voice.safeParse({ stories: [{ ...draft, quoteId: "viewer" }] }).success, false);
   assert.equal(voice.safeParse({ stories: [{ ...draft, quoteId: null }] }).success, true);
+});
+test("quote-free tool requests omit quoteId and store an explicit null", () => {
+  const chat: ChatMessage = { id: "viewer", userId: "viewer", author: "Viewer", text: "A real message", at: Date.now(), source: "chat" };
+  const audio = { ...chat, id: "speech", source: "audio" as const };
+  const { quoteId: _quote, ...withoutQuote } = draft;
+  for (const [settings, messages] of [
+    [{ ...defaultCoverageSettings, quotes: false }, [chat]],
+    [defaultCoverageSettings, [audio]],
+    [{ ...defaultCoverageSettings, includeChat: false }, [chat, audio]],
+  ] as const) {
+    const schema = createCoverageToolSchema(settings, [...messages]);
+    assert.equal("quoteId" in schema.shape.stories.element.shape, false);
+    const result = parseCoverageOutput({ stories: [withoutQuote] }, settings, [...messages]);
+    assert.equal(result.stories[0].quoteId, null);
+    assert.throws(() => parseCoverageOutput({ stories: [{ ...withoutQuote, quoteId: "invented" }] }, settings, [...messages]));
+  }
+  const eligible = createCoverageToolSchema(defaultCoverageSettings, [chat]);
+  assert.equal("quoteId" in eligible.shape.stories.element.shape, true);
+  assert.equal(parseCoverageOutput({ stories: [{ ...draft, quoteId: "viewer" }] }, defaultCoverageSettings, [chat]).stories[0].quoteId, "viewer");
+  assert.ok(coveragePrompt({ ...defaultCoverageSettings, quotes: false }).includes("Omit quoteId entirely"));
 });
 test("generation receives the selected model, tone, time window and filtered audio context", async () => {
   let selected: CoverageSettings | undefined;

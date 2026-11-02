@@ -5,7 +5,6 @@ import {
 } from "../shared/coverageInput.ts";
 import { defaultCoverageSettings } from "../shared/coverageSettings.ts";
 import { defaultOverlayDesign } from "../shared/overlayDesign.ts";
-import { z } from "zod";
 import { randomBytes, randomUUID } from "node:crypto";
 import { EventEmitter } from "node:events";
 import type { ChatMessage, NewsroomState, Story } from "../shared/types.ts";
@@ -17,6 +16,7 @@ import {
 import { readRecord, writeRecord } from "./store.ts";
 import { storyScore } from "./ranking.ts";
 import { clearChatState } from "../shared/clearChat.ts";
+import { coverageErrorMessage } from "./coverageError.ts";
 export interface SavedNewsroom {
   state: NewsroomState;
   overlayToken: string;
@@ -113,12 +113,7 @@ export class Newsroom extends EventEmitter {
     this.emit("state", this.state);
   }
   fail(error: unknown) {
-    this.state.error =
-      error instanceof z.ZodError
-        ? "Invalid coverage. Check the Chyron model settings."
-        : error instanceof Error
-          ? error.message
-          : "Chyron failed.";
+    this.state.error = coverageErrorMessage(error);
     this.emitState();
   }
   async commit() {

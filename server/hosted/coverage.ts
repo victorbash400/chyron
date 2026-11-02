@@ -13,6 +13,7 @@ import {
   changeRoom,
 } from "./rooms.ts";
 import { publishRoom } from "./realtime.ts";
+import { coverageErrorMessage } from "../coverageError.ts";
 export async function analyzeRoom(userId: string) {
   const pending = await getRoom(userId);
   const pendingInput = coverageInput(
@@ -100,10 +101,7 @@ export async function analyzeRoom(userId: string) {
   } catch (error) {
     await changeRoom(userId, (room) => {
       if (room.leaseOwner !== owner) return;
-      room.state.error =
-        error instanceof Error
-          ? error.message
-          : "Coverage failed. Check Chyron settings.";
+      room.state.error = coverageErrorMessage(error);
     });
   } finally {
     await releaseCoverage(userId, owner);
