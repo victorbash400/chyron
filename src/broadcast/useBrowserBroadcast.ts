@@ -78,7 +78,7 @@ export function useBrowserBroadcast(
       const connection = new BroadcastUplink(
         (value) => {
           setStatus(value);
-          if (value === "live" && audio?.hasInput)
+          if (value === "live" && audio?.hasInput && !test)
             onAudio(new MediaStream([audio.track]));
         },
         onError,

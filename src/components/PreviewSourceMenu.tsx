@@ -37,8 +37,8 @@ export default function PreviewSourceMenu({
     >
       <IconButton
         ref={trigger}
-        label="Preview video source"
-        title="Preview video source"
+        label="Video source"
+        title="Video source"
         aria-expanded={open}
         disabled={disabled}
         onClick={() => setOpen(!open)}

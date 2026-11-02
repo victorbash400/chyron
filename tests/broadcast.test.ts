@@ -4,7 +4,7 @@ import {
   encryptStreamKey,
   decryptStreamKey,
 } from "../server/broadcast/crypto.ts";
-import { encoderArguments } from "../relay/encoder.ts";
+import { encoderArguments, encoderPreset } from "../relay/encoder.ts";
 import { authorizationUrl } from "../server/hosted/twitch.ts";
 import { BroadcastUplink } from "../src/broadcast/BroadcastUplink.ts";
 import type { BroadcastStatus } from "../shared/broadcast.ts";
@@ -39,11 +39,8 @@ test("broadcast access is requested explicitly and ordinary chat sign-in keeps i
 });
 test("encoder reads its destination credential from a private file and produces Twitch-compatible media", () => {
   const args = encoderArguments("/private/credential");
-  assert.ok(args.includes("-/rtmp_playpath"));
-  assert.equal(
-    args[args.indexOf("-/rtmp_playpath") + 1],
-    "/private/credential",
-  );
+  assert.ok(args.includes("-fpre"));
+  assert.equal(args[args.indexOf("-fpre") + 1], "/private/credential");
   assert.equal(args.at(-1), "rtmps://live.twitch.tv:443/app/");
   assert.equal(args[args.indexOf("-c:v") + 1], "libx264");
   assert.equal(args[args.indexOf("-c:a") + 1], "aac");
@@ -185,5 +182,63 @@ test("preview capture rejects another tab and isolates only the selected element
       if (descriptor) Object.defineProperty(globalThis, key, descriptor);
       else Reflect.deleteProperty(globalThis, key);
     }
+  }
+});
+
+test("the actual encoder command reads a private preset and transcodes browser WebM to H264 and AAC", async () => {
+  const { default: ffmpeg } = await import("ffmpeg-static");
+  const { spawnSync } = await import("node:child_process");
+  const { mkdtemp, writeFile, readFile, rm } = await import("node:fs/promises");
+  const { tmpdir } = await import("node:os");
+  const { join } = await import("node:path");
+  assert.ok(ffmpeg);
+  const directory = await mkdtemp(join(tmpdir(), "chyron-encoder-test-"));
+  try {
+    const input = join(directory, "input.webm"),
+      preset = join(directory, "preset"),
+      output = join(directory, "output.flv");
+    const generated = spawnSync(
+      ffmpeg,
+      [
+        "-hide_banner",
+        "-loglevel",
+        "error",
+        "-f",
+        "lavfi",
+        "-i",
+        "testsrc2=size=320x180:rate=30",
+        "-f",
+        "lavfi",
+        "-i",
+        "anullsrc=r=48000:cl=stereo",
+        "-t",
+        "1",
+        "-c:v",
+        "libvpx",
+        "-deadline",
+        "realtime",
+        "-c:a",
+        "libopus",
+        input,
+      ],
+      { encoding: "utf8", timeout: 15000 },
+    );
+    assert.equal(generated.status, 0, generated.stderr);
+    await writeFile(preset, encoderPreset("synthetic-test-key", true), {
+      mode: 0o600,
+    });
+    const args = encoderArguments(preset);
+    args[args.length - 1] = output;
+    const encoded = spawnSync(ffmpeg, args, {
+      input: await readFile(input),
+      encoding: "utf8",
+      timeout: 15000,
+    });
+    assert.equal(encoded.status, 0, encoded.stderr);
+    assert.ok(encoded.stdout.includes("progress=end"));
+    assert.ok((await readFile(output)).length > 1000);
+    assert.throws(() => encoderPreset("key\nmalicious=option", false));
+  } finally {
+    await rm(directory, { recursive: true, force: true });
   }
 });

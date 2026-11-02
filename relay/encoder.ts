@@ -8,6 +8,15 @@ export interface Encoder {
   kill: () => void;
   onDrain: (handler: () => void) => void;
 }
+export function encoderPreset(streamKey: string, test: boolean) {
+  if (
+    !streamKey ||
+    streamKey.length > 512 ||
+    ["\r", "\n", "\0"].some((character) => streamKey.includes(character))
+  )
+    throw new Error("Invalid Twitch stream key.");
+  return `rtmp_playpath=${streamKey}${test ? "?bandwidthtest=true" : ""}\n`;
+}
 export function encoderArguments(keyPath: string) {
   return [
     "-hide_banner",
@@ -58,7 +67,7 @@ export function encoderArguments(keyPath: string) {
     "pipe:1",
     "-stats_period",
     "1",
-    "-/rtmp_playpath",
+    "-fpre",
     keyPath,
     "-rtmp_app",
     "app",
@@ -73,15 +82,14 @@ export async function createEncoder(
   onLive: () => void,
   onExit: (ok: boolean) => void,
 ): Promise<Encoder> {
+  const preset = encoderPreset(streamKey, test);
   const directory = await mkdtemp(
     join(process.env.BROADCAST_TMP_DIR ?? tmpdir(), "chyron-broadcast-"),
   );
   const keyPath = join(directory, "credential");
-  await writeFile(keyPath, streamKey + (test ? "?bandwidthtest=true" : ""), {
-    mode: 0o600,
-  });
   let child: ChildProcessWithoutNullStreams;
   try {
+    await writeFile(keyPath, preset, { mode: 0o600 });
     child = spawn(
       process.env.FFMPEG_PATH ?? "ffmpeg",
       encoderArguments(keyPath),

@@ -77,6 +77,7 @@ try {
       }
       if (message.type === "error" || message.type === "ended") {
         assert.equal(accepted, true);
+        assert.equal(message.type, "ended");
         clearTimeout(timer);
         ws.close();
         resolve();
