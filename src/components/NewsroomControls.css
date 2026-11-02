@@ -2,26 +2,17 @@
   display: flex;
   flex-direction: column;
   min-height: 0;
+  min-width: 0;
 }
-.newsroom-controls .newsroom-control-rows {
+.newsroom-control-groups {
+  display: flex;
+  flex-direction: column;
   flex: 1;
+  gap: 16px;
   min-height: 0;
-  overflow: auto;
-  border: 0;
-  border-radius: 0;
+  overflow-y: auto;
   padding-bottom: 4px;
 }
-.newsroom-control-rows > * + *::before {
-  left: 12px;
-  right: 12px;
-}
-.newsroom-control-rows button {
-  gap: 6px;
-}
-.newsroom-control-rows button[role="switch"] {
-  margin-inline: 0;
-}
-
-.newsroom-simulator {
-  padding: 10px 12px;
+.newsroom-control-groups > * {
+  flex-shrink: 0;
 }

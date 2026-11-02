@@ -1,7 +1,7 @@
 import type { CoverageSettings } from "../../shared/coverageSettings.ts";
 import SettingsRow from "./settings/SettingsRow.tsx";
 import SettingsGroup from "./settings/SettingsGroup.tsx";
-import SettingsChoice from "./settings/SettingsChoice.tsx";
+import SettingsPicker from "./settings/SettingsPicker.tsx";
 import ToggleSwitch from "./controls/ToggleSwitch.tsx";
 export default function CoverageSourceSettings({
   settings,
@@ -15,7 +15,7 @@ export default function CoverageSourceSettings({
   return (
     <SettingsGroup>
       <SettingsRow label="Authors for new story">
-        <SettingsChoice
+        <SettingsPicker
           label="Authors for new story"
           value={settings.minimumParticipants}
           options={([1, 2, 3, 5] as const).map((value) => ({
@@ -27,7 +27,7 @@ export default function CoverageSourceSettings({
         />
       </SettingsRow>
       <SettingsRow label="Chat context">
-        <SettingsChoice
+        <SettingsPicker
           label="Chat context"
           value={settings.contextSeconds}
           options={[
@@ -64,7 +64,7 @@ export default function CoverageSourceSettings({
         />
       </SettingsRow>
       <SettingsRow label="Story duration">
-        <SettingsChoice
+        <SettingsPicker
           label="Story duration"
           value={settings.lifetimeSeconds}
           options={[

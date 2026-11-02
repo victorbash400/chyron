@@ -1,5 +1,5 @@
 import type { CoverageSettings } from "../../shared/coverageSettings.ts";
-import SettingsChoice from "./settings/SettingsChoice.tsx";
+import SettingsPicker from "./settings/SettingsPicker.tsx";
 import SettingsGroup from "./settings/SettingsGroup.tsx";
 import SettingsRow from "./settings/SettingsRow.tsx";
 import "./CoverageEditorialSettings.css";
@@ -15,7 +15,7 @@ export default function CoverageEditorialSettings({
   return (
     <SettingsGroup>
       <SettingsRow label="News format">
-        <SettingsChoice
+        <SettingsPicker
           label="News format"
           value={settings.focus}
           options={[
@@ -28,7 +28,7 @@ export default function CoverageEditorialSettings({
         />
       </SettingsRow>
       <SettingsRow label="Newsworthiness">
-        <SettingsChoice
+        <SettingsPicker
           label="Newsworthiness"
           value={settings.newsworthiness}
           options={[

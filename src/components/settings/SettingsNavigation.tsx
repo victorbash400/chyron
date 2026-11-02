@@ -1,4 +1,4 @@
-import SettingsChoice from "./SettingsChoice.tsx";
+import SettingsPicker from "./SettingsPicker.tsx";
 export type SettingsSection = "appearance" | "news";
 export default function SettingsNavigation({
   section,
@@ -8,7 +8,7 @@ export default function SettingsNavigation({
   onChange: (section: SettingsSection) => void;
 }) {
   return (
-    <SettingsChoice
+    <SettingsPicker
       label="Settings section"
       value={section}
       options={[

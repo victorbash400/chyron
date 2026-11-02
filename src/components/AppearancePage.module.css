@@ -17,9 +17,6 @@
   gap: 12px;
   margin-bottom: 20px;
 }
-.content > header > button {
-  display: none;
-}
 .content h1 {
   margin: 0;
   font-size: 20px;
@@ -42,9 +39,6 @@
 @media (max-width: 520px) {
   .main {
     padding: 20px 16px;
-  }
-  .content > header > button {
-    display: inline-flex;
   }
   .content h1 {
     font-size: 18px;

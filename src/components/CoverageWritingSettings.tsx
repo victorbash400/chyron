@@ -4,7 +4,7 @@ import type {
 } from "../../shared/coverageSettings.ts";
 import SettingsRow from "./settings/SettingsRow.tsx";
 import SettingsGroup from "./settings/SettingsGroup.tsx";
-import SettingsChoice from "./settings/SettingsChoice.tsx";
+import SettingsPicker from "./settings/SettingsPicker.tsx";
 export default function CoverageWritingSettings({
   settings,
   disabled,
@@ -19,7 +19,7 @@ export default function CoverageWritingSettings({
   return (
     <SettingsGroup>
       <SettingsRow label="News model">
-        <SettingsChoice
+        <SettingsPicker
           label="News model"
           value={settings.model}
           options={models}
@@ -28,7 +28,7 @@ export default function CoverageWritingSettings({
         />
       </SettingsRow>
       <SettingsRow label="Summary length">
-        <SettingsChoice
+        <SettingsPicker
           label="Summary length"
           value={settings.summary}
           options={[
@@ -41,7 +41,7 @@ export default function CoverageWritingSettings({
         />
       </SettingsRow>
       <SettingsRow label="Writing tone">
-        <SettingsChoice
+        <SettingsPicker
           label="Writing tone"
           value={settings.tone}
           options={[
@@ -53,7 +53,7 @@ export default function CoverageWritingSettings({
         />
       </SettingsRow>
       <SettingsRow label="Stories per update">
-        <SettingsChoice
+        <SettingsPicker
           label="Stories per update"
           value={settings.maxStories}
           options={([1, 3, 5] as const).map((value) => ({

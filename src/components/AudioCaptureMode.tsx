@@ -1,4 +1,4 @@
-import SettingsChoice from "./settings/SettingsChoice.tsx";
+import SettingsPicker from "./settings/SettingsPicker.tsx";
 import SettingsRow from "./settings/SettingsRow.tsx";
 export default function AudioCaptureMode({
   continuous,
@@ -16,7 +16,7 @@ export default function AudioCaptureMode({
   return (
     <>
       <SettingsRow compact label="Capture mode">
-        <SettingsChoice
+        <SettingsPicker
           label="Capture mode"
           value={continuous ? "continuous" : "clip"}
           options={[
@@ -29,7 +29,7 @@ export default function AudioCaptureMode({
       </SettingsRow>
       {continuous && (
         <SettingsRow compact label="Audio chunks">
-          <SettingsChoice
+          <SettingsPicker
             label="Audio chunks"
             value={seconds}
             options={[

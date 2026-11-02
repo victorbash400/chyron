@@ -5,6 +5,7 @@ import AudioCaptureMode from "./AudioCaptureMode.tsx";
 import { useState } from "react";
 import { Mic, Square, LoaderCircle } from "lucide-react";
 import { useAudioCapture } from "../state/useAudioCapture.ts";
+import SettingsGroup from "./settings/SettingsGroup.tsx";
 import SettingsRow from "./settings/SettingsRow.tsx";
 import SettingsInlineButton from "./settings/SettingsInlineButton.tsx";
 import "./AudioCapture.css";
@@ -26,7 +27,7 @@ export default function AudioCapture({
   const audio = useAudioCapture(sourceId, onError);
   const busy = audio.pending > 0;
   return (
-    <>
+    <SettingsGroup>
       <SettingsRow compact label="Audio input">
         <AudioSourcePicker
           source={source}
@@ -75,6 +76,6 @@ export default function AudioCapture({
         />
       </SettingsRow>
       {audio.transcript && <AudioTranscript text={audio.transcript} />}
-    </>
+    </SettingsGroup>
   );
 }

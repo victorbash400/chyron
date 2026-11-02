@@ -1,5 +1,5 @@
 import type { SourceMode } from "../../shared/types.ts";
-import "./SourceSwitch.css";
+import SettingsPicker from "./settings/SettingsPicker.tsx";
 export default function SourceSwitch({
   mode,
   disabled,
@@ -10,17 +10,15 @@ export default function SourceSwitch({
   onChange: (mode: SourceMode) => void;
 }) {
   return (
-    <div className="source-switch" role="group" aria-label="Chat source">
-      {(["twitch", "simulation"] as const).map((source) => (
-        <button
-          key={source}
-          aria-pressed={mode === source}
-          disabled={disabled}
-          onClick={() => onChange(source)}
-        >
-          {source === "twitch" ? "Twitch" : "Simulation"}
-        </button>
-      ))}
-    </div>
+    <SettingsPicker
+      label="Chat source"
+      value={mode}
+      options={[
+        { value: "twitch", label: "Twitch" },
+        { value: "simulation", label: "Simulation" },
+      ]}
+      disabled={disabled}
+      onChange={onChange}
+    />
   );
 }

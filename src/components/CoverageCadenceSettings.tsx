@@ -2,7 +2,7 @@ import type {
   CoverageSettings,
   CoverageModelOption,
 } from "../../shared/coverageSettings.ts";
-import SettingsChoice from "./settings/SettingsChoice.tsx";
+import SettingsPicker from "./settings/SettingsPicker.tsx";
 import SettingsGroup from "./settings/SettingsGroup.tsx";
 import SettingsRow from "./settings/SettingsRow.tsx";
 import SettingsInlineButton from "./settings/SettingsInlineButton.tsx";
@@ -52,7 +52,7 @@ export default function CoverageCadenceSettings({
         </SettingsInlineButton>
       </SettingsRow>
       <SettingsRow label="Generate news">
-        <SettingsChoice
+        <SettingsPicker
           label="Generate news"
           value={settings.generation}
           options={[
@@ -64,7 +64,7 @@ export default function CoverageCadenceSettings({
         />
       </SettingsRow>
       <SettingsRow label="Batch window">
-        <SettingsChoice
+        <SettingsPicker
           label="Batch window"
           value={settings.updateDelayMs}
           options={[
@@ -78,7 +78,7 @@ export default function CoverageCadenceSettings({
         />
       </SettingsRow>
       <SettingsRow label="New messages per batch">
-        <SettingsChoice
+        <SettingsPicker
           label="New messages per batch"
           value={settings.minimumMessages}
           options={([1, 3, 5] as const).map((value) => ({
