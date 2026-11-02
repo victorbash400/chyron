@@ -1,0 +1,16 @@
+.group {
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+  gap: 2px;
+  padding: 3px;
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  background: transparent;
+}
+.group :where(button[aria-label], a[aria-label]) {
+  border-radius: 17px;
+}
+.group :where(button[aria-expanded="true"]) {
+  background: var(--selection);
+}

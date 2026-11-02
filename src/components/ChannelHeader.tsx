@@ -6,6 +6,7 @@ import {
   PanelLeft,
 } from "lucide-react";
 import type { WorkspacePanel } from "../state/useWorkspaceNavigation.ts";
+import ToolbarGroup from "./controls/ToolbarGroup.tsx";
 import ChyronBrand from "./ChyronBrand.tsx";
 import IconButton from "./controls/IconButton.tsx";
 import styles from "./ChannelHeader.module.css";
@@ -22,15 +23,20 @@ export default function ChannelHeader({
     <header className={styles.toolbar}>
       <div className={styles.navigation}>
         <div className={styles.mobile}>
-          <IconButton label="Open styles" onClick={onStyles}>
+          <IconButton
+            label="Open styles"
+            title="Open styles"
+            onClick={onStyles}
+          >
             <PanelLeft />
           </IconButton>
         </div>
         <ChyronBrand />
       </div>
-      <nav className={styles.actions} aria-label="Workspace panels">
+      <ToolbarGroup className={styles.actions} label="Workspace panels">
         <IconButton
           label="News controls"
+          title="News controls"
           selected={panel === "news"}
           onClick={() => onPanel("news")}
         >
@@ -38,6 +44,7 @@ export default function ChannelHeader({
         </IconButton>
         <IconButton
           label="Settings"
+          title="Settings"
           selected={panel === "settings"}
           onClick={() => onPanel("settings")}
         >
@@ -45,6 +52,7 @@ export default function ChannelHeader({
         </IconButton>
         <IconButton
           label="Chat"
+          title="Chat"
           selected={panel === "chat"}
           onClick={() => onPanel("chat")}
         >
@@ -52,12 +60,13 @@ export default function ChannelHeader({
         </IconButton>
         <IconButton
           label="Account"
+          title="Account"
           selected={panel === "account"}
           onClick={() => onPanel("account")}
         >
           <CircleUserRound />
         </IconButton>
-      </nav>
+      </ToolbarGroup>
     </header>
   );
 }
