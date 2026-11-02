@@ -1,18 +1,23 @@
 .range-control {
   display: flex;
-  flex-direction: column;
+  flex-direction: row-reverse;
+  align-items: center;
   gap: 12px;
-  width: 100%;
-  min-width: 80px;
-  max-width: 240px;
+  width: 200px;
+  min-width: 0;
+  max-width: 100%;
 }
 .range-control > span {
-  font-size: 11px;
+  min-width: 36px;
+  font-variant-numeric: tabular-nums;
+  font-size: 12px;
   font-weight: 500;
   color: var(--muted);
 }
 .range-control input {
   appearance: none;
+  min-width: 0;
+  flex: 1;
   width: 100%;
   height: 4px;
   border: 0;

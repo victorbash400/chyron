@@ -2,20 +2,20 @@
   container: settings / inline-size;
   flex: 1;
   min-width: 0;
-  padding: 0 12px 16px;
+  padding: 8px 24px 24px;
   overflow-y: auto;
   background: var(--panel);
 }
 .content {
   width: 100%;
-  max-width: 760px;
+  max-width: 800px;
   margin: 0 auto;
 }
 .content > header {
   display: flex;
   align-items: center;
   gap: 12px;
-  margin-bottom: 20px;
+  margin-bottom: 24px;
 }
 .content h1 {
   margin: 0;

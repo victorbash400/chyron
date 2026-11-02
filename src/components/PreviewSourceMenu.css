@@ -6,23 +6,29 @@
   right: 0;
   top: calc(100% + 5px);
   z-index: 5;
-  min-width: 155px;
-  background: var(--surface);
+  min-width: 190px;
+  background: var(--panel);
   border: 1px solid var(--line);
-  border-radius: 16px;
-  padding: 5px;
+  border-radius: 10px;
+  padding: 6px;
 }
 .preview-source-options button {
   display: flex;
   align-items: center;
   gap: 8px;
   width: 100%;
-  padding: 9px;
-  border-radius: 10px;
-  font-size: 11px;
+  min-height: 34px;
+  padding: 6px 10px;
+  border-radius: 6px;
+  font-size: 13px;
   text-align: left;
 }
 .preview-source-options svg {
   width: 14px;
   height: 14px;
+}
+
+.preview-source-options button:hover,
+.preview-source-options button:focus-visible {
+  background: var(--hover);
 }

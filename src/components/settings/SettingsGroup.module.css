@@ -2,8 +2,8 @@
   container-type: inline-size;
   overflow: hidden;
   border: 1px solid var(--border);
-  border-radius: 12px;
-  background: var(--panel);
+  border-radius: 16px;
+  background: var(--surface);
 }
 .group > * + * {
   position: relative;
@@ -12,8 +12,8 @@
   content: "";
   position: absolute;
   top: 0;
-  left: 16px;
-  right: 16px;
+  left: 20px;
+  right: 20px;
   height: 1px;
   background: var(--divider);
 }

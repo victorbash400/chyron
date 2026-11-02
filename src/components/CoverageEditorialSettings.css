@@ -1,6 +1,7 @@
 .editorial-direction {
-  width: 100%;
-  font-size: 12px;
+  width: 320px;
+  max-width: 100%;
+  font-size: 13px;
   line-height: 1.5;
   resize: vertical;
   min-height: 72px;

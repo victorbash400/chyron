@@ -3,18 +3,18 @@
   align-items: center;
   gap: 6px;
   justify-content: center;
-  min-height: 32px;
+  min-height: 34px;
   padding: 0 12px;
   flex-shrink: 0;
-  border: 1px solid var(--border);
-  border-radius: 8px;
-  background: transparent;
+  border: 1px solid transparent;
+  border-radius: 10px;
+  background: var(--hover);
   color: var(--ink);
-  font-size: 12px;
+  font-size: 13px;
   font-weight: 500;
   cursor: pointer;
 }
-.button:hover {
+.button:hover:not(:disabled) {
   background: color-mix(in srgb, var(--ink) 4%, transparent);
 }
 .primary {
@@ -26,8 +26,14 @@
   background: transparent;
   color: var(--disabled);
   cursor: default;
+  opacity: 1;
 }
 
 .primary:hover:not(:disabled) {
   background: color-mix(in srgb, var(--ink) 4%, var(--accent));
+}
+
+.button:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
 }
