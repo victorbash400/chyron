@@ -10,7 +10,7 @@
 .style-picker-scroll {
   display: flex;
   flex-direction: column;
-  gap: 18px;
+  gap: 8px;
   padding: 12px 12px 24px;
   overflow: auto;
   flex: 1;

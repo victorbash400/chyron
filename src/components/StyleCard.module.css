@@ -1,9 +1,9 @@
 .button {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 4px;
   min-width: 0;
-  padding: 6px 0;
+  padding: 3px 0;
   border: 0;
   background: transparent;
   color: var(--muted);
@@ -14,7 +14,7 @@
   display: flex;
   align-items: center;
   width: 100%;
-  min-height: 56px;
+  min-height: 44px;
   background: transparent;
   transition: transform 160ms ease, filter 160ms ease;
 }
