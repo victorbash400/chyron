@@ -59,6 +59,7 @@ export interface OverlayState {
   visible: boolean;
   lead: Story | null;
   ticker: Story[];
+  tickerMessages?: Pick<ChatMessage, "id" | "author" | "text">[];
   quote: ChatMessage | null;
 }
 export interface Bootstrap {

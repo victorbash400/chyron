@@ -74,6 +74,7 @@ test("overlay endpoint requires its exact capability token and returns only broa
       "mode",
       "quote",
       "ticker",
+      "tickerMessages",
       "visible",
     ]);
   } finally {

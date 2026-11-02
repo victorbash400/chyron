@@ -60,6 +60,14 @@ export function overlayState(
     visible: state.visible,
     lead,
     ticker: stories,
+    tickerMessages: state.messages
+      .filter(
+        (message) =>
+          message.source !== "audio" &&
+          message.at > (state.chatClearedAt ?? 0),
+      )
+      .slice(-4)
+      .map(({ id, author, text }) => ({ id, author, text })),
     quote: state.coverage.quotes
       ? (state.messages.find(
           (m) => m.id === lead?.quoteId && m.source !== "audio",

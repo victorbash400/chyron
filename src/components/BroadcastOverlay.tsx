@@ -31,7 +31,6 @@ export default function BroadcastOverlay({
     "--broadcast-ink": light ? "#0b1018" : "#ffffff",
     "--broadcast-text-accent": light ? "#101827" : design.color,
     "--broadcast-scale": design.size / 100,
-    "--ticker-duration": `${100 - design.speed}s`,
   } as CSSProperties;
   return (
     <div
@@ -53,7 +52,12 @@ export default function BroadcastOverlay({
         {coverage.quote && !thumbnail && (
           <BroadcastQuote message={coverage.quote} />
         )}
-        <BroadcastTicker stories={coverage.ticker} />
+        <BroadcastTicker
+          stories={coverage.ticker}
+          messages={coverage.tickerMessages}
+          speed={design.speed}
+          thumbnail={thumbnail}
+        />
       </div>
     </div>
   );
