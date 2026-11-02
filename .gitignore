@@ -28,8 +28,6 @@ server/hosted/silero_vad.onnx
 
 # Published project documentation
 !/README.md
-!/README.codex.md
-!/devpost.md
 
 # Local recording
 /chyronvideo.mp4

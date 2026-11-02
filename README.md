@@ -9,7 +9,7 @@
 
 Chyron is a web application that turns Twitch chat and spoken commentary into automatically updating broadcast overlays. It groups related messages into headlines, follows developing conversations, and displays attributed viewer quotes and a scrolling chat ticker over a stream. Streamers can adjust the reporting and design, use the overlay in OBS, or broadcast from the browser.
 
-[Open Chyron](https://chyron-six.vercel.app) · [Building with Codex](README.codex.md) · [Devpost description](devpost.md)
+[Open Chyron](https://chyron-six.vercel.app)
 
 ## System architecture
 
@@ -76,6 +76,14 @@ In desktop Chrome, choose a camera or screen under **Video source**, then use **
 
 The relay validates the ticket, encodes H.264/AAC with FFmpeg at 1280 × 720 and 30 fps, and sends the stream to Twitch over RTMPS. It reports encoder progress back to the browser and stops on disconnect or upload backpressure. The encoder runs separately from the hosted API. See [browser broadcast](src/broadcast/useBrowserBroadcast.ts), [uplink](src/broadcast/BroadcastUplink.ts), and [relay encoding](relay/encoder.ts).
 
+## Building with Codex
+
+We used OpenAI Codex to build the Twitch integration, coverage pipeline, overlay designs, audio capture, and browser broadcast relay. Work moved from the product brief and interface references into source changes, automated checks, browser inspection, and provider tests. Feedback from the running application guided each revision.
+
+![Development workflow from product direction and repository context through Codex tool use, implementation, verification, and deployment](docs/images/codex-workflow.png)
+
+Codex worked across the frontend, API, and infrastructure definitions. For the Twitch integration, this included OAuth, EventSub subscriptions, moderation handling, and account isolation. For broadcasting, it included preview capture, audio mixing, relay authorization, FFmpeg encoding, and a private Twitch ingest test. Source inspection and structured model checks also identified and corrected a quote-selection mismatch in voice-only coverage.
+
 ## State and deployment
 
 React and Vite provide the interface. Vercel serves the built frontend and routes `/api/*` to the hosted handler. DynamoDB stores account rooms, individual messages, sessions, encrypted Twitch tokens, and capability records. AppSync Events provides separate account and overlay channels; its authorizer limits subscription access. Coverage leases and revision checks coordinate concurrent requests and prevent stale results from overwriting a changed source.
@@ -121,8 +129,6 @@ pnpm build
 ```
 
 The tests cover story evidence, moderation, sessions, origin checks, audio handling, overlay presentation, ticker behavior, and broadcast contracts. Provider checks are separate: `pnpm check:aws` exercises real DynamoDB, S3, and Bedrock operations, and scripts in `scripts/` cover hosted behavior, audio, and the relay. These checks require their configured services and can incur provider charges.
-
-The [Codex development account](README.codex.md) explains the implementation and verification workflow, including the quote-schema correction and private Twitch ingest test.
 
 ## License
 
