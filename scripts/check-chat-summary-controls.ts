@@ -1,4 +1,7 @@
 import assert from "node:assert/strict";
+import { Agent, fetch as fetchWithDispatcher } from "undici";
+import WebSocket from "ws";
+import { awsLookup } from "../server/aws-dns.ts";
 import { randomUUID } from "node:crypto";
 import { QueryCommand } from "@aws-sdk/lib-dynamodb";
 import { AccountSessions, tokenHash } from "../server/hosted/sessions.ts";
@@ -20,7 +23,21 @@ const account = {
   name: "Summary verification",
 };
 const sessions = new AccountSessions();
-const nativeFetch = globalThis.fetch;
+const originalFetch = globalThis.fetch;
+const originalWebSocket = globalThis.WebSocket;
+const dispatcher = new Agent({
+  connect: { lookup: awsLookup, family: 4, timeout: 15000 },
+});
+const nativeFetch: typeof fetch = (input, init) =>
+  (fetchWithDispatcher as unknown as typeof fetch)(input, {
+    ...init,
+    dispatcher,
+  } as RequestInit);
+globalThis.WebSocket = class extends WebSocket {
+  constructor(url: string | URL, protocols?: string | string[]) {
+    super(url, protocols, { lookup: awsLookup, family: 4 });
+  }
+} as unknown as typeof globalThis.WebSocket;
 let headers: Headers | undefined;
 let overlayToken: string | undefined;
 let disconnect: (() => void) | undefined;
@@ -141,7 +158,8 @@ try {
 } finally {
   clearTimeout(timeout);
   disconnect?.();
-  globalThis.fetch = nativeFetch;
+  globalThis.fetch = originalFetch;
+  globalThis.WebSocket = originalWebSocket;
   if (headers) await sessions.logout(headers);
   if (overlayToken)
     await records.remove({
@@ -159,4 +177,5 @@ try {
   );
   for (const row of rows.Items ?? [])
     await records.remove({ pk: row.pk, sk: row.sk });
+  await dispatcher.close();
 }
