@@ -29,7 +29,7 @@ export function usePreviewVideo(onError: (error: string) => void) {
             })
           : await navigator.mediaDevices.getDisplayMedia({
               video: true,
-              audio: false,
+              audio: true,
             });
       if (!mounted.current) {
         next.getTracks().forEach((track) => track.stop());

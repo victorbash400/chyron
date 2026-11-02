@@ -1,0 +1,19 @@
+.broadcast-dialog {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+.broadcast-dialog-actions {
+  display: flex;
+  justify-content: flex-end;
+}
+.broadcast-dialog-error {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+.broadcast-dialog [role="alert"] {
+  color: var(--danger);
+  font-size: 12px;
+}

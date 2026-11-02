@@ -62,7 +62,7 @@ export function useAudioCapture(
       stopTracks();
     };
   }, [sourceId, disabled, stop, stopTracks]);
-  async function start(source: "microphone" | "tab") {
+  async function start(source: "microphone" | "tab" | MediaStream) {
     if (disabled || opening || recording || pending) return;
     const current = generation.current;
     discardFinal.current = false;
@@ -72,14 +72,18 @@ export function useAudioCapture(
       if (!navigator.mediaDevices || !window.MediaRecorder)
         throw new Error("Audio capture is unavailable. Use Chrome.");
       const stream =
-        source === "microphone"
-          ? await navigator.mediaDevices.getUserMedia({
-              audio: { echoCancellation: true, noiseSuppression: true },
-            })
-          : await navigator.mediaDevices.getDisplayMedia({
-              video: true,
-              audio: true,
-            });
+        typeof source !== "string"
+          ? new MediaStream(
+              source.getAudioTracks().map((track) => track.clone()),
+            )
+          : source === "microphone"
+            ? await navigator.mediaDevices.getUserMedia({
+                audio: { echoCancellation: true, noiseSuppression: true },
+              })
+            : await navigator.mediaDevices.getDisplayMedia({
+                video: true,
+                audio: true,
+              });
       if (!mounted.current || current !== generation.current) {
         stream.getTracks().forEach((track) => track.stop());
         return;

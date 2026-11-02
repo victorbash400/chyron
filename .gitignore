@@ -22,3 +22,4 @@ public/**/*.tiff
 .vercel/
 server/hosted/bundle.mjs
 server/hosted/ffmpeg
+.relay-build/

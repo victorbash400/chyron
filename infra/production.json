@@ -4,6 +4,10 @@
   "Parameters": {
     "BedrockProjectArn": {
       "Type": "String"
+    },
+    "BroadcastSecretArn": {
+      "Type": "String",
+      "Default": ""
     }
   },
   "Resources": {
@@ -315,6 +319,30 @@
           }
         ]
       }
+    },
+    "BroadcastCredentials": {
+      "Type": "AWS::IAM::Policy",
+      "Condition": "HasBroadcastSecret",
+      "Properties": {
+        "PolicyName": "ChyronBroadcastCredential",
+        "Roles": [
+          {
+            "Ref": "RuntimeRole"
+          }
+        ],
+        "PolicyDocument": {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Effect": "Allow",
+              "Action": "secretsmanager:GetSecretValue",
+              "Resource": {
+                "Ref": "BroadcastSecretArn"
+              }
+            }
+          ]
+        }
+      }
     }
   },
   "Outputs": {
@@ -346,6 +374,20 @@
           "Dns.Realtime"
         ]
       }
+    }
+  },
+  "Conditions": {
+    "HasBroadcastSecret": {
+      "Fn::Not": [
+        {
+          "Fn::Equals": [
+            {
+              "Ref": "BroadcastSecretArn"
+            },
+            ""
+          ]
+        }
+      ]
     }
   }
 }

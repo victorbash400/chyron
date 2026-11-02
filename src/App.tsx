@@ -1,3 +1,4 @@
+import { useBroadcastAudio } from "./broadcast/useBroadcastAudio.ts";
 import { lazy, Suspense, useEffect, useState } from "react";
 import { useWorkspaceNavigation } from "./state/useWorkspaceNavigation.ts";
 import { useNewsroom } from "./state/useNewsroom.ts";
@@ -31,6 +32,17 @@ export default function App({
 }) {
   const [loggingOut, setLoggingOut] = useState(false);
   const room = useNewsroom();
+  const [broadcastAudio, setBroadcastAudio] = useState<MediaStream | null>(
+    null,
+  );
+  useBroadcastAudio(
+    broadcastAudio,
+    room.bootstrap?.state.sourceId ?? "",
+    !room.bootstrap ||
+      room.bootstrap.state.paused ||
+      !room.bootstrap.state.coverage.includeAudio,
+    room.setError,
+  );
   const navigation = useWorkspaceNavigation();
   const [evidence, setEvidence] = useState<Story | null>(null);
   const [stylesOpen, setStylesOpen] = useState(false);
@@ -74,6 +86,7 @@ export default function App({
         }
         preview={
           <OverlayPreview
+            onBroadcastAudio={setBroadcastAudio}
             state={state}
             url={overlayUrl}
             busy={room.pending}
@@ -98,6 +111,7 @@ export default function App({
             onClose={() => navigation.navigate(null)}
             controls={
               <NewsroomControls
+                broadcastAudioActive={Boolean(broadcastAudio)}
                 state={state}
                 url={overlayUrl}
                 busy={room.pending}

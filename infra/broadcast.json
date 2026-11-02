@@ -1,0 +1,334 @@
+{
+  "AWSTemplateFormatVersion": "2010-09-09",
+  "Description": "Chyron isolated browser-to-Twitch broadcast relay",
+  "Parameters": {
+    "ArtifactBucket": {
+      "Type": "String"
+    },
+    "ArtifactKey": {
+      "Type": "String"
+    },
+    "VpcId": {
+      "Type": "AWS::EC2::VPC::Id"
+    },
+    "SubnetId": {
+      "Type": "AWS::EC2::Subnet::Id"
+    },
+    "CloudFrontPrefixList": {
+      "Type": "String"
+    },
+    "ImageId": {
+      "Type": "AWS::EC2::Image::Id"
+    }
+  },
+  "Resources": {
+    "StreamSecret": {
+      "Type": "AWS::SecretsManager::Secret",
+      "Properties": {
+        "Name": "chyron/production/broadcast-encryption",
+        "GenerateSecretString": {
+          "PasswordLength": 64,
+          "ExcludePunctuation": true
+        }
+      }
+    },
+    "OriginSecret": {
+      "Type": "AWS::SecretsManager::Secret",
+      "Properties": {
+        "Name": "chyron/production/broadcast-origin",
+        "GenerateSecretString": {
+          "PasswordLength": 64,
+          "ExcludePunctuation": true
+        }
+      }
+    },
+    "Role": {
+      "Type": "AWS::IAM::Role",
+      "Properties": {
+        "RoleName": "chyron-broadcast-runtime",
+        "AssumeRolePolicyDocument": {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Effect": "Allow",
+              "Principal": {
+                "Service": "ec2.amazonaws.com"
+              },
+              "Action": "sts:AssumeRole"
+            }
+          ]
+        },
+        "ManagedPolicyArns": [
+          "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"
+        ],
+        "Policies": [
+          {
+            "PolicyName": "ChyronBroadcastOnly",
+            "PolicyDocument": {
+              "Version": "2012-10-17",
+              "Statement": [
+                {
+                  "Effect": "Allow",
+                  "Action": "dynamodb:DeleteItem",
+                  "Resource": {
+                    "Fn::Sub": "arn:aws:dynamodb:${AWS::Region}:${AWS::AccountId}:table/Chyron-prod"
+                  },
+                  "Condition": {
+                    "ForAllValues:StringLike": {
+                      "dynamodb:LeadingKeys": [
+                        "BROADCAST#*"
+                      ]
+                    }
+                  }
+                },
+                {
+                  "Effect": "Allow",
+                  "Action": "secretsmanager:GetSecretValue",
+                  "Resource": [
+                    {
+                      "Ref": "StreamSecret"
+                    },
+                    {
+                      "Ref": "OriginSecret"
+                    }
+                  ]
+                },
+                {
+                  "Effect": "Allow",
+                  "Action": "s3:GetObject",
+                  "Resource": {
+                    "Fn::Sub": "arn:aws:s3:::${ArtifactBucket}/relay/*"
+                  }
+                }
+              ]
+            }
+          }
+        ]
+      }
+    },
+    "Profile": {
+      "Type": "AWS::IAM::InstanceProfile",
+      "Properties": {
+        "Roles": [
+          {
+            "Ref": "Role"
+          }
+        ]
+      }
+    },
+    "SecurityGroup": {
+      "Type": "AWS::EC2::SecurityGroup",
+      "Properties": {
+        "GroupDescription": "Chyron broadcast ingress from CloudFront only",
+        "VpcId": {
+          "Ref": "VpcId"
+        },
+        "SecurityGroupIngress": [
+          {
+            "IpProtocol": "tcp",
+            "FromPort": 8080,
+            "ToPort": 8080,
+            "SourcePrefixListId": {
+              "Ref": "CloudFrontPrefixList"
+            }
+          }
+        ],
+        "Tags": [
+          {
+            "Key": "Name",
+            "Value": "chyron-broadcast"
+          }
+        ]
+      }
+    },
+    "Instance": {
+      "Type": "AWS::EC2::Instance",
+      "Properties": {
+        "ImageId": {
+          "Ref": "ImageId"
+        },
+        "InstanceType": "t3.medium",
+        "IamInstanceProfile": {
+          "Ref": "Profile"
+        },
+        "SubnetId": {
+          "Ref": "SubnetId"
+        },
+        "SecurityGroupIds": [
+          {
+            "Ref": "SecurityGroup"
+          }
+        ],
+        "MetadataOptions": {
+          "HttpTokens": "required",
+          "HttpEndpoint": "enabled"
+        },
+        "BlockDeviceMappings": [
+          {
+            "DeviceName": "/dev/sda1",
+            "Ebs": {
+              "VolumeSize": 20,
+              "VolumeType": "gp3",
+              "Encrypted": true,
+              "DeleteOnTermination": true
+            }
+          }
+        ],
+        "Tags": [
+          {
+            "Key": "Name",
+            "Value": "chyron-broadcast"
+          },
+          {
+            "Key": "Project",
+            "Value": "Chyron"
+          }
+        ],
+        "UserData": {
+          "Fn::Base64": {
+            "Fn::Sub": "#!/bin/bash\nset -euo pipefail\nexport DEBIAN_FRONTEND=noninteractive\napt-get update\napt-get install -y ffmpeg awscli ca-certificates curl xz-utils\ncurl -fsS https://nodejs.org/dist/v26.13.0/node-v26.13.0-linux-x64.tar.xz -o /tmp/node.tar.xz\ncurl -fsS https://nodejs.org/dist/v26.13.0/SHASUMS256.txt -o /tmp/node-shasums\ncd /tmp\nNODE_SUM=$(awk '$2 == \"node-v26.13.0-linux-x64.tar.xz\" { print $1 }' /tmp/node-shasums)\necho \"$NODE_SUM  node.tar.xz\" | sha256sum -c -\ntar -xJf node.tar.xz -C /usr/local --strip-components=1\nuseradd --system --home-dir /opt/chyron --shell /usr/sbin/nologin chyron\nmkdir -p /opt/chyron\naws s3 cp s3://${ArtifactBucket}/${ArtifactKey} /tmp/relay.tar.gz --region ${AWS::Region}\ntar -xzf /tmp/relay.tar.gz -C /opt/chyron\nORIGIN_SECRET=$(aws secretsmanager get-secret-value --secret-id '${OriginSecret}' --query SecretString --output text --region ${AWS::Region})\ncat >/opt/chyron/runtime.env <<ENV\nAWS_REGION=${AWS::Region}\nAPP_ORIGIN=https://chyron-six.vercel.app\nDYNAMODB_TABLE_NAME=Chyron-prod\nBROADCAST_SECRET_ARN=${StreamSecret}\nBROADCAST_ORIGIN_SECRET=$ORIGIN_SECRET\nBROADCAST_TMP_DIR=/dev/shm\nPORT=8080\nMAX_BROADCASTS=1\nENV\nchmod 600 /opt/chyron/runtime.env\ncat >/etc/systemd/system/chyron-broadcast.service <<'SERVICE'\n[Unit]\nDescription=Chyron browser broadcast relay\nAfter=network-online.target\nWants=network-online.target\n[Service]\nUser=chyron\nGroup=chyron\nEnvironmentFile=/opt/chyron/runtime.env\nWorkingDirectory=/opt/chyron\nExecStart=/usr/local/bin/node /opt/chyron/relay.mjs\nRestart=on-failure\nRestartSec=3\nNoNewPrivileges=true\nPrivateTmp=true\nProtectSystem=strict\nProtectHome=true\nReadWritePaths=/dev/shm\nMemoryMax=1800M\nTimeoutStopSec=15\n[Install]\nWantedBy=multi-user.target\nSERVICE\nsystemctl daemon-reload\nsystemctl enable --now chyron-broadcast\n"
+          }
+        }
+      }
+    },
+    "VpcOrigin": {
+      "Type": "AWS::CloudFront::VpcOrigin",
+      "Properties": {
+        "VpcOriginEndpointConfig": {
+          "Name": "chyron-broadcast",
+          "Arn": {
+            "Fn::Sub": "arn:aws:ec2:${AWS::Region}:${AWS::AccountId}:instance/${Instance}"
+          },
+          "HTTPPort": 8080,
+          "OriginProtocolPolicy": "http-only"
+        }
+      }
+    },
+    "CachePolicy": {
+      "Type": "AWS::CloudFront::CachePolicy",
+      "Properties": {
+        "CachePolicyConfig": {
+          "Name": "chyron-broadcast-no-cache",
+          "DefaultTTL": 0,
+          "MaxTTL": 0,
+          "MinTTL": 0,
+          "ParametersInCacheKeyAndForwardedToOrigin": {
+            "EnableAcceptEncodingGzip": false,
+            "CookiesConfig": {
+              "CookieBehavior": "none"
+            },
+            "HeadersConfig": {
+              "HeaderBehavior": "none"
+            },
+            "QueryStringsConfig": {
+              "QueryStringBehavior": "none"
+            }
+          }
+        }
+      }
+    },
+    "RequestPolicy": {
+      "Type": "AWS::CloudFront::OriginRequestPolicy",
+      "Properties": {
+        "OriginRequestPolicyConfig": {
+          "Name": "chyron-broadcast-websocket",
+          "CookiesConfig": {
+            "CookieBehavior": "none"
+          },
+          "QueryStringsConfig": {
+            "QueryStringBehavior": "none"
+          },
+          "HeadersConfig": {
+            "HeaderBehavior": "whitelist",
+            "Headers": [
+              "Origin",
+              "Sec-WebSocket-Key",
+              "Sec-WebSocket-Version",
+              "Sec-WebSocket-Protocol",
+              "Sec-WebSocket-Extensions"
+            ]
+          }
+        }
+      }
+    },
+    "Distribution": {
+      "Type": "AWS::CloudFront::Distribution",
+      "Properties": {
+        "DistributionConfig": {
+          "Enabled": true,
+          "Comment": "Chyron browser broadcast relay",
+          "PriceClass": "PriceClass_100",
+          "HttpVersion": "http2",
+          "IPV6Enabled": true,
+          "Origins": [
+            {
+              "Id": "relay",
+              "DomainName": {
+                "Fn::GetAtt": [
+                  "Instance",
+                  "PrivateDnsName"
+                ]
+              },
+              "VpcOriginConfig": {
+                "VpcOriginId": {
+                  "Fn::GetAtt": [
+                    "VpcOrigin",
+                    "Id"
+                  ]
+                },
+                "OriginReadTimeout": 60
+              },
+              "OriginCustomHeaders": [
+                {
+                  "HeaderName": "X-Chyron-Origin",
+                  "HeaderValue": {
+                    "Fn::Sub": "{{resolve:secretsmanager:${OriginSecret}:SecretString}}"
+                  }
+                }
+              ]
+            }
+          ],
+          "DefaultCacheBehavior": {
+            "TargetOriginId": "relay",
+            "ViewerProtocolPolicy": "https-only",
+            "AllowedMethods": [
+              "GET",
+              "HEAD"
+            ],
+            "CachePolicyId": {
+              "Ref": "CachePolicy"
+            },
+            "OriginRequestPolicyId": {
+              "Ref": "RequestPolicy"
+            }
+          },
+          "ViewerCertificate": {
+            "CloudFrontDefaultCertificate": true
+          }
+        }
+      }
+    }
+  },
+  "Outputs": {
+    "RelayUrl": {
+      "Value": {
+        "Fn::Sub": "wss://${Distribution.DomainName}/broadcast"
+      }
+    },
+    "BroadcastSecretArn": {
+      "Value": {
+        "Ref": "StreamSecret"
+      }
+    },
+    "InstanceId": {
+      "Value": {
+        "Ref": "Instance"
+      }
+    },
+    "DistributionId": {
+      "Value": {
+        "Ref": "Distribution"
+      }
+    }
+  }
+}

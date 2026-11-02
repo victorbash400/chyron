@@ -29,7 +29,10 @@ export async function authRoute(request: Request) {
     return new Response(null, {
       status: 303,
       headers: {
-        Location: authorizationUrl(state.state),
+        Location: authorizationUrl(
+          state.state,
+          url.searchParams.get("broadcast") === "1",
+        ),
         "Set-Cookie": state.cookie,
         "Cache-Control": "no-store",
         "Referrer-Policy": "no-referrer",

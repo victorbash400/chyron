@@ -1,3 +1,4 @@
+import { broadcastRoute } from "./broadcast.ts";
 import { randomUUID } from "node:crypto";
 import { z } from "zod";
 import { origin } from "../config.ts";
@@ -71,6 +72,8 @@ export async function handleRequest(
     const session = await sessions.read(request.headers);
     if (!session) throw new HttpError(401, "Sign in with Twitch.");
     const userId = session.account.id;
+    const broadcast = await broadcastRoute(request, userId);
+    if (broadcast) return broadcast;
     if (request.method === "GET") {
       if (url.pathname === "/api/realtime")
         return json(await accountConnection(session));

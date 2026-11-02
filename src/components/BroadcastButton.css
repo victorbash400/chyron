@@ -1,0 +1,8 @@
+.broadcast-pending {
+  animation: broadcast-spin 1s linear infinite;
+}
+@keyframes broadcast-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}

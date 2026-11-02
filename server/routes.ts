@@ -26,6 +26,7 @@ export async function registerRoutes(
   twitch: TwitchConnection,
 ) {
   const simulator = new ChatSimulator(room);
+  app.get("/api/broadcast", async () => ({ configured: false, authorized: false }));
   app.get("/api/session", async (request) => ({ account: request.cookies.chyron_local_logged_out ? null : room.state.channel, local: !request.cookies.chyron_local_logged_out, canSignIn: twitch.configured() }));
   app.post("/api/auth/logout", async (_request, reply) => { reply.setCookie("chyron_local_logged_out", "1", { path: "/", httpOnly: true, sameSite: "lax" }); return { ok: true }; });
   app.post("/api/simulation/start", async (request, reply) => {

@@ -1,7 +1,7 @@
 import { z } from "zod";
 import type { StreamerAccount } from "../../shared/session.ts";
 import { origin, required } from "../config.ts";
-import { seal } from "../store.ts";
+import { seal, unseal } from "../store.ts";
 import { records } from "./records.ts";
 import { changeRoom } from "./rooms.ts";
 import { resetSource } from "./settings.ts";
@@ -57,13 +57,15 @@ async function applicationToken() {
   };
   return appToken.token;
 }
-export function authorizationUrl(state: string) {
+export function authorizationUrl(state: string, broadcast = false) {
   const url = new URL("https://id.twitch.tv/oauth2/authorize");
   url.search = new URLSearchParams({
     client_id: required("TWITCH_CLIENT_ID"),
     redirect_uri: callbackUrl(),
     response_type: "code",
-    scope: scopes.join(" "),
+    scope: [...scopes, ...(broadcast ? ["channel:read:stream_key"] : [])].join(
+      " ",
+    ),
     state,
   }).toString();
   return url.href;
@@ -125,8 +127,22 @@ export async function exchangeCode(code: string): Promise<StreamerAccount> {
   };
   await records.put(
     { pk: `USER#${account.id}`, sk: "TWITCH" },
-    seal({ ...token, expiresAt: Date.now() + token.expires_in * 1000 }),
+    seal({
+      ...token,
+      scopes: valid.scopes,
+      expiresAt: Date.now() + token.expires_in * 1000,
+    }),
   );
+  if (valid.scopes.includes("channel:read:stream_key")) {
+    await records.put(
+      { pk: `USER#${account.id}`, sk: "TWITCH_BROADCAST" },
+      seal({
+        ...token,
+        scopes: valid.scopes,
+        expiresAt: Date.now() + token.expires_in * 1000,
+      }),
+    );
+  }
   return account;
 }
 async function subscriptions(userId: string) {
@@ -253,4 +269,83 @@ export async function refreshStream(userId: string) {
     });
   }
   return null;
+}
+
+interface StoredTwitchToken {
+  access_token: string;
+  refresh_token?: string;
+  expiresAt: number;
+  scopes?: string[];
+}
+async function storedToken(userId: string) {
+  const value = await records.get<string>({
+    pk: `USER#${userId}`,
+    sk: "TWITCH_BROADCAST",
+  });
+  return value ? unseal<StoredTwitchToken>(value) : null;
+}
+export async function hasBroadcastAccess(userId: string) {
+  return Boolean(
+    (await storedToken(userId))?.scopes?.includes("channel:read:stream_key"),
+  );
+}
+export async function getBroadcastKey(userId: string) {
+  let stored = await storedToken(userId);
+  if (!stored?.scopes?.includes("channel:read:stream_key"))
+    throw new HttpError(403, "Authorize Twitch broadcasting first.");
+  if (stored.expiresAt < Date.now() + 60000) {
+    if (!stored.refresh_token)
+      throw new HttpError(403, "Reconnect Twitch broadcasting.");
+    const refreshed = tokenSchema.parse(
+      await (
+        await request("https://id.twitch.tv/oauth2/token", {
+          method: "POST",
+          body: new URLSearchParams({
+            client_id: required("TWITCH_CLIENT_ID"),
+            client_secret: required("TWITCH_CLIENT_SECRET"),
+            grant_type: "refresh_token",
+            refresh_token: stored.refresh_token,
+          }),
+        })
+      ).json(),
+    );
+    stored = {
+      ...stored,
+      ...refreshed,
+      expiresAt: Date.now() + refreshed.expires_in * 1000,
+    };
+    await records.put(
+      { pk: `USER#${userId}`, sk: "TWITCH_BROADCAST" },
+      seal(stored),
+    );
+  }
+  const url = new URL("https://api.twitch.tv/helix/streams/key");
+  url.searchParams.set("broadcaster_id", userId);
+  const response = await request(url.href, {
+    headers: {
+      Authorization: `Bearer ${stored.access_token}`,
+      "Client-Id": required("TWITCH_CLIENT_ID"),
+    },
+  });
+  return z
+    .object({
+      data: z.array(z.object({ stream_key: z.string().min(1) })).length(1),
+    })
+    .parse(await response.json()).data[0].stream_key;
+}
+
+export async function channelIsLive(userId: string) {
+  const url = new URL("https://api.twitch.tv/helix/streams");
+  url.searchParams.set("user_id", userId);
+  const response = await request(url.href, {
+    headers: {
+      Authorization: `Bearer ${await applicationToken()}`,
+      "Client-Id": required("TWITCH_CLIENT_ID"),
+    },
+  });
+  return (
+    z
+      .object({ data: z.array(z.object({ id: z.string() })) })
+      .parse(await response.json()).data.length > 0
+  );
 }

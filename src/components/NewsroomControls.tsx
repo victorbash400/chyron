@@ -12,6 +12,7 @@ import "./NewsroomControls.css";
 
 export default function NewsroomControls({
   state,
+  broadcastAudioActive,
   url,
   busy,
   onSettings,
@@ -22,6 +23,7 @@ export default function NewsroomControls({
 }: {
   onSimulate: (settings: SimulatorSettings) => Promise<boolean>;
   onStopSimulation: () => void;
+  broadcastAudioActive: boolean;
   state: NewsroomState;
   url: string;
   busy: boolean;
@@ -62,7 +64,7 @@ export default function NewsroomControls({
         )}
         <AudioCapture
           sourceId={state.sourceId}
-          disabled={state.paused}
+          disabled={state.paused || broadcastAudioActive}
           onError={onError}
         />
         <SettingsGroup>
