@@ -2,7 +2,7 @@
   width: 100%;
   flex-shrink: 0;
   content-visibility: auto;
-  contain-intrinsic-size: auto 132px;
+  contain-intrinsic-size: auto 112px;
 }
 .style-card-preview {
   position: relative;
