@@ -1,11 +1,10 @@
 .button {
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 8px;
   min-width: 0;
-  padding: 6px 2px;
+  padding: 6px 0;
   border: 0;
-  border-radius: 12px;
   background: transparent;
   color: var(--muted);
   font-size: 12px;
@@ -15,12 +14,9 @@
   display: flex;
   align-items: center;
   width: 100%;
-  min-height: 76px;
-  border-radius: 12px;
-  transition:
-    transform 160ms ease,
-    box-shadow 160ms ease,
-    background 160ms ease;
+  min-height: 56px;
+  background: transparent;
+  transition: transform 160ms ease, filter 160ms ease;
 }
 .label {
   display: block;
@@ -29,25 +25,14 @@
   white-space: nowrap;
 }
 .button:hover,
-.button[aria-pressed="true"] {
-  color: var(--ink);
-}
+.button[aria-pressed="true"] { color: var(--ink); }
 .button:hover .preview {
   transform: translateY(-2px);
-  background: #fff;
-  box-shadow: 0 8px 20px -12px #243b4540;
+  filter: drop-shadow(0 4px 5px #243b4520);
 }
 .button[aria-pressed="true"] .preview {
-  transform: translateY(-4px);
-  background: #fff;
-  box-shadow:
-    0 12px 26px -12px #243b4560,
-    0 3px 8px -5px #243b4530;
+  transform: translateY(-3px);
+  filter: drop-shadow(0 6px 7px #243b4545);
 }
-.button[aria-pressed="true"] .label {
-  font-weight: 600;
-}
-.button:focus-visible {
-  outline: 2px solid var(--accent);
-  outline-offset: 3px;
-}
+.button[aria-pressed="true"] .label { font-weight: 600; }
+.button:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; border-radius: 4px; }

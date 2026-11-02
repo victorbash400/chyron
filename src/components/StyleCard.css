@@ -2,12 +2,12 @@
   width: 100%;
   flex-shrink: 0;
   content-visibility: auto;
-  contain-intrinsic-size: auto 112px;
+  contain-intrinsic-size: auto 92px;
 }
 .style-card-preview {
   position: relative;
-  background: #f7f9fb;
-  padding: 20px 12px;
+  background: transparent;
+  padding: 8px 0;
 }
 .style-card-preview .broadcast-overlay.is-thumbnail {
   position: relative;
@@ -27,4 +27,40 @@
 .style-card:disabled {
   opacity: 1;
   cursor: wait;
+}
+.style-card-preview .is-thumbnail .broadcast-headline {
+  font-size: 4.4cqw;
+}
+.style-card-preview .is-thumbnail .broadcast-kicker {
+  font-size: 3.8cqw;
+}
+.style-card-preview .is-thumbnail .broadcast-banner {
+  min-height: 11cqw;
+}
+.style-card-preview .is-thumbnail .catalogue-headline {
+  font-size: 4.5cqw;
+}
+.style-card-preview .is-thumbnail .catalogue-eyebrow {
+  font-size: 2cqw;
+  letter-spacing: 0.12em;
+}
+.style-card-preview .is-thumbnail .catalogue-eyebrow > span {
+  display: none;
+}
+.style-card-preview .is-thumbnail .catalogue-mark svg {
+  width: 5.5cqw;
+  height: 5.5cqw;
+}
+.style-card-preview .is-thumbnail .catalogue-mark > span {
+  font-size: 3.4cqw;
+}
+.style-card-preview .is-thumbnail .broadcast-ticker {
+  height: 4cqw;
+  font-size: 2.4cqw;
+}
+.style-card-preview .is-thumbnail .ticker-label {
+  font-size: 2.3cqw;
+}
+.style-card-preview .is-thumbnail .scoreboard-headline {
+  font-size: 3.6cqw;
 }
