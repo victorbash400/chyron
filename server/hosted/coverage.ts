@@ -10,6 +10,9 @@ import {
 } from "./rooms.ts";
 import { publishRoom } from "./realtime.ts";
 export async function analyzeRoom(userId: string) {
+  const pending = await getRoom(userId);
+  const audioPending = pending.state.coverage.includeAudio && pending.state.messages.some(message => message.source === "audio" && message.at > pending.lastAnalysisAt);
+  if (pending.state.paused || pending.received <= pending.processed || (!audioPending && pending.received - pending.processed < pending.state.coverage.minimumMessages)) return;
   const owner = randomUUID();
   if (!(await acquireCoverage(userId, owner))) return;
   const started = Date.now();
