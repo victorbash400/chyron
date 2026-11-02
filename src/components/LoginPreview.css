@@ -1,0 +1,124 @@
+.login-preview {
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 26%;
+  aspect-ratio: 1.9;
+  min-width: 0;
+  border: 1px solid #ffffff;
+  border-radius: 24px;
+  background: #edeaf2;
+  box-shadow: 0 22px 60px -30px #8155ac50;
+}
+.login-streamer {
+  display: block;
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+  object-fit: cover;
+  object-position: 55% center;
+  border-radius: 23px 0 0 23px;
+}
+.login-preview-chat {
+  padding: 20px 16px;
+  overflow: hidden;
+  border-radius: 0 23px 23px 0;
+}
+.login-preview-chat-label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  font-weight: 500;
+}
+.login-preview-chat-label svg {
+  width: 16px;
+  height: 16px;
+}
+.login-preview-message {
+  display: flex;
+  gap: 8px;
+  margin-top: 24px;
+}
+.login-preview-message > i {
+  flex: 0 0 16px;
+  height: 16px;
+  border-radius: 4px;
+  background: #b28ae5;
+}
+.login-preview-message[data-color="green"] > i {
+  background: #a5d7a4;
+}
+.login-preview-message[data-color="blue"] > i {
+  background: #a1b8ef;
+}
+.login-preview-message[data-color="pink"] > i {
+  background: #d69bd5;
+}
+.login-preview-message > span {
+  display: grid;
+  flex: 1;
+  gap: 6px;
+}
+.login-preview-message span i {
+  height: 8px;
+  border-radius: 6px;
+  background: #d6d2de;
+}
+.login-preview-message span i:last-child {
+  width: 66%;
+}
+.login-preview-summary {
+  position: absolute;
+  left: 18px;
+  right: 18%;
+  bottom: 18px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 16px;
+  border: 1px solid #b98be9;
+  border-radius: 22px;
+  background: #29242ff2;
+  color: #fff;
+}
+.login-preview-summary > img {
+  flex-shrink: 0;
+  filter: invert(72%) sepia(43%) saturate(1900%) hue-rotate(217deg);
+}
+.login-preview-summary-label {
+  display: block;
+  margin-bottom: 5px;
+  color: #ddd4e8;
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+.login-preview-summary p {
+  font-size: clamp(12px, 1.15vw, 16px);
+  line-height: 1.4;
+}
+@media (max-width: 500px) {
+  .login-preview {
+    aspect-ratio: 1.55;
+  }
+  .login-preview-chat {
+    padding: 16px 10px;
+  }
+  .login-preview-chat-label {
+    gap: 5px;
+    font-size: 11px;
+  }
+  .login-preview-message {
+    gap: 5px;
+    margin-top: 20px;
+  }
+  .login-preview-summary {
+    left: 12px;
+    right: 12px;
+    bottom: 12px;
+    gap: 12px;
+    padding: 12px;
+    border-radius: 16px;
+  }
+}
