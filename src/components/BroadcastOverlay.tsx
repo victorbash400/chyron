@@ -1,5 +1,6 @@
 import type { CSSProperties } from "react";
 import type { OverlayState } from "../../shared/types.ts";
+import { overlayPresentation } from "../../shared/overlayPresentation.ts";
 import { catalogueStyles } from "../../shared/catalogueStyles.ts";
 import CatalogueBanner from "./CatalogueBanner.tsx";
 import BroadcastBanner from "./BroadcastBanner.tsx";
@@ -16,6 +17,7 @@ export default function BroadcastOverlay({
   thumbnail?: boolean;
 }) {
   if (!state.visible) return null;
+  const coverage = overlayPresentation(state);
   const { design } = state;
   const light = [
     "#ffffff",
@@ -40,21 +42,19 @@ export default function BroadcastOverlay({
       {state.mode === "simulation" && !thumbnail && (
         <span className="broadcast-simulation">SIMULATION</span>
       )}
-      {state.lead && (
-        <div className="broadcast-coverage">
-          {design.style === "scoreboard" ? (
-            <BroadcastScoreboard story={state.lead} />
-          ) : catalogueStyles.some((style) => style.id === design.style) ? (
-            <CatalogueBanner story={state.lead} />
-          ) : (
-            <BroadcastBanner story={state.lead} />
-          )}
-          {state.quote && !thumbnail && (
-            <BroadcastQuote message={state.quote} />
-          )}
-          <BroadcastTicker stories={state.ticker} />
-        </div>
-      )}
+      <div className="broadcast-coverage">
+        {design.style === "scoreboard" ? (
+          <BroadcastScoreboard story={coverage.lead} />
+        ) : catalogueStyles.some((style) => style.id === design.style) ? (
+          <CatalogueBanner story={coverage.lead} />
+        ) : (
+          <BroadcastBanner story={coverage.lead} />
+        )}
+        {coverage.quote && !thumbnail && (
+          <BroadcastQuote message={coverage.quote} />
+        )}
+        <BroadcastTicker stories={coverage.ticker} />
+      </div>
     </div>
   );
 }

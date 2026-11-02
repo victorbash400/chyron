@@ -7,7 +7,19 @@ import { generateText, tool } from "ai";
 import { z } from "zod";
 import { bedrockModel } from "./bedrock.ts";
 import type { ChatMessage, Story } from "../shared/types.ts";
-export function createCoverageSchema(settings: CoverageSettings) {
+export function createCoverageSchema(
+  settings: CoverageSettings,
+  messages?: ChatMessage[],
+) {
+  const quoteIds = messages
+    ?.filter((message) => message.source !== "audio" && settings.includeChat)
+    .map((message) => message.id);
+  const quote =
+    !settings.quotes || quoteIds?.length === 0
+      ? z.null()
+      : quoteIds
+        ? z.enum(quoteIds).nullable()
+        : z.string().nullable();
   return z.object({
     stories: z
       .array(
@@ -30,7 +42,9 @@ export function createCoverageSchema(settings: CoverageSettings) {
             ),
           status: z.enum(["BREAKING", "DEVELOPING", "UPDATE"]),
           messageIds: z.array(z.string()).min(1).max(30),
-          quoteId: settings.quotes ? z.string().nullable() : z.null(),
+          quoteId: quote.describe(
+            "A supplied viewer message ID, also included in messageIds, or null. Never quote audio.",
+          ),
           interest: z.number().min(0).max(1),
         }),
       )
@@ -44,7 +58,7 @@ export async function writeCoverage(
   stories: Story[],
   settings: CoverageSettings = defaultCoverageSettings,
 ): Promise<Coverage> {
-  const schema = createCoverageSchema(settings);
+  const schema = createCoverageSchema(settings, messages);
   const result = await generateText({
     model: await bedrockModel(settings.model),
     maxRetries: 0,

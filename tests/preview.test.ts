@@ -5,6 +5,8 @@ import { previewCoverage } from "../src/state/previewCoverage.ts";
 import { overlayState } from "../server/ranking.ts";
 import type { Story } from "../shared/types.ts";
 import { previewChat } from "../src/state/previewChat.ts";
+import { overlayPresentation } from "../shared/overlayPresentation.ts";
+import { overlayStyleIds } from "../shared/overlayDesign.ts";
 const story: Story = {
   id: "draft",
   headline: "Chat debates the keyboard",
@@ -34,7 +36,7 @@ test("real coverage appears identically in the preview and the OBS feed", () => 
   }
 });
 
-test("an empty newsroom previews the selected design without publishing sample content", () => {
+test("an empty newsroom displays the selected design without creating a story", () => {
   const room = new Newsroom();
   try {
     room.state.design = {
@@ -44,8 +46,8 @@ test("an empty newsroom previews the selected design without publishing sample c
       speed: 50,
     };
     const preview = previewCoverage(room.state);
-    assert.equal(preview.kind, "sample");
-    assert.ok(preview.coverage.lead?.headline);
+    assert.equal(preview.kind, "empty");
+    assert.equal(preview.coverage.lead?.headline, "Live updates");
     assert.deepEqual(preview.coverage.design, room.state.design);
     assert.deepEqual(preview.coverage.ticker, [preview.coverage.lead]);
     assert.equal(preview.coverage.quote, null);
@@ -64,7 +66,7 @@ test("sample previews respect overlay visibility and exclude dismissed stories",
     room.state.visible = false;
     room.state.stories = [{ ...story, dismissed: true }];
     const preview = previewCoverage(room.state);
-    assert.equal(preview.kind, "sample");
+    assert.equal(preview.kind, "empty");
     assert.equal(preview.coverage.visible, false);
     assert.notEqual(preview.coverage.lead?.id, story.id);
     assert.equal(overlayState(room.state).lead, null);
@@ -73,16 +75,16 @@ test("sample previews respect overlay visibility and exclude dismissed stories",
   }
 });
 
-test("broadcast preparation removes all illustrative preview content", () => {
+test("the empty chyron remains in the broadcast composition while fake chat is removed", () => {
   const room = new Newsroom();
   try {
-    assert.equal(previewCoverage(room.state).kind, "sample");
+    assert.equal(previewCoverage(room.state).kind, "empty");
     assert.equal(previewChat(room.state.messages, true).kind, "sample");
     assert.deepEqual(
-      previewCoverage(room.state, false).coverage,
-      overlayState(room.state),
+      previewCoverage(room.state).coverage,
+      overlayPresentation(overlayState(room.state)),
     );
-    assert.equal(previewCoverage(room.state, false).coverage.lead, null);
+    assert.equal(previewCoverage(room.state).coverage.lead.headline, "Live updates");
     assert.deepEqual(previewChat(room.state.messages, false).messages, []);
     assert.deepEqual(room.state.messages, []);
     assert.deepEqual(room.state.stories, []);
@@ -116,13 +118,36 @@ test("real news stays in the video composition while samples are disabled", () =
   try {
     room.state.stories = [story];
     assert.equal(
-      previewCoverage(room.state, false).coverage.lead?.id,
+      previewCoverage(room.state).coverage.lead?.id,
       story.id,
     );
     assert.deepEqual(
-      previewCoverage(room.state, false).coverage,
+      previewCoverage(room.state).coverage,
       overlayState(room.state),
     );
+  } finally {
+    room.dispose();
+  }
+});
+
+test("every style has the same empty presentation in preview and the external overlay", () => {
+  const room = new Newsroom();
+  try {
+    for (const style of overlayStyleIds) {
+      room.state.design.style = style;
+      const external = overlayPresentation(overlayState(room.state));
+      assert.equal(external.lead.headline, "Live updates");
+      assert.equal(external.design.style, style);
+      assert.deepEqual(previewCoverage(room.state).coverage, external);
+      assert.equal(room.state.stories.length, 0);
+    }
+    room.state.visible = false;
+    assert.equal(overlayPresentation(overlayState(room.state)).visible, false);
+    room.state.visible = true;
+    room.state.stories = [story];
+    assert.equal(overlayPresentation(overlayState(room.state)).lead.id, story.id);
+    room.state.stories = [{ ...story, updatedAt: 0 }];
+    assert.equal(overlayPresentation(overlayState(room.state)).lead.headline, "Live updates");
   } finally {
     room.dispose();
   }

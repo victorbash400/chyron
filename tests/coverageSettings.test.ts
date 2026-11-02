@@ -46,6 +46,19 @@ test("summary length, quote selection, and story count are enforced in structure
     true,
   );
 });
+test("quote selection is constrained to supplied chat IDs and disabled for voice-only input", () => {
+  const chat: ChatMessage = { id: "viewer", userId: "viewer", author: "Viewer", text: "A real message", at: Date.now(), source: "chat" };
+  const audio = { ...chat, id: "speech", source: "audio" as const };
+  const schema = createCoverageSchema(defaultCoverageSettings, [chat, audio]);
+  for (const quoteId of ["speech", "invented", ""]) {
+    assert.equal(schema.safeParse({ stories: [{ ...draft, quoteId }] }).success, false);
+  }
+  assert.equal(schema.safeParse({ stories: [{ ...draft, quoteId: "viewer" }] }).success, true);
+  assert.equal(schema.safeParse({ stories: [{ ...draft, quoteId: null }] }).success, true);
+  const voice = createCoverageSchema({ ...defaultCoverageSettings, includeChat: false }, [chat, audio]);
+  assert.equal(voice.safeParse({ stories: [{ ...draft, quoteId: "viewer" }] }).success, false);
+  assert.equal(voice.safeParse({ stories: [{ ...draft, quoteId: null }] }).success, true);
+});
 test("generation receives the selected model, tone, time window and filtered audio context", async () => {
   let selected: CoverageSettings | undefined;
   let ids: string[] = [];

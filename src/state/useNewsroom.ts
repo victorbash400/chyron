@@ -17,11 +17,11 @@ export function useNewsroom() {
     designs.current = new DesignUpdates(
       async (design) => api<DesignReceipt>("/api/settings", { design }),
       setDesignPatch,
-      ({ design, revision }) => {
+      ({ design, revision, visible }) => {
         designRevision.current = revision;
         setBootstrap((previous) =>
           previous && revision >= previous.state.revision
-            ? { ...previous, state: { ...previous.state, design } }
+            ? { ...previous, state: { ...previous.state, design, visible: visible ?? previous.state.visible } }
             : previous,
         );
       },
@@ -142,6 +142,7 @@ export function useNewsroom() {
           state: {
             ...bootstrap.state,
             design: { ...bootstrap.state.design, ...designPatch },
+            visible: designPatch.style ? true : bootstrap.state.visible,
           },
         }
       : null,

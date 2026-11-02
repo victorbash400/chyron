@@ -214,8 +214,22 @@ export class Newsroom extends EventEmitter {
         : undefined;
       if (update.existingId && !existing)
         throw new Error("Model referenced an unknown story. Retry coverage.");
+      const quote = update.quoteId
+        ? this.state.messages.find(
+            (message) =>
+              message.id === update.quoteId &&
+              message.source !== "audio" &&
+              this.state.coverage.includeChat,
+          )
+        : undefined;
+      if (update.quoteId && !quote)
+        throw new Error("Model selected an invalid quote. Retry coverage.");
       const ids = [
-        ...new Set([...(existing?.messageIds ?? []), ...update.messageIds]),
+        ...new Set([
+          ...(existing?.messageIds ?? []),
+          ...update.messageIds,
+          ...(quote ? [quote.id] : []),
+        ]),
       ].slice(-30);
       const evidence = ids.map((id) =>
         this.state.messages.find((m) => m.id === id),
@@ -227,11 +241,6 @@ export class Newsroom extends EventEmitter {
       )
         throw new Error("Model referenced an unknown message. Retry coverage.");
       const messages = evidence.filter((m): m is ChatMessage => Boolean(m));
-      if (
-        update.quoteId &&
-        !messages.some((m) => m.id === update.quoteId && m.source !== "audio")
-      )
-        throw new Error("Model selected an invalid quote. Retry coverage.");
       const participants = new Set(
         messages.filter((m) => m.source !== "audio").map((m) => m.userId),
       ).size;

@@ -132,6 +132,18 @@ test("audio cannot be attributed as a viewer quote", () => {
     r.dispose();
   }
 });
+test("a real selected quote becomes story evidence even when omitted from messageIds", () => {
+  const r = room();
+  try {
+    r.apply({ stories: [{ ...coverage.stories[0], messageIds: ["m1"], quoteId: "m2" }] }, at);
+    assert.equal(r.state.stories.length, 1);
+    assert.deepEqual(r.state.stories[0].messageIds, ["m1", "m2"]);
+    assert.equal(overlayState(r.state, at).quote?.id, "m2");
+    assert.throws(() => r.apply({ stories: [{ ...coverage.stories[0], quoteId: "invented" }] }, at));
+  } finally {
+    r.dispose();
+  }
+});
 test("repetition by one viewer cannot start a new story", () => {
   const r = room();
   try {

@@ -102,7 +102,7 @@ export async function handleRequest(
     let result: unknown = { ok: true };
     if (url.pathname === "/api/settings") {
       const room = await updateSettings(userId, body);
-      result = { ok: true, design: room.state.design, revision: room.revision };
+      result = { ok: true, design: room.state.design, revision: room.revision, visible: room.state.visible };
     } else if (parts.length === 3 && parts[1] === "stories") {
       const { action } = z
         .object({ action: z.enum(["dismiss", "restore"]) })

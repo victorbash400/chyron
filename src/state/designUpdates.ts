@@ -4,6 +4,7 @@ type Patch = Partial<OverlayDesign>;
 export interface DesignReceipt {
   design: OverlayDesign;
   revision: number;
+  visible?: boolean;
 }
 export class DesignUpdates {
   private queued: Patch = {};

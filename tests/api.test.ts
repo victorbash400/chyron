@@ -189,16 +189,22 @@ test("every style can be saved and is returned in the broadcast feed", async () 
   const f = await fixture();
   try {
     for (const style of overlayStyles) {
+      await f.request("/api/settings", { visible: false });
       const response = await f.request("/api/settings", {
         design: { style: style.id, color: style.color },
       });
       assert.equal(response.statusCode, 200);
+      assert.equal(response.json().visible, true);
       const overlay = (
         await f.request(`/api/overlay/${f.room.overlayToken}`)
       ).json();
       assert.equal(overlay.design.style, style.id);
       assert.equal(overlay.design.color, style.color);
+      assert.equal(overlay.visible, true);
     }
+    await f.request("/api/settings", { visible: false });
+    await f.request("/api/settings", { design: { color: "#1767ff" } });
+    assert.equal(f.room.state.visible, false);
     assert.equal(
       (await f.request("/api/settings", { design: { style: "unknown" } }))
         .statusCode,

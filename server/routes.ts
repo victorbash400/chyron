@@ -103,15 +103,22 @@ export async function registerRoutes(
       room.state.model = configuredCoverageModel(room.state.coverage.model);
     }
     if (design) room.state.design = { ...room.state.design, ...design };
+    if (design?.style && patch.visible === undefined) room.state.visible = true;
     if (patch.paused) room.state.sourceId = randomUUID();
     const appliedDesign = { ...room.state.design };
     const appliedRevision = room.state.revision + 1;
+    const appliedVisible = room.state.visible;
     await room.commit();
     if (coverage?.lifetimeSeconds) room.scheduleExpiry();
     if (coverage) room.rescheduleCoverage();
     if (patch.paused) simulator.stop();
     if (patch.paused === false) room.scheduleCoverage();
-    return { ok: true, design: appliedDesign, revision: appliedRevision };
+    return {
+      ok: true,
+      design: appliedDesign,
+      revision: appliedRevision,
+      visible: appliedVisible,
+    };
   });
   app.post<{ Params: { id: string } }>("/api/stories/:id", async (request) => {
     const { action } = z

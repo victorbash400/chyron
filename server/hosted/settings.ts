@@ -43,6 +43,7 @@ export async function updateSettings(userId: string, input: unknown) {
     }
     if (patch.design)
       room.state.design = { ...room.state.design, ...patch.design };
+    if (patch.design?.style) room.state.visible = true;
     if (patch.visible !== undefined) room.state.visible = patch.visible;
     if (patch.paused !== undefined) room.state.paused = patch.paused;
     if (patch.paused) {

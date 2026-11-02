@@ -42,14 +42,13 @@ export default function OverlayPreview({
   const showChat = Boolean(video.stream) || state.mode === "simulation";
   const canvas = useRef<HTMLDivElement>(null);
   const allowSample = broadcast.status === "idle";
-  const preview = previewCoverage(state, allowSample);
+  const preview = previewCoverage(state);
   const chat = previewChat(state.messages, allowSample);
   return (
     <section className="workspace-panel overlay-preview" aria-label="Preview">
       <div className="panel-heading">
         <h2>Preview</h2>
-        {(preview.kind === "sample" ||
-          (showChat && chatVisible && chat.kind === "sample")) && (
+        {showChat && chatVisible && chat.kind === "sample" && (
           <span className="draft-label">Sample</span>
         )}
         <ToolbarGroup label="Preview controls" className="preview-actions">
