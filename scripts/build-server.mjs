@@ -1,3 +1,4 @@
+import { execFileSync } from "node:child_process";
 import { build } from "esbuild";
 import { createRequire } from "node:module";
 import { copyFile } from "node:fs/promises";
@@ -23,3 +24,5 @@ await build({
   },
   alias: { "ffmpeg-static": "./server/hosted/decoder.mjs" },
 });
+
+execFileSync(process.execPath, ["--check", "server/hosted/bundle.mjs"], { stdio: "inherit" });

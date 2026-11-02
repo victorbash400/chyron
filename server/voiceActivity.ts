@@ -1,4 +1,4 @@
-import { createRequire } from "node:module";
+import { createRequire as createModelRequire } from "node:module";
 import { readFile } from "node:fs/promises";
 import { InferenceSession, Tensor } from "onnxruntime-node";
 import { decodedAudio, hasAudibleSignal } from "./audioSignal.ts";
@@ -7,7 +7,7 @@ function detector() {
   session ??= readFile(
     process.env.VERCEL
       ? new URL("./silero_vad.onnx", import.meta.url)
-      : createRequire(import.meta.url).resolve(
+      : createModelRequire(import.meta.url).resolve(
           "@ricky0123/vad-node/dist/silero_vad.onnx",
         ),
   )
