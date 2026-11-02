@@ -26,6 +26,7 @@
 }
 .preview-canvas {
   position: relative;
+  container-type: inline-size;
   isolation: isolate;
   transform-style: flat;
   aspect-ratio: 16/9;
@@ -40,9 +41,19 @@
   border-radius: 10px;
   overflow: hidden;
 }
+.preview-canvas > .broadcast-overlay {
+  z-index: 2;
+}
 .preview-stage .preview-canvas {
   width: min(100cqw, calc(100cqh * 16 / 9));
 }
-@media (max-width: 760px) { .overlay-preview { padding: 0 8px 8px; } }
+@media (max-width: 760px) {
+  .overlay-preview {
+    padding: 0 8px 8px;
+  }
+}
 
-.preview-canvas.has-video { background: #000; border-radius: 0; }
+.preview-canvas.has-video {
+  background: #000;
+  border-radius: 0;
+}

@@ -1,0 +1,20 @@
+.preview-chat-message {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35cqw;
+  flex-shrink: 0;
+  font-size: 1.45cqw;
+  line-height: 1.4;
+  overflow-wrap: anywhere;
+}
+.preview-chat-author {
+  color: color-mix(in srgb, var(--chat-author), white 42%);
+  font-size: 1.2cqw;
+  font-weight: 600;
+}
+.preview-chat-text {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 3;
+  overflow: hidden;
+}

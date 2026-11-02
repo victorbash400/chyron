@@ -1,9 +1,8 @@
 import { useRef, useState } from "react";
-import { overlayState } from "../../server/ranking.ts";
 import { useBrowserBroadcast } from "../broadcast/useBrowserBroadcast.ts";
 import BroadcastButton from "./BroadcastButton.tsx";
 import BroadcastDialog from "./BroadcastDialog.tsx";
-import { Eye, EyeOff, ExternalLink } from "lucide-react";
+import { Eye, EyeOff, ExternalLink, MessageSquareText } from "lucide-react";
 import type { NewsroomState } from "../../shared/types.ts";
 import { previewCoverage } from "../state/previewCoverage.ts";
 import { usePreviewVideo } from "../state/usePreviewVideo.ts";
@@ -13,6 +12,8 @@ import IconLink from "./controls/IconLink.tsx";
 import IconButton from "./controls/IconButton.tsx";
 import PreviewVideo from "./PreviewVideo.tsx";
 import PreviewSourceMenu from "./PreviewSourceMenu.tsx";
+import PreviewChatOverlay from "./PreviewChatOverlay.tsx";
+import { previewChat } from "../state/previewChat.ts";
 import "./OverlayPreview.css";
 export default function OverlayPreview({
   state,
@@ -32,15 +33,17 @@ export default function OverlayPreview({
   const video = usePreviewVideo(onError);
   const broadcast = useBrowserBroadcast(onError, onBroadcastAudio);
   const [broadcastOpen, setBroadcastOpen] = useState(false);
+  const [chatVisible, setChatVisible] = useState(true);
   const canvas = useRef<HTMLDivElement>(null);
-  const preview = video.stream
-    ? { kind: "live", coverage: overlayState(state) }
-    : previewCoverage(state);
+  const allowSample = broadcast.status === "idle";
+  const preview = previewCoverage(state, allowSample);
+  const chat = previewChat(state.messages, allowSample);
   return (
     <section className="workspace-panel overlay-preview" aria-label="Preview">
       <div className="panel-heading">
         <h2>Preview</h2>
-        {preview.kind === "sample" && (
+        {(preview.kind === "sample" ||
+          (video.stream && chatVisible && chat.kind === "sample")) && (
           <span className="draft-label">Sample</span>
         )}
         <ToolbarGroup label="Preview controls" className="preview-actions">
@@ -50,6 +53,16 @@ export default function OverlayPreview({
             onSelect={(source) => void video.start(source)}
             onRemove={video.stop}
           />
+          {video.stream && (
+            <IconButton
+              label={chatVisible ? "Hide chat overlay" : "Show chat overlay"}
+              title={chatVisible ? "Hide chat overlay" : "Show chat overlay"}
+              selected={chatVisible}
+              onClick={() => setChatVisible(!chatVisible)}
+            >
+              <MessageSquareText />
+            </IconButton>
+          )}
           <IconButton
             label={state.visible ? "Hide overlay" : "Show overlay"}
             title={state.visible ? "Hide overlay" : "Show overlay"}
@@ -80,6 +93,9 @@ export default function OverlayPreview({
           ref={canvas}
         >
           {video.stream && <PreviewVideo stream={video.stream} />}
+          {video.stream && chatVisible && (
+            <PreviewChatOverlay messages={chat.messages} />
+          )}
           <BroadcastOverlay state={preview.coverage} />
         </div>
       </div>

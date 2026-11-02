@@ -4,6 +4,7 @@ import { Newsroom } from "../server/newsroom.ts";
 import { previewCoverage } from "../src/state/previewCoverage.ts";
 import { overlayState } from "../server/ranking.ts";
 import type { Story } from "../shared/types.ts";
+import { previewChat } from "../src/state/previewChat.ts";
 const story: Story = {
   id: "draft",
   headline: "Chat debates the keyboard",
@@ -67,6 +68,61 @@ test("sample previews respect overlay visibility and exclude dismissed stories",
     assert.equal(preview.coverage.visible, false);
     assert.notEqual(preview.coverage.lead?.id, story.id);
     assert.equal(overlayState(room.state).lead, null);
+  } finally {
+    room.dispose();
+  }
+});
+
+test("broadcast preparation removes all illustrative preview content", () => {
+  const room = new Newsroom();
+  try {
+    assert.equal(previewCoverage(room.state).kind, "sample");
+    assert.equal(previewChat(room.state.messages, true).kind, "sample");
+    assert.deepEqual(
+      previewCoverage(room.state, false).coverage,
+      overlayState(room.state),
+    );
+    assert.equal(previewCoverage(room.state, false).coverage.lead, null);
+    assert.deepEqual(previewChat(room.state.messages, false).messages, []);
+    assert.deepEqual(room.state.messages, []);
+    assert.deepEqual(room.state.stories, []);
+  } finally {
+    room.dispose();
+  }
+});
+
+test("video chat shows recent viewer messages and excludes speech transcripts", () => {
+  const messages = Array.from({ length: 7 }, (_, index) => ({
+    id: String(index),
+    userId: "viewer",
+    author: "Viewer",
+    text: `Message ${index}`,
+    at: index,
+    source: "chat" as const,
+  }));
+  const input = [
+    ...messages,
+    { ...messages[0]!, id: "audio", source: "audio" as const },
+  ];
+  const result = previewChat(input, true);
+  assert.equal(result.kind, "live");
+  assert.deepEqual(result.messages, messages.slice(-5));
+  assert.deepEqual(previewChat(input, false).messages, result.messages);
+  assert.equal(input.length, 8);
+});
+
+test("real news stays in the video composition while samples are disabled", () => {
+  const room = new Newsroom();
+  try {
+    room.state.stories = [story];
+    assert.equal(
+      previewCoverage(room.state, false).coverage.lead?.id,
+      story.id,
+    );
+    assert.deepEqual(
+      previewCoverage(room.state, false).coverage,
+      overlayState(room.state),
+    );
   } finally {
     room.dispose();
   }

@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+import { flushSync } from "react-dom";
 import type {
   BroadcastStatus,
   BroadcastTicket,
@@ -40,7 +41,7 @@ export function useBrowserBroadcast(
   ) {
     if (status !== "idle") return;
     const current = ++generation.current;
-    setStatus("preparing");
+    flushSync(() => setStatus("preparing"));
     let capture: MediaStream | undefined;
     let sourceEnded: (() => void) | undefined;
     let audio: Awaited<ReturnType<typeof mixAudio>> | undefined;

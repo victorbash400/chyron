@@ -1,0 +1,31 @@
+.preview-chat-overlay {
+  position: absolute;
+  z-index: 1;
+  top: 5%;
+  right: 3%;
+  width: 26%;
+  max-height: 64%;
+  display: flex;
+  flex-direction: column;
+  gap: 1.2cqw;
+  padding: 1.5cqw;
+  border-radius: 1.1cqw;
+  background: #101820d9;
+  color: #fff;
+  overflow: hidden;
+  pointer-events: none;
+  font-family: Geist, sans-serif;
+}
+.preview-chat-heading {
+  font-size: 1.3cqw;
+  font-weight: 500;
+  color: #ffffffad;
+}
+.preview-chat-messages {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  gap: 1.2cqw;
+  min-height: 0;
+  overflow: hidden;
+}
