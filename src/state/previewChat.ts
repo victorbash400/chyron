@@ -1,3 +1,4 @@
+import { chatMessages } from "./chatMessages.ts";
 import type { ChatMessage } from "../../shared/types.ts";
 
 const samples: ChatMessage[] = [
@@ -28,9 +29,7 @@ const samples: ChatMessage[] = [
 ];
 
 export function previewChat(messages: ChatMessage[], allowSample: boolean) {
-  const chat = messages
-    .filter((message) => message.source !== "audio")
-    .slice(-5);
+  const chat = chatMessages(messages).slice(-5);
   return chat.length || !allowSample
     ? { kind: "live" as const, messages: chat }
     : { kind: "sample" as const, messages: samples };

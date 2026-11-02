@@ -42,9 +42,7 @@ export async function receiveAudio(userId: string, request: Request) {
         409,
         "Source changed during transcription. Record again.",
       );
-    if (!result.transcript.trim()) return { transcript: "", status: "silence" };
-    if (result.uncertainties.length)
-      return { transcript: "", status: "uncertain" };
+    if (result.status !== "speech") return result;
     const added = await appendMessage(userId, room, {
       id: randomUUID(),
       userId: "streamer-audio",
@@ -55,7 +53,7 @@ export async function receiveAudio(userId: string, request: Request) {
     });
     if (!added)
       throw new HttpError(409, "Audio source changed. Start capture again.");
-    return { transcript: result.transcript, status: "speech" };
+    return result;
   } finally {
     await changeRoom(userId, (current) => {
       if (current.audioOwner === owner) {

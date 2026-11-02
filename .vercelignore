@@ -20,3 +20,5 @@ dist
 server/hosted/bundle.mjs
 server/hosted/ffmpeg
 .relay-build
+
+server/hosted/silero_vad.onnx

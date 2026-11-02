@@ -240,10 +240,7 @@ export async function registerRoutes(
         room.state.channel?.id !== channel
       )
         throw new Error("Source changed during transcription. Record again.");
-      if (!result.transcript.trim())
-        return { transcript: "", status: "silence" };
-      if (result.uncertainties.length)
-        return { transcript: "", status: "uncertain" };
+      if (result.status !== "speech") return result;
       room.add([
         {
           id: randomUUID(),
@@ -254,7 +251,7 @@ export async function registerRoutes(
           source: "audio",
         },
       ]);
-      return { transcript: result.transcript, status: "speech" };
+      return result;
     } finally {
       transcribing = false;
     }

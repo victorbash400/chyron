@@ -6,7 +6,8 @@
   "functions": {
     "api/index.mjs": {
       "maxDuration": 300,
-      "includeFiles": "server/hosted/ffmpeg"
+      "includeFiles": "server/hosted/{ffmpeg,silero_vad.onnx}",
+      "excludeFiles": "node_modules/**/onnxruntime-node/bin/napi-v6/{darwin,win32,linux/arm64}/**"
     }
   },
   "rewrites": [
