@@ -1,0 +1,31 @@
+.broadcast-style-urgent .catalogue-banner {
+  background: linear-gradient(175deg, #333640, #0b0e14);
+  border-bottom: 0.4cqw solid var(--broadcast-accent);
+  border-radius: 0;
+  clip-path: polygon(2% 0, 100% 0, 98% 100%, 0 100%);
+}
+.broadcast-style-urgent .catalogue-mark {
+  flex-basis: 22%;
+  background: linear-gradient(
+    160deg,
+    #ffffff40,
+    var(--broadcast-accent) 45%,
+    color-mix(in srgb, var(--broadcast-accent), black 30%)
+  );
+  color: var(--broadcast-ink);
+  margin: 0 1cqw 0 0;
+  clip-path: polygon(0 0, 100% 0, 88% 100%, 0 100%);
+  border: 0;
+}
+.broadcast-style-urgent .catalogue-mark svg {
+  display: none;
+}
+.broadcast-style-urgent .catalogue-mark > span {
+  display: block;
+  font-size: 2.6cqw;
+  font-weight: 700;
+  font-style: italic;
+}
+.broadcast-style-urgent .catalogue-eyebrow {
+  color: #fff;
+}

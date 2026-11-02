@@ -1,0 +1,25 @@
+.broadcast-style-glassline .catalogue-banner {
+  background: linear-gradient(175deg, #637e9ae8, #304963ed 45%, #61819be8);
+  border: 0.16cqw solid #fff;
+  border-radius: 1.8cqw;
+  box-shadow:
+    inset 0 0 0 0.4cqw #d4eaff40,
+    0 0.5cqw 1.5cqw #1b4d7940;
+}
+.broadcast-style-glassline .catalogue-banner::after {
+  content: "";
+  position: absolute;
+  left: 15%;
+  right: 15%;
+  bottom: -0.2cqw;
+  height: 0.25cqw;
+  background: var(--broadcast-accent);
+  box-shadow: 0 0 0.8cqw var(--broadcast-accent);
+}
+.broadcast-style-glassline .catalogue-mark {
+  color: #fff;
+  border-color: #fff9;
+}
+.broadcast-style-glassline .catalogue-eyebrow {
+  color: #fff;
+}

@@ -1,42 +1,50 @@
 .broadcast-banner {
   display: flex;
   align-items: stretch;
-  background: #fff;
-  color: #0a0c12;
-  min-height: 5.6cqw;
+  background: linear-gradient(180deg, #fff, #edf0f5);
+  color: #101827;
+  border-radius: 0.3cqw;
+  box-shadow: 0 0.6cqw 1.5cqw -0.6cqw #0005;
+  min-height: 6.4cqw;
   font-family: "Barlow Condensed", "Arial Narrow", Arial, sans-serif;
   font-weight: 800;
   text-transform: uppercase;
-  line-height: 1.05;
+  line-height: 1.15;
 }
 .broadcast-kicker {
   display: flex;
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
-  background: var(--broadcast-accent);
+  background: linear-gradient(
+    145deg,
+    color-mix(in srgb, var(--broadcast-accent), white 14%),
+    var(--broadcast-accent)
+  );
   color: var(--broadcast-ink);
   padding: 0.65cqw 2.2cqw 0.8cqw 1.4cqw;
-  font-size: 3.6cqw;
+  font-size: 2.9cqw;
   font-style: italic;
   clip-path: polygon(7% 0, 100% 0, 88% 100%, 0 100%);
   margin-left: -0.1cqw;
   margin-right: 0.6cqw;
-  min-width: 18%;
+  min-width: 19%;
 }
 .broadcast-headline {
   display: flex;
   align-items: center;
   flex: 1;
   min-width: 0;
-  padding: 0.6cqw 1.7cqw 0.8cqw 0.4cqw;
-  font-size: 3.3cqw;
+  padding: 1cqw 2cqw 1cqw 0.7cqw;
+  font-size: 2.85cqw;
   letter-spacing: -0.025em;
   overflow-wrap: anywhere;
 }
 .broadcast-style-minimal .broadcast-banner {
-  border-radius: 0.5cqw;
-  min-height: 5.1cqw;
+  border-radius: 0.8cqw;
+  min-height: 5.8cqw;
+  background: #fffffff0;
+  box-shadow: 0 0.4cqw 1.2cqw #0002;
 }
 .broadcast-style-minimal .broadcast-kicker {
   clip-path: none;
@@ -51,9 +59,10 @@
   font-size: 3.1cqw;
 }
 .broadcast-style-world .broadcast-banner {
-  background: #041c48;
+  background: linear-gradient(180deg, #103c77, #061a38);
   color: white;
-  border: 0.18cqw solid #2670b9;
+  border: 0.1cqw solid #6394cf;
+  border-bottom: 0.4cqw solid var(--broadcast-accent);
   transform: skewX(-9deg);
 }
 .broadcast-style-world .broadcast-kicker {
@@ -71,9 +80,13 @@
   font-size: 3.15cqw;
 }
 .broadcast-style-neon .broadcast-banner {
-  background: #382061;
+  background:
+    radial-gradient(ellipse at 100% 0, #915ad060, transparent 50%),
+    linear-gradient(145deg, #392154, #171021);
   color: white;
-  border: 0.2cqw solid var(--broadcast-accent);
+  border: 0.1cqw solid color-mix(in srgb, var(--broadcast-accent), white 30%);
+  border-radius: 0.9cqw;
+  overflow: hidden;
 }
 .broadcast-style-neon .broadcast-kicker {
   background: var(--broadcast-accent);

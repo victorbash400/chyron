@@ -1,0 +1,19 @@
+.broadcast-style-glass .catalogue-banner {
+  background: linear-gradient(130deg, #65778fe8, #293e59e0);
+  border: 0.12cqw solid #ffffffb0;
+  border-radius: 1.9cqw;
+  color: white;
+  box-shadow:
+    inset 0 0.15cqw 0 #fff8,
+    0 0.8cqw 1.5cqw #0b18372b;
+}
+.broadcast-style-glass .catalogue-mark {
+  color: white;
+  border-color: #ffffff90;
+}
+.broadcast-style-glass .catalogue-eyebrow {
+  color: #fff;
+}
+.broadcast-style-glass .catalogue-headline {
+  text-shadow: 0 0.1cqw 0.5cqw #1d2b4760;
+}

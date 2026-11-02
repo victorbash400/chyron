@@ -8,20 +8,20 @@
   background: #0b1c35;
   color: #fff;
   border-radius: 0.8cqw 0.8cqw 0 0;
-  border-top: 0.25cqw solid #5784ba;
+  border-top: 0.12cqw solid #7899be;
   line-height: 1;
 }
 .scoreboard-metric {
   display: flex;
   align-items: center;
   gap: 1.1cqw;
-  background: #073b78;
+  background: linear-gradient(180deg, #194d84, #092c53);
   padding: 1cqw 1.3cqw;
-  font-size: 2.1cqw;
+  font-size: 1.6cqw;
   flex-shrink: 0;
 }
 .scoreboard-metric strong {
-  font-size: 4.8cqw;
+  font-size: 4cqw;
   letter-spacing: -0.05em;
 }
 .scoreboard-metric:last-child {
@@ -38,13 +38,4 @@
   text-align: center;
   font-size: 2.5cqw;
   overflow-wrap: anywhere;
-}
-.is-thumbnail .broadcast-scoreboard {
-  min-height: 8.3cqw;
-}
-.is-thumbnail .scoreboard-metric {
-  font-size: 2.6cqw;
-}
-.is-thumbnail .scoreboard-metric strong {
-  font-size: 5.8cqw;
 }

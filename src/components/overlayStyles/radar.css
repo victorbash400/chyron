@@ -1,0 +1,34 @@
+.broadcast-style-radar .catalogue-banner {
+  background:
+    repeating-radial-gradient(
+      ellipse at 10% 50%,
+      transparent 0 2cqw,
+      #76d64916 2cqw 2.1cqw
+    ),
+    linear-gradient(170deg, #143629, #07170f);
+  border: 0.12cqw solid #4d9e5a;
+  border-right: 1cqw solid var(--broadcast-accent);
+  border-radius: 1cqw;
+}
+.broadcast-style-radar .catalogue-mark {
+  margin: 1cqw;
+  flex-basis: 8%;
+  border: 0.15cqw solid var(--broadcast-accent);
+  border-radius: 50%;
+  box-shadow:
+    0 0 0 0.5cqw #76d64915,
+    inset 0 0 1.3cqw #76d64925;
+}
+.broadcast-style-radar .catalogue-eyebrow {
+  color: #d7f4d9;
+}
+.broadcast-style-radar .catalogue-banner::after {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  left: 20%;
+  right: 10%;
+  height: 0.2cqw;
+  background: var(--broadcast-accent);
+  box-shadow: 0 0 0.6cqw var(--broadcast-accent);
+}

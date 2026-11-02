@@ -1,0 +1,22 @@
+.broadcast-style-alert .catalogue-banner {
+  background: #15191f;
+  color: #fff;
+  border-bottom: 0.6cqw solid var(--broadcast-accent);
+  border-radius: 0;
+  clip-path: polygon(2% 0, 100% 0, 98% 100%, 0 100%);
+}
+.broadcast-style-alert .catalogue-mark {
+  flex-basis: 20%;
+  margin: 0;
+  border: 0;
+  background: var(--broadcast-accent);
+  color: var(--broadcast-ink);
+  clip-path: polygon(0 0, 100% 0, 88% 100%, 0 100%);
+}
+.broadcast-style-alert .catalogue-mark svg {
+  width: 4cqw;
+  height: 4cqw;
+}
+.broadcast-style-alert .catalogue-copy {
+  padding-left: 1cqw;
+}

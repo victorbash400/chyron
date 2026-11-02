@@ -1,0 +1,26 @@
+.broadcast-style-editorial-plus .catalogue-banner {
+  background:
+    repeating-linear-gradient(
+      130deg,
+      transparent 0 1cqw,
+      #b1a4950a 1cqw 1.1cqw
+    ),
+    linear-gradient(180deg, #fffdf8, #ece7df);
+  color: #251a1c;
+  border-radius: 0.6cqw;
+  border-right: 1.2cqw solid var(--broadcast-accent);
+  border-bottom: 0.15cqw solid #b9a9a5;
+}
+.broadcast-style-editorial-plus .catalogue-mark {
+  color: #281d21;
+  border-color: #78676970;
+}
+.broadcast-style-editorial-plus .catalogue-eyebrow {
+  color: var(--broadcast-accent);
+}
+.broadcast-style-editorial-plus .catalogue-headline {
+  font:
+    500 2.5cqw/1.25 Georgia,
+    serif;
+  letter-spacing: -0.04em;
+}

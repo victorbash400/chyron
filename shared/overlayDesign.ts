@@ -1,3 +1,4 @@
+import { catalogueStyles } from "./catalogueStyles.ts";
 export const overlayStyles = [
   { id: "bulletin", name: "Bulletin", color: "#ff263d" },
   { id: "minimal", name: "Minimal", color: "#ff263d" },
@@ -15,6 +16,7 @@ export const overlayStyles = [
   { id: "split", name: "Split", color: "#ff263d" },
   { id: "press", name: "Press", color: "#101827" },
   { id: "pulse", name: "Pulse", color: "#7739ff" },
+  ...catalogueStyles,
 ] as const;
 export const overlayColors = [
   "#ff263d",
@@ -25,6 +27,11 @@ export const overlayColors = [
   "#101827",
   "#ffffff",
   "#f46b18",
+  "#00dbea",
+  "#d7ad54",
+  "#b61937",
+  "#76d649",
+  "#b44bff",
 ] as const;
 export interface OverlayDesign {
   style: (typeof overlayStyles)[number]["id"];

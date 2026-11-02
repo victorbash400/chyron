@@ -1,0 +1,25 @@
+.broadcast-style-modern-flow .catalogue-banner {
+  background:
+    radial-gradient(ellipse at 5% 0, var(--broadcast-accent), transparent 40%),
+    linear-gradient(125deg, #221433, #342048);
+  border-radius: 1.6cqw;
+  overflow: hidden;
+}
+.broadcast-style-modern-flow .catalogue-banner::before {
+  content: "";
+  position: absolute;
+  width: 38%;
+  height: 180%;
+  right: -5%;
+  top: -50%;
+  border-radius: 50%;
+  border: 2cqw solid
+    color-mix(in srgb, var(--broadcast-accent), transparent 40%);
+  transform: rotate(-30deg);
+}
+.broadcast-style-modern-flow .catalogue-mark {
+  color: white;
+}
+.broadcast-style-modern-flow .catalogue-eyebrow {
+  color: #e0cdf9;
+}

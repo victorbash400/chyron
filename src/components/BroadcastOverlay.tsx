@@ -1,5 +1,7 @@
 import type { CSSProperties } from "react";
 import type { OverlayState } from "../../shared/types.ts";
+import { catalogueStyles } from "../../shared/catalogueStyles.ts";
+import CatalogueBanner from "./CatalogueBanner.tsx";
 import BroadcastBanner from "./BroadcastBanner.tsx";
 import BroadcastScoreboard from "./BroadcastScoreboard.tsx";
 import BroadcastTicker from "./BroadcastTicker.tsx";
@@ -15,7 +17,13 @@ export default function BroadcastOverlay({
 }) {
   if (!state.visible) return null;
   const { design } = state;
-  const light = design.color === "#ffffff" || design.color === "#ffd20a";
+  const light = [
+    "#ffffff",
+    "#ffd20a",
+    "#d7ad54",
+    "#76d649",
+    "#00dbea",
+  ].includes(design.color);
   const style = {
     "--broadcast-accent": design.color,
     "--broadcast-ink": light ? "#0b1018" : "#ffffff",
@@ -36,6 +44,8 @@ export default function BroadcastOverlay({
         <div className="broadcast-coverage">
           {design.style === "scoreboard" ? (
             <BroadcastScoreboard story={state.lead} />
+          ) : catalogueStyles.some((style) => style.id === design.style) ? (
+            <CatalogueBanner story={state.lead} />
           ) : (
             <BroadcastBanner story={state.lead} />
           )}

@@ -1,0 +1,99 @@
+@import "./overlayStyles/breaking-plus.css";
+@import "./overlayStyles/newsline.css";
+@import "./overlayStyles/alert.css";
+@import "./overlayStyles/frost.css";
+@import "./overlayStyles/modern-flow.css";
+@import "./overlayStyles/broadcast.css";
+@import "./overlayStyles/edge.css";
+@import "./overlayStyles/neon-line.css";
+@import "./overlayStyles/glass.css";
+@import "./overlayStyles/studio-live.css";
+@import "./overlayStyles/editorial-plus.css";
+@import "./overlayStyles/urgent.css";
+@import "./overlayStyles/wave.css";
+@import "./overlayStyles/spotlight.css";
+@import "./overlayStyles/ribbon-fold.css";
+@import "./overlayStyles/glassline.css";
+@import "./overlayStyles/command.css";
+@import "./overlayStyles/radar.css";
+@import "./overlayStyles/prime.css";
+@import "./overlayStyles/night-desk.css";
+.catalogue-banner {
+  position: relative;
+  isolation: isolate;
+  display: flex;
+  align-items: stretch;
+  min-height: 8.4cqw;
+  background: linear-gradient(180deg, #252c39, #0a101a);
+  color: #fff;
+  border-radius: 0.8cqw;
+  box-shadow: 0 0.8cqw 1.8cqw -0.8cqw #07132670;
+  font-family: "Barlow Condensed", "Arial Narrow", sans-serif;
+}
+.catalogue-mark {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 12%;
+  margin: 1.4cqw 0;
+  border-right: 0.1cqw solid #ffffff50;
+  color: var(--broadcast-accent);
+}
+.catalogue-mark svg {
+  width: 3.5cqw;
+  height: 3.5cqw;
+  stroke-width: 1.6;
+}
+.catalogue-mark > span {
+  display: none;
+}
+.catalogue-copy {
+  flex: 1;
+  min-width: 0;
+  padding: 1.2cqw 3cqw 1.35cqw 2.4cqw;
+  z-index: 1;
+}
+.catalogue-eyebrow {
+  display: flex;
+  align-items: center;
+  gap: 1.5cqw;
+  font:
+    600 1.05cqw Geist,
+    sans-serif;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  margin-bottom: 0.65cqw;
+  color: var(--broadcast-accent);
+}
+.catalogue-eyebrow > span {
+  font-size: 0.85cqw;
+  letter-spacing: 0.12em;
+  color: inherit;
+  opacity: 0.7;
+}
+.catalogue-headline {
+  display: block;
+  font-size: 2.75cqw;
+  font-weight: 600;
+  line-height: 1.15;
+  letter-spacing: -0.015em;
+  overflow-wrap: anywhere;
+}
+.broadcast-coverage:has(.catalogue-banner) .broadcast-ticker {
+  margin: 0.7cqw 1.2cqw 0;
+  border-radius: 0.4cqw;
+  background: #0a101adb;
+  height: 2.6cqw;
+  font-size: 1.4cqw;
+}
+.broadcast-coverage:has(.catalogue-banner) .ticker-label {
+  background: transparent;
+  color: #ffffffb0;
+  clip-path: none;
+  font:
+    500 1.05cqw Geist,
+    sans-serif;
+  letter-spacing: 0.1em;
+  padding: 0 1.4cqw;
+}

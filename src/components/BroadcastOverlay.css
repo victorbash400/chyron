@@ -33,27 +33,8 @@
   bottom: 3%;
   transform: none;
 }
-.broadcast-overlay.is-thumbnail .broadcast-kicker {
-  font-size: 4.4cqw;
-}
-.broadcast-overlay.is-thumbnail .broadcast-headline {
-  font-size: 3.8cqw;
-}
-.broadcast-overlay.is-thumbnail .broadcast-banner {
-  min-height: 7.3cqw;
-}
-.broadcast-overlay.is-thumbnail .broadcast-ticker {
-  height: 4.5cqw;
-  font-size: 2.3cqw;
-}
-.broadcast-overlay.is-thumbnail .ticker-label {
-  font-size: 2.6cqw;
-}
 .broadcast-overlay.is-thumbnail .ticker-track {
   animation: none;
-}
-.broadcast-overlay.is-thumbnail .broadcast-style-minimal .broadcast-kicker {
-  font-size: 3.7cqw;
 }
 @keyframes banner-enter {
   from {

@@ -1,0 +1,36 @@
+.broadcast-style-broadcast .catalogue-banner {
+  background:
+    radial-gradient(
+      ellipse at 95% 130%,
+      var(--broadcast-accent),
+      transparent 45%
+    ),
+    linear-gradient(180deg, #153c88, #071a40);
+  border: 0.15cqw solid #ffffff55;
+  border-top-color: var(--broadcast-accent);
+  border-radius: 1.3cqw;
+  overflow: hidden;
+}
+.broadcast-style-broadcast .catalogue-banner::after {
+  content: "";
+  position: absolute;
+  right: -2cqw;
+  top: -5cqw;
+  width: 19cqw;
+  height: 19cqw;
+  border: 0.1cqw solid #72adff60;
+  border-radius: 50%;
+  background: repeating-radial-gradient(
+    ellipse at center,
+    transparent 0 1.7cqw,
+    #8bbcff30 1.75cqw 1.85cqw
+  );
+  opacity: 0.7;
+}
+.broadcast-style-broadcast .catalogue-mark {
+  color: #fff;
+  transform: skewX(-10deg);
+}
+.broadcast-style-broadcast .catalogue-eyebrow {
+  color: #bcd7ff;
+}

@@ -1,0 +1,30 @@
+.broadcast-style-prime .catalogue-banner {
+  background:
+    radial-gradient(ellipse at 30% 0, #542880, transparent 55%),
+    linear-gradient(160deg, #251437, #0d0b21);
+  border: 0.18cqw solid #ce9aff;
+  border-bottom: 0.4cqw solid var(--broadcast-accent);
+  border-radius: 0;
+  clip-path: polygon(2% 0, 100% 0, 98% 100%, 0 100%);
+  box-shadow: inset 0 0 0 0.6cqw #a84aff20;
+}
+.broadcast-style-prime .catalogue-mark {
+  color: #e7caff;
+  border-color: #ce9aff90;
+  transform: skewX(-12deg);
+}
+.broadcast-style-prime .catalogue-mark svg {
+  transform: skewX(12deg);
+}
+.broadcast-style-prime .catalogue-eyebrow {
+  color: #e4c9ff;
+}
+.broadcast-style-prime .catalogue-banner::after {
+  content: "";
+  position: absolute;
+  left: 14%;
+  right: 5%;
+  bottom: 0.4cqw;
+  height: 0.1cqw;
+  background: linear-gradient(90deg, transparent, #fff, transparent);
+}

@@ -1,0 +1,28 @@
+.broadcast-style-night-desk .catalogue-banner {
+  background:
+    radial-gradient(ellipse at 100% 30%, #1d57a680, transparent 45%),
+    linear-gradient(170deg, #10274a, #040c1c);
+  border-bottom: 0.35cqw solid var(--broadcast-accent);
+  border-radius: 1cqw;
+  overflow: hidden;
+}
+.broadcast-style-night-desk .catalogue-banner::before {
+  content: "";
+  position: absolute;
+  right: -2%;
+  top: -4cqw;
+  width: 24cqw;
+  height: 22cqw;
+  border: 0.1cqw solid #6aa6ff70;
+  border-radius: 50%;
+  background: radial-gradient(circle, #7bb7ff70 0.08cqw, transparent 0.12cqw) 0
+    0/0.65cqw 0.65cqw;
+  transform: rotate(-20deg);
+  opacity: 0.4;
+}
+.broadcast-style-night-desk .catalogue-mark {
+  color: #e4f1ff;
+}
+.broadcast-style-night-desk .catalogue-eyebrow {
+  color: #c6dfff;
+}

@@ -1,0 +1,25 @@
+.broadcast-style-neon-line .catalogue-banner {
+  border: 0.2cqw solid var(--broadcast-accent);
+  border-radius: 0.8cqw;
+  background: linear-gradient(165deg, #052f39, #050d17 65%);
+  box-shadow:
+    inset 0 0 1.5cqw
+      color-mix(in srgb, var(--broadcast-accent), transparent 75%),
+    0 0.5cqw 1.5cqw color-mix(in srgb, var(--broadcast-accent), transparent 65%);
+}
+.broadcast-style-neon-line .catalogue-mark {
+  border-color: var(--broadcast-accent);
+}
+.broadcast-style-neon-line .catalogue-mark svg {
+  filter: drop-shadow(0 0 0.5cqw var(--broadcast-accent));
+}
+.broadcast-style-neon-line .catalogue-banner::after {
+  content: "";
+  position: absolute;
+  right: 1cqw;
+  top: 1cqw;
+  bottom: 1cqw;
+  width: 0.25cqw;
+  background: var(--broadcast-accent);
+  transform: skewX(-15deg);
+}

@@ -1,4 +1,5 @@
 import "@fontsource/barlow-condensed/latin-500.css";
+import "@fontsource/barlow-condensed/latin-600.css";
 import "@fontsource/barlow-condensed/latin-800.css";
 import "@fontsource/barlow-condensed/latin-800-italic.css";
 import React, { lazy, Suspense } from "react";

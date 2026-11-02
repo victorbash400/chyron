@@ -1,0 +1,34 @@
+.broadcast-style-breaking-plus .catalogue-banner {
+  background: linear-gradient(180deg, #fff, #f2f3f5);
+  color: #111827;
+  border-bottom: 0.65cqw solid var(--broadcast-accent);
+  border-radius: 0.45cqw;
+}
+.broadcast-style-breaking-plus .catalogue-mark {
+  flex-basis: 23%;
+  margin: 0 1cqw 0 0;
+  border: 0;
+  background: linear-gradient(
+    160deg,
+    color-mix(in srgb, var(--broadcast-accent), white 20%),
+    var(--broadcast-accent)
+  );
+  color: var(--broadcast-ink);
+  clip-path: polygon(5% 0, 100% 0, 89% 100%, 0 100%);
+}
+.broadcast-style-breaking-plus .catalogue-mark svg {
+  display: none;
+}
+.broadcast-style-breaking-plus .catalogue-mark > span {
+  display: block;
+  font-size: 2.8cqw;
+  font-weight: 800;
+  font-style: italic;
+}
+.broadcast-style-breaking-plus .catalogue-eyebrow {
+  color: #737b89;
+}
+.broadcast-style-breaking-plus .catalogue-headline {
+  text-transform: uppercase;
+  font-weight: 750;
+}

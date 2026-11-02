@@ -13,6 +13,11 @@ const labels = [
   "Black",
   "White",
   "Orange",
+  "Cyan",
+  "Gold",
+  "Burgundy",
+  "Lime",
+  "Orchid",
 ];
 export default function ColorPalette({
   value,
@@ -34,8 +39,15 @@ export default function ColorPalette({
           onClick={() => onChange(color)}
           style={{
             background: color,
-            color:
-              color === "#ffffff" || color === "#ffd20a" ? "#181a25" : "#fff",
+            color: [
+              "#ffffff",
+              "#ffd20a",
+              "#00dbea",
+              "#d7ad54",
+              "#76d649",
+            ].includes(color)
+              ? "#181a25"
+              : "#fff",
           }}
         >
           {value === color && <Check />}

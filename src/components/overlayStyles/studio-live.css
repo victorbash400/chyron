@@ -1,0 +1,24 @@
+.broadcast-style-studio-live .catalogue-banner {
+  background: linear-gradient(180deg, #fff, #e9edf3);
+  color: #0b1522;
+  border-radius: 0;
+  border-bottom: 0.5cqw solid var(--broadcast-accent);
+  clip-path: polygon(1% 0, 100% 0, 98% 100%, 0 100%);
+}
+.broadcast-style-studio-live .catalogue-mark {
+  flex-basis: 18%;
+  background: linear-gradient(140deg, #333b48, #080f1b);
+  margin: 0;
+  border-right: 0.5cqw solid var(--broadcast-accent);
+  color: white;
+  transform: skewX(-12deg);
+}
+.broadcast-style-studio-live .catalogue-mark svg {
+  transform: skewX(12deg);
+}
+.broadcast-style-studio-live .catalogue-eyebrow {
+  color: #647185;
+}
+.broadcast-style-studio-live .catalogue-headline {
+  font-weight: 700;
+}

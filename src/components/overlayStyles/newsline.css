@@ -1,0 +1,21 @@
+.broadcast-style-newsline .catalogue-banner {
+  border: 0.1cqw solid #586273;
+  border-bottom: 0.3cqw solid var(--broadcast-accent);
+  background: linear-gradient(175deg, #303b4b, #080e19 70%);
+}
+.broadcast-style-newsline .catalogue-mark {
+  color: white;
+}
+.broadcast-style-newsline .catalogue-eyebrow {
+  color: #a8b5ca;
+}
+.broadcast-style-newsline .catalogue-banner::after {
+  content: "";
+  position: absolute;
+  bottom: -0.2cqw;
+  left: 16%;
+  right: 16%;
+  height: 0.15cqw;
+  background: white;
+  box-shadow: 0 0 1cqw var(--broadcast-accent);
+}

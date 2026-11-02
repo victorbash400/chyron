@@ -1,0 +1,48 @@
+.broadcast-style-ribbon-fold .catalogue-banner {
+  background: linear-gradient(180deg, #fff, #eee9e8);
+  color: #261a22;
+  border-radius: 0.3cqw;
+  border-left: 0.7cqw solid var(--broadcast-accent);
+  border-right: 0.7cqw solid var(--broadcast-accent);
+}
+.broadcast-style-ribbon-fold .catalogue-banner::before {
+  content: "";
+  position: absolute;
+  z-index: 0;
+  left: -0.7cqw;
+  top: -0.7cqw;
+  width: 20%;
+  height: 125%;
+  clip-path: polygon(0 0, 100% 0, 12% 25%, 0 100%);
+  background: linear-gradient(
+    140deg,
+    #390e20,
+    var(--broadcast-accent) 35%,
+    #620c29 70%
+  );
+  transform: skewX(-12deg);
+  border-radius: 1.2cqw 0 1.2cqw 0;
+}
+.broadcast-style-ribbon-fold .catalogue-mark {
+  color: #34242c;
+  border-color: #a6969c;
+}
+.broadcast-style-ribbon-fold .catalogue-eyebrow {
+  color: var(--broadcast-accent);
+}
+.broadcast-style-ribbon-fold .catalogue-headline {
+  font-weight: 550;
+}
+.broadcast-style-ribbon-fold .catalogue-banner::after {
+  content: "";
+  position: absolute;
+  right: -0.7cqw;
+  bottom: -0.7cqw;
+  width: 20%;
+  height: 125%;
+  background: linear-gradient(140deg, var(--broadcast-accent), #390e20);
+  clip-path: polygon(100% 0, 100% 100%, 0 100%, 88% 75%);
+}
+.broadcast-style-ribbon-fold .catalogue-mark {
+  z-index: 1;
+}
