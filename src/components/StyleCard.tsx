@@ -28,7 +28,7 @@ function StyleCard({
       aria-pressed={selected}
       disabled={disabled}
       onClick={() => {
-        if (!selected) onChange({ style: choice.id, color: choice.color });
+        onChange(selected ? { style: choice.id } : { style: choice.id, color: choice.color });
       }}
     >
       <span className={`${styles.preview} style-card-preview`}>
